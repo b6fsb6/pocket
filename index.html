@@ -413,6 +413,14 @@ html.pgopen{overflow:hidden}
 .bd .bt{font-size:13px;color:var(--muted);flex-basis:100%}
 .bd .bc{min-width:32px;text-align:center;padding:3px 6px;border:1px solid var(--accent);border-radius:999px;font:700 13px var(--font-display);color:var(--muted);opacity:.55}
 .bd .bc.on{background:var(--fill);color:var(--accent-ink);opacity:1}
+.bd .pb{display:flex;align-items:center;gap:10px;flex-basis:100%}
+.bd .pb i{flex:1;height:6px;border-radius:999px;background:var(--line);overflow:hidden;font-style:normal}
+.bd .pb i b{display:block;height:100%;background:var(--fill);border-radius:999px}
+.bd .pb small{font:600 12px var(--font-data);color:var(--muted);white-space:nowrap}
+#advWin{font:700 15px var(--font-body);color:var(--accent-ink);background:var(--fill);border-radius:10px;padding:10px 14px;margin:0 0 12px}
+#advWin.pop{animation:winpop .9s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes winpop{0%{transform:scale(.88);opacity:0;box-shadow:0 0 0 0 var(--fill)}50%{opacity:1;box-shadow:0 0 0 10px transparent}100%{transform:none;box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){#advWin.pop{animation:none}}
 .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:320px;margin:8px 0}
 .strip .sd{font-size:11px;color:var(--muted);text-align:center}
 .strip .sc{aspect-ratio:1;border-radius:4px;border:1px solid var(--line,#8884);background:transparent}
@@ -653,7 +661,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
       <h1>Pocket</h1>
       <span class="headbtns"><button class="pill" id="helpBtn" type="button" data-help="help-how">Help</button><button class="pill" id="themeBtn" type="button"></button><span class="pill on" id="micPill" role="status" hidden><i id="micDot"></i><span id="micTxt">Mic on</span></span></span>
     </div>
-    <p class="sub"><span>Go from trailing to nailing the beat</span><small class="ver" id="ver"></small></p>
+    <p class="sub"><span id="tag">Go from trailing to nailing the beat</span><small class="ver" id="ver"></small></p>
   </header>
 
 
@@ -1357,12 +1365,14 @@ RLRR LRLL RLRR LRLL</pre>
     <div id="stPlay"></div>
 
     <section id="advice" hidden aria-label="Score and tempo">
+      <div id="advWin" hidden></div>
       <div class="res" id="advRes">
         <div class="resbig"><span id="advPct"></span><small>on time</small></div>
         <div class="resside"><b id="advStat"></b><span id="advSub"></span></div>
       </div>
       <p class="insight" id="advHead"></p>
       <p class="hint" id="advBody"></p>
+      <p class="hint" id="advNext"></p>
       <div class="btns advmain" id="advBtns1">
         <button class="btn primary" id="advAgain" type="button">Again</button>
         <button class="btn" id="advUse" type="button" hidden></button>
@@ -2100,7 +2110,7 @@ const BADGES=[{id:'ses',name:'Runs',unit:'runs',at:[5,10,25,50,100,250,500]},{id
 /* A book holds hundreds of exercises, so counts of exercises run from 1 up to 1000. */
 const LADDER=[1,5,10,25,50,100,250,500,750,1000];
 LEVELS.forEach(l=>BADGES.push({id:'l'+l.v,lv:l.v,name:l.n,unit:'exercises cleared on '+l.n,at:LADDER}));
-BADGES.push({id:'all',name:'On all four levels',unit:'exercises cleared on all four levels',at:LADDER});
+BADGES.push({id:'all',name:'On every level',unit:'exercises cleared on every level',at:LADDER});
 BADGES.push({id:'dyn',name:'Accents and ghosts',unit:'accent or ghost exercises cleared',one:'accent or ghost exercise cleared',at:LADDER});
 BADGES.push({id:'rtc',name:'Routines cleared',unit:'routines cleared',one:'routine cleared',at:[1,3,5,10,25]});
 BADGES.push({id:'swp',name:'Clean routine runs',unit:'clean routine runs',one:'clean routine run',at:[1,5,10,25,50]});
@@ -2466,7 +2476,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.84.0';                           /* shown beside the title */
+const VERSION='0.85.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3999,6 +4009,7 @@ function showTab(t){
   if(t==='setup')syncData();
   if(t==='library')renderLibraryPage();
   if(t==='pattern'){renderBuilder();syncInfo();}
+  syncTagline();
 }
 const spreadWord=v=>(v<=2?'even':(v<=4?'a little uneven':'uneven'))+' ±'+v.toFixed(1)+' dB';
 const fmtDb=v=>(Math.abs(v)<0.05?'0':(v>0?'+':'\u2212')+Math.abs(v).toFixed(1));
@@ -4246,14 +4257,37 @@ function recordRun(r){
   if(scoreOn)recs.runs.push(run);   /* a practice run is shown but not kept */
   const bv1=badgeValues(recs.runs,recs.sum),won=[];
   BADGES.forEach(b=>b.at.forEach(n=>{if(bv0[b.id]<n&&bv1[b.id]>=n)won.push(n===1&&b.one?'1 '+b.one:(n+' '+b.unit).replace(/^1 exercises/,'1 exercise'));}));
-  const saved=scoreOn?saveRecs():true;
+  if(!scoreOn){const dk=dayKey(run.t);recs.sum.days[dk]=(recs.sum.days[dk]||0)+run.sec;}   /* the time of a practice run still counts toward today and the streak */
+  const saved=saveRecs();
   if(scoreOn)askPersist();
+  syncTagline();
   lastRun={run:run,only:r.only||null,prevBest:prevBest,newTempo:newTempo,won:won,rows:rows,skipped:skipped,saved:saved,discarded:false,practice:!scoreOn};
 }
 /* After a run the score is brought into view. The run layout is still being undone, so the jump repeats once the page has settled. */
 function showResult(){
   const go=()=>{const b=$('advice');if(b.hidden||curTab!=='play')return;const r=b.getBoundingClientRect();if(r.bottom>innerHeight||r.top<0)scrollBy(0,r.top-12);};
   go();requestAnimationFrame(()=>{go();});setTimeout(go,150);setTimeout(go,450);
+}
+/* The badge step you are closest to, as one line. */
+function nextBadge(){
+  const v=badgeValues(recs.runs,recs.sum);let best=null;
+  BADGES.forEach(b=>{
+    const next=b.at.find(n=>v[b.id]<n);if(!next)return;
+    const prev=b.at.filter(n=>v[b.id]>=n).pop()||0,r=(v[b.id]-prev)/(next-prev);
+    if(!best||r>best.r)best={r:r,b:b,next:next};
+  });
+  if(!best)return '';
+  const b=best.b,what=b.lead?b.lead+' '+best.next+(b.suf||''):best.next+' '+(b.one&&best.next===1?b.one:b.unit);
+  return 'Next badge: '+what+' ('+(b.lead?v[b.id]+(b.suf||''):v[b.id]+' of '+best.next)+')';
+}
+/* On Play the header shows the streak and today's practice, so the reward is in sight. */
+const TAGLINE='Go from trailing to nailing the beat';
+function syncTagline(){
+  const el=$('tag');if(!el)return;
+  const days=practiceDays(recs.runs,recs.sum);
+  if(curTab!=='play'||!days.size){el.textContent=TAGLINE;return;}
+  const now=new Date(),n=streakOf(days,now),sec=days.get(dayKey(now.getTime()))||0;
+  el.textContent=(n?n+(n===1?' day':' days')+' in a row':'No streak yet')+' · '+(sec>=STREAK_MIN?'today done':'today '+Math.floor(sec/60)+' of '+STREAK_MIN/60+' min');
 }
 function renderAdvice(){
   const box=$('advice');
@@ -4265,6 +4299,7 @@ function renderAdvice(){
   if(L.discarded){
     $('advRes').hidden=true;$('advHead').textContent='Run discarded.';
     $('advBody').textContent='It is not in your records.';
+    $('advWin').hidden=true;$('advNext').hidden=true;
     use.hidden=true;disc.hidden=true;$('advWeak').hidden=true;return;
   }
   disc.hidden=!!L.practice;
@@ -4293,11 +4328,17 @@ function renderAdvice(){
   else if(adv.cleared)body=(one?'Ready for ':'All '+n+' exercises cleared. Ready for ')+adv.next+' BPM if you like. Any tempo is fine.';
   else if(one)body='Staying at '+S.bpm+' BPM is a good idea until this settles. Any tempo is fine.';
   else body='Work on '+adv.weak.slice().sort((a,b)=>a.pct-b.pct).slice(0,6).map(b=>'exercise '+b.idx+' ('+Math.round(b.pct*100)+'%)').join(', ')+(adv.weak.length>6?' and more':'')+'. Staying at '+S.bpm+' BPM is a good idea until they settle. Any tempo is fine.';
-  if(L.newTempo&&L.newTempo.length)body='★ New best tempo: '+(L.newTempo.length<=2?L.newTempo.map(x=>showKey(x.key)+' cleared at '+x.bpm+' BPM').join(', '):L.newTempo.length+' exercises cleared at a new tempo')+'. '+body;
-  if(L.won&&L.won.length)body='★ Achievement: '+L.won.join(', ')+'. '+body;
+  {   /* what was just earned gets its own moment at the top, once */
+    const wins=[];
+    if(L.won&&L.won.length)wins.push('New badge: '+L.won.join(', '));
+    if(L.newTempo&&L.newTempo.length)wins.push('New best tempo: '+(L.newTempo.length<=2?L.newTempo.map(x=>showKey(x.key)+' at '+x.bpm+' BPM').join(', '):L.newTempo.length+' exercises at a new tempo'));
+    const win=$('advWin');win.hidden=!wins.length;win.textContent=wins.join(' · ');
+    if(wins.length&&!L.celebrated){L.celebrated=true;win.classList.remove('pop');void win.offsetWidth;win.classList.add('pop');}
+    const nb=nextBadge();$('advNext').hidden=!nb;$('advNext').textContent=nb;
+  }
   if(L.skipped)body+=' '+L.skipped+(L.skipped===1?' exercise was':' exercises were')+' stopped before one full pass and not scored.';
   if(!L.saved)body+=' Your browser would not save the records.';
-  if(L.practice)body='Practice run, not saved. '+body;
+  if(L.practice)body='Practice run, not saved. Your time still counts today. '+body;
   $('advHead').textContent=fix;$('advBody').textContent=body;
   use.hidden=!adv.cleared||adv.next===S.bpm;
   L.weakIdx=adv.weak.map(b=>b.idx);
@@ -4402,7 +4443,7 @@ function renderBadges(){
   BGROUPS.forEach(g=>{
     const w=document.createElement('section');w.className='bw panel';w.setAttribute('aria-label',g.name);
     const h=document.createElement('h3');h.textContent=g.name;w.appendChild(h);
-    const d=document.createElement('p');d.className='hint';d.textContent=g.d+(g===BGROUPS[0]?' A filled badge is earned.':'');w.appendChild(d);
+    const d=document.createElement('p');d.className='hint';d.textContent=g.d+(g===BGROUPS[0]?' Each bar shows your way to the next step.':'');w.appendChild(d);
     if(g.grid){
       const tb=document.createElement('table');tb.className='cgrid';
       const hd=document.createElement('tr');['Level','Any tempo','60+','80+','100+','120+'].forEach(x=>{const c=document.createElement('th');c.textContent=x;hd.appendChild(c);});tb.appendChild(hd);
@@ -4417,7 +4458,11 @@ function renderBadges(){
     g.ids.forEach(id=>{
       const b=BADGES.find(x=>x.id===id),row=document.createElement('div');row.className='bd';
       const t=document.createElement('span');t.className='bt';t.textContent=(b.lead||(g.ids.length>1?b.name:'You have'))+' · '+v[id]+(b.suf||'');row.appendChild(t);
-      b.at.forEach(n=>{const c=document.createElement('span');c.className='bc'+(v[id]>=n?' on':'');c.textContent=n;c.title=v[id]>=n?'Earned':'Reach '+n;row.appendChild(c);});
+      const next=b.at.find(n=>v[id]<n),done=b.at.filter(n=>v[id]>=n).length,prev=b.at.filter(n=>v[id]>=n).pop()||0;
+      const pb=document.createElement('div');pb.className='pb';
+      const bar=document.createElement('i'),fill=document.createElement('b');fill.style.width=(next?Math.max(2,Math.round(100*(v[id]-prev)/(next-prev))):100)+'%';bar.appendChild(fill);
+      const cap=document.createElement('small');cap.textContent=next?'next '+next+(done?' · '+done+' earned':''):'all '+done+' earned';
+      pb.append(bar,cap);row.appendChild(pb);
       w.appendChild(row);
     });
     box.appendChild(w);
@@ -6689,7 +6734,7 @@ function wire(){
   });
   $('updLater').addEventListener('click',()=>{updLater=true;showUpd();});
   setTimeout(checkUpdate,2000);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){micTest=false;if(run&&!run.ended)pauseRun();idleMic();}if(!document.hidden){checkUpdate();if(run&&!run.ended)lockScreen();}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){micTest=false;if(run&&!run.ended)pauseRun();idleMic();}if(!document.hidden){syncTagline();checkUpdate();if(run&&!run.ended)lockScreen();}});
   let lastW=0,rzT=0;
   window.addEventListener('resize',()=>{
     drawTrace();

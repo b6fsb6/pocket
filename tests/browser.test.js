@@ -24,7 +24,7 @@ test.before(async () => {
 test.after(async () => { await browser.close(); server.close(); });
 
 /* A fresh browser profile, with settings put in storage before the app starts. */
-async function open(settings, size) {
+async function open(settings, size, init) {
   const ctx = await browser.newContext({ viewport: size || { width: 390, height: 900 } });
   const p = await ctx.newPage();
   p.errors = [];
@@ -32,6 +32,7 @@ async function open(settings, size) {
   await p.addInitScript(s => {
     if (s && !localStorage.getItem('stick-timing-trainer.v1')) localStorage.setItem('stick-timing-trainer.v1', JSON.stringify({ settings: s, cal: null }));
   }, settings);
+  if (init) await p.addInitScript(init);
   await p.goto(base);
   await p.waitForTimeout(300);
   return p;
@@ -186,8 +187,8 @@ test('a stray exercise is deleted from a run, and an unheard one is not scored',
 });
 
 /* One keyboard run with perfect hits. Returns how many runs were saved and the result text. */
-async function runOnce(settings, practice) {
-  const p = await open(Object.assign({ input: 'kb', bpm: 120, routineText: '8 RLRL', eachUnit: 'pass', eachVal: 1, seeded: true }, settings));
+async function runOnce(settings, practice, init) {
+  const p = await open(Object.assign({ input: 'kb', bpm: 120, routineText: '8 RLRL', eachUnit: 'pass', eachVal: 1, seeded: true }, settings), null, init);
   if (practice) await p.evaluate(() => { const s = document.getElementById('score'); s.value = '0'; s.dispatchEvent(new Event('change')); });
   await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
   await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
@@ -204,6 +205,10 @@ async function runOnce(settings, practice) {
     saved: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).runs || []).map(r => r.lv),
     text: document.getElementById('advice').innerText,
     discard: !document.getElementById('advDiscard').hidden,
+    win: document.getElementById('advWin').hidden ? '' : document.getElementById('advWin').textContent,
+    next: document.getElementById('advNext').textContent,
+    tag: document.getElementById('tag').textContent,
+    days: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).sum || {}).days || {},
   }));
   assert.deepEqual(p.errors, []);
   return out;
@@ -220,4 +225,23 @@ test('a practice run shows its result but saves nothing', async () => {
   assert.deepEqual(o.saved, []);
   assert.match(o.text, /Practice run, not saved/);
   assert.ok(!o.discard);
+});
+
+test('a practice run still counts its time, and the header shows it', async () => {
+  const o = await runOnce({ click: 'beat' }, true);
+  assert.equal(Object.keys(o.days).length, 1);
+  assert.match(o.tag, /^No streak yet · today \d+ of 5 min$/);
+});
+
+test('a new badge is announced on the result, with the next one in sight', async () => {
+  const seed = () => {
+    if (localStorage.getItem('seeded-runs')) return;
+    localStorage.setItem('seeded-runs', '1');
+    const run = i => ({ id: 'r' + i, t: Date.now() - 86400000 * (i + 1), mode: 'single', rk: null, lv: 'beat', dy: '', ne: 1, bpm: 60, tol: 20, sec: 60,
+      exercises: [{ k: '8 RLRL', bpm: 60, due: 16, within: 8, heard: 16, avg: 0, sd: 3, miss: 0, i: 1 }] });
+    localStorage.setItem('stick-timing-trainer.records.v2', JSON.stringify({ v: 1, names: {}, nu: 1, lib: [], runs: [0, 1, 2, 3].map(run) }));
+  };
+  const o = await runOnce({ click: 'beat' }, false, seed);
+  assert.match(o.win, /New badge: 5 runs/);
+  assert.match(o.next, /^Next badge: /);
 });
