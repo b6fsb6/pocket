@@ -1,7 +1,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const { loadCore, plain } = require('./helpers');
 const c = loadCore(['parseStrokes', 'parseExerciseLine', 'parseRoutine', 'resolveExercises', 'buildPlan', 'builderApply',
-  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT']);
+  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum']);
 
 const plan = (text, opt) => {
   const p = c.parseRoutine(text);
@@ -119,4 +119,13 @@ test('mastery is measured in strokes a minute, so sixteenths count for more than
   /* rests are not strokes, and a half-note beat counts its own strokes */
   assert.equal(c.strokeRate(key('R_L_ R_L_'), 60), 120);
   assert.equal(c.strokeRate(key('2/2: RLRL RLRL'), 70), 280);
+});
+
+test('Exercises in routines adds up exercise counts, and Longest clean run is the best clean run in minutes', () => {
+  const ex = n => Array.from({ length: n }, (_, i) => ({ k: 'e' + i, i, due: 16, within: 16, heard: 16, bpm: 60 }));
+  const run = (rk, ne, sec, id, bad) => ({ id, t: 1e12 + id, rk, ne, lv: 'strokes', bpm: 60, sec, exercises: ex(ne).map((b, i) => (bad && i === 0 ? Object.assign(b, { within: 4 }) : b)) });
+  const runs = [run('a', 24, 1440, 1), run('b', 2, 120, 2), run('c', 24, 1500, 3, true), run('a', 24, 1380, 4)];
+  const v = c.badgeValues(runs, c.newSum());
+  assert.equal(v.rtc, 26, 'routines a (24) and b (2) are cleared; c is not');
+  assert.equal(v.cln, 24, 'the best clean run is 1440 s; the longer run had a bad exercise');
 });

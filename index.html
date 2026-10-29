@@ -2105,13 +2105,13 @@ function clearedBefore(runs,k,lv,sum,dy){
   return m;
 }
 /* Runs that age out of the detail list are folded into a small permanent summary, so totals, streaks, badges and cleared tempos never shrink. */
-const newSum=()=>({runs:0,sec:0,days:{},pat:{},rt:{},sw:0,pf:0});
+const newSum=()=>({runs:0,sec:0,days:{},pat:{},rt:{},cr:0,pf:0});
 /* A clean routine run: two or more exercises played right through, every one at the target. A perfect exercise: at least 16 strokes, every one on time. */
 const sweepRun=run=>run.lv!=='off'&&run.ne>=2&&run.exercises.length>=run.ne&&run.exercises.every(b=>b.due>0&&b.within/b.due>=TARGET);
 const perfectN=run=>run.lv==='off'?0:run.exercises.filter(b=>b.due>=16&&b.within>=b.due).length;
 function foldRun(sum,run){
   sum.runs++;sum.sec+=run.sec||0;
-  if(sweepRun(run))sum.sw=(sum.sw||0)+1;
+  if(sweepRun(run))sum.cr=Math.max(sum.cr||0,run.sec||0);
   sum.pf=(sum.pf||0)+perfectN(run);
   const dk=dayKey(run.t);sum.days[dk]=(sum.days[dk]||0)+(run.sec||0);
   if(run.lv==='off')return;
@@ -2158,8 +2158,8 @@ const LADDER=[1,5,10,25,50,100,250,500,750,1000];
 LEVELS.forEach(l=>BADGES.push({id:'l'+l.v,lv:l.v,name:l.n,unit:'exercises cleared on '+l.n,at:LADDER}));
 BADGES.push({id:'all',name:'On every level',unit:'exercises cleared on every level',at:LADDER});
 BADGES.push({id:'dyn',name:'Accents and ghosts',unit:'accent or ghost exercises cleared',one:'accent or ghost exercise cleared',at:LADDER});
-BADGES.push({id:'rtc',name:'Routines cleared',unit:'routines cleared',one:'routine cleared',at:[1,3,5,10,25]});
-BADGES.push({id:'swp',name:'Clean routine runs',unit:'clean routine runs',one:'clean routine run',at:[1,5,10,25,50]});
+BADGES.push({id:'rtc',name:'Exercises in routines',unit:'exercises cleared in routines',one:'exercise cleared in a routine',at:LADDER});
+BADGES.push({id:'cln',name:'Longest clean run',lead:'Longest clean run',suf:' min',unit:'min, longest routine run with every exercise cleared',at:[5,10,15,20,30,45,60]});
 BADGES.push({id:'prf',name:'Perfect exercises',unit:'perfect exercises',one:'perfect exercise',at:LADDER});
 BADGES.push({id:'tmp',name:'Fastest clear',lead:'Fastest clear',suf:' BPM',unit:'BPM, fastest exercise cleared',at:[40,60,80,100,120,140,160]});
 /* Each step has a written name and each badge a glyph. The look of a step (its tier) follows how far up its ladder it sits, so every ladder runs from plain wood to diamond. */
@@ -2167,10 +2167,9 @@ const STEPNAMES={ses:['Warmed up','Regular','Locked in','Dedicated','Road-tested
   str:['On a roll','Habit forming','Dialled in','A month of grooves','Two months deep','Hundred days','Half a year','A full year'],
   ladder:['First clear','A handful','Ten down','Quarter hundred','Fifty up','Centurion','Deep cut','Encyclopedia','Almost there','The whole book'],
   prf:['Spotless','Crisp','Tight','Surgical','Metronome','Machine','Clockwork','Pinpoint','Untouchable','Perfect pocket'],
-  rtc:['First routine','Three down','Five down','Ten routines','Setlist master'],
-  swp:['Clean sweep','Smooth five','Smooth ten','Smooth 25','Smooth fifty'],
+  cln:['Warmed through','Ten straight','Quarter hour','Twenty flat','Half hour','Three quarters','Full hour'],
   tmp:['Slow burn','Easy groove','Cruising','Hundred club','Picking up','Fast hands','Speed demon']};
-const GLYPHS={lstrokes:'lv1',lbeat:'lv2',lhalf:'lv3',lbar:'lv4',lnone:'lvM',ses:'drum',str:'cal',all:'lvA',dyn:'acc',rtc:'book',swp:'sweep',prf:'target',tmp:'metro'};
+const GLYPHS={lstrokes:'lv1',lbeat:'lv2',lhalf:'lv3',lbar:'lv4',lnone:'lvM',ses:'drum',str:'cal',all:'lvA',dyn:'acc',rtc:'book',cln:'sweep',prf:'target',tmp:'metro'};
 BADGES.forEach(b=>{b.nm=STEPNAMES[b.id]||STEPNAMES.ladder;b.gl=GLYPHS[b.id]||'tick';});
 /* Mastery of one exercise on one click level, from the fastest tempo it was cleared at, measured in strokes a minute so sixteenths count for more than eighths. Eight steps: cleared at all, then seven rates. */
 const RATE_AT=[120,180,240,320,400,480,600];
@@ -2193,8 +2192,8 @@ const BGROUPS=[{name:'Runs',d:'Runs where at least one exercise was played throu
   {name:'Days in a row',d:'Your longest run of practice days. A day counts at 5 minutes or more. One rest day a week does not break it.',ids:['str']},
   {name:'Exercises cleared',d:'An exercise is cleared on a level when you play it at 90% or more of strokes on time at that click level. Each exercise counts once on each level, whatever the accent rule. Each level is cleared on its own. The table counts exercises by the fastest tempo they were cleared at.',grid:true,ids:['lstrokes','lbeat','lhalf','lbar','lnone','all']},
   {name:'Accents and ghosts',d:'Exercises cleared with an accent or ghost rule: 90% or more of strokes on time and played as written. The same exercise with another rule counts again.',ids:['dyn']},
-  {name:'Routines cleared',d:'A routine is cleared when one run plays it right through with every exercise at 90% or more.',ids:['rtc']},
-  {name:'Clean play',d:'Clean routine runs: two or more exercises played right through, every one at 90% or more. Perfect exercises: an exercise of at least 16 strokes with every stroke on time.',ids:['swp','prf']},
+  {name:'Routines',d:'A routine is cleared when one run plays it right through with every exercise at 90% or more. Each routine counts once, by the number of exercises in it. Longest clean run is the most minutes of one routine run with every exercise at 90% or more.',ids:['rtc','cln']},
+  {name:'Perfect exercises',d:'An exercise of at least 16 strokes with every stroke on time.',ids:['prf']},
   {name:'Tempo',d:'The fastest tempo at which you have cleared any exercise.',ids:['tmp']}];
 /* Cleared exercises per level: each sticking once, at the fastest tempo it was cleared at, whatever the accent rule. */
 function clearedByLevel(st){
@@ -2209,8 +2208,8 @@ function badgeValues(runs,sum){
   LEVELS.forEach(l=>{o['l'+l.v]=by[l.v].size;});
   o.all=[...by[LEVELS[0].v].keys()].filter(k=>LEVELS.every(l=>by[l.v].has(k))).length;
   o.dyn=st.filter(e=>e.dy).length;
-  o.rtc=new Set(routineStats(runs,sum).filter(e=>e.cleared).map(e=>e.rk)).size;
-  o.swp=(sum&&sum.sw||0)+runs.filter(sweepRun).length;
+  {const m=new Map();routineStats(runs,sum).forEach(e=>{if(e.cleared)m.set(e.rk,e.ne||0);});o.rtc=[...m.values()].reduce((a,b)=>a+b,0);}
+  o.cln=Math.floor(Math.max(sum&&sum.cr||0,...runs.filter(sweepRun).map(r=>r.sec||0))/60);
   o.prf=(sum&&sum.pf||0)+runs.reduce((n,r)=>n+perfectN(r),0);
   o.tmp=st.reduce((m,e)=>Math.max(m,e.cleared),0);
   return o;
@@ -2549,7 +2548,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.92.0';                           /* shown beside the title */
+const VERSION='0.93.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2691,7 +2690,7 @@ function unpackRecs(o){
   });
   const q=o.sum;
   if(q&&typeof q==='object'){
-    sum.runs=Math.max(0,num(q.runs));sum.sec=Math.max(0,num(q.sec));sum.sw=Math.max(0,num(q.sw));sum.pf=Math.max(0,num(q.pf));
+    sum.runs=Math.max(0,num(q.runs));sum.sec=Math.max(0,num(q.sec));sum.cr=Math.max(0,num(q.cr));sum.pf=Math.max(0,num(q.pf));
     Object.keys(q.days||{}).forEach(k=>{if(/^\d{4}-\d\d-\d\d$/.test(k))sum.days[k]=Math.max(0,num(q.days[k]));});
     (q.pat||[]).forEach(e=>{
       const k=items[e&&e.k];if(typeof k!=='string'||!Array.isArray(e.tr)||!e.tr.length||!LEVELS.some(l=>l.v===e.lv))return;
@@ -2714,7 +2713,7 @@ function packRecs(sel){   /* sel says which parts to include; none given means t
     return o;
   });
   const q=recs.sum,out={v:2};
-  if(sel.hist)out.sum={runs:q.runs,sec:q.sec,sw:q.sw||0,pf:q.pf||0,days:q.days,rt:q.rt,pat:Object.keys(q.pat).map(k=>Object.assign({},q.pat[k],{k:hk(q.pat[k].k)}))};
+  if(sel.hist)out.sum={runs:q.runs,sec:q.sec,cr:q.cr||0,pf:q.pf||0,days:q.days,rt:q.rt,pat:Object.keys(q.pat).map(k=>Object.assign({},q.pat[k],{k:hk(q.pat[k].k)}))};
   if(sel.lib)out.lib=recs.lib.map(e=>({id:e.id,x:hk(e.x),t:e.t}));
   if(sel.lists)out.lists=S.lists.map(l=>({url:l.url,name:l.name||undefined}));
   if(sel.set){out.settings={};PORTABLE.forEach(k=>{out.settings[k]=S[k];});}
@@ -4574,7 +4573,7 @@ function renderBadges(){
       const t=document.createElement('span');t.className='bt';t.textContent=g.ids.length>1?b.name:g.name;tx.appendChild(t);
       const c=document.createElement('p');c.className='bc2';c.textContent=(done?b.nm[done-1]+' \u00b7 ':'')+fmtBadge(b,v[id]);tx.appendChild(c);
       const bar=document.createElement('div');bar.className='bbar';const f=document.createElement('i');f.style.width=(next?100*(v[id]-prev)/(next-prev):100)+'%';bar.appendChild(f);tx.appendChild(bar);
-      const g2=document.createElement('p');g2.className='bgo';g2.textContent=next?(b.lead?(next-v[id])+' BPM':String(next-v[id]))+' to go for '+b.nm[done]+'':'Every step earned';tx.appendChild(g2);
+      const g2=document.createElement('p');g2.className='bgo';g2.textContent=next?(b.lead?(next-v[id])+b.suf:String(next-v[id]))+' to go for '+b.nm[done]+'':'Every step earned';tx.appendChild(g2);
       row.appendChild(tx);w.appendChild(row);
     });
     box.appendChild(w);
