@@ -2192,7 +2192,7 @@ const BGROUPS=[{name:'Runs',d:'Runs where at least one exercise was played throu
   {name:'Days in a row',d:'Your longest run of practice days. A day counts at 5 minutes or more. One rest day a week does not break it.',ids:['str']},
   {name:'Exercises cleared',d:'An exercise is cleared on a level when you play it at 90% or more of strokes on time at that click level. Each exercise counts once on each level, whatever the accent rule. Each level is cleared on its own. The table counts exercises by the fastest tempo they were cleared at.',grid:true,ids:['lstrokes','lbeat','lhalf','lbar','lnone','all']},
   {name:'Accents and ghosts',d:'Exercises cleared with an accent or ghost rule: 90% or more of strokes on time and played as written. The same exercise with another rule counts again.',ids:['dyn']},
-  {name:'Routines cleared',d:'To clear a routine, play it from start to finish with every exercise at 90% or greater. A cleared routine adds its number of exercises, once. For example, a 24-exercise routine adds 24, but only the first time.',ids:['rtc']},
+  {name:'Routines cleared',d:'To clear a routine, play it from start to finish with every exercise at 90% or greater. A cleared routine adds its number of exercises, once. For example, a 24-exercise routine adds 24, but will only count towards this badge once.',ids:['rtc']},
   {name:'Longest clean run',d:'The most minutes of one routine, played start to finish, with every exercise at 90% or more.',ids:['cln']},
   {name:'Perfect exercises',d:'An exercise of at least 16 strokes with every stroke on time.',ids:['prf']},
   {name:'Tempo',d:'The fastest tempo at which you have cleared any exercise.',ids:['tmp']}];
@@ -2549,7 +2549,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.93.2';                           /* shown beside the title */
+const VERSION='0.93.3';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
