@@ -139,15 +139,17 @@ test('editor: Discard puts a saved routine back', async () => {
   assert.equal(await p.textContent('#edState'), 'Saved');
 });
 
-test('destructive buttons ask twice', async () => {
+test('Clear asks what to wipe, starts with nothing ticked, and asks twice', async () => {
   const p = await open({ seeded: true });
   await p.click('#tabSettings').catch(() => {});
-  const label = await p.evaluate(() => {
-    const b = document.getElementById('recClear');
-    b.click();
-    return b.textContent + '|' + b.classList.contains('arm');
-  });
-  assert.equal(label, 'Clear all?|true');
+  await p.evaluate(() => document.getElementById('recClear').click());
+  const r = await p.evaluate(() => ({ parts: [...document.querySelectorAll('#exOpts input')].map(c => c.dataset.k + ':' + c.checked), off: document.getElementById('exGo').disabled, redo: !!document.getElementById('redoSetup') }));
+  assert.deepEqual(r.parts, ['hist:false', 'lib:false', 'lists:false', 'set:false', 'dev:false']);
+  assert.equal(r.off, true);
+  assert.equal(r.redo, false);
+  await p.evaluate(() => document.querySelector('#exOpts input[data-k=dev]').click());
+  const label = await p.evaluate(() => { const b = document.getElementById('exGo'); b.click(); return b.textContent + '|' + b.classList.contains('arm'); });
+  assert.equal(label, 'Clear?|true');
 });
 
 test('a stray exercise is deleted from a run, and an unheard one is not scored', async () => {

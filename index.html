@@ -702,7 +702,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
 .rmenu{position:fixed;z-index:60;min-width:150px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.35);display:grid}
 .rmenu button{border:0;background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;padding:12px 14px;border-radius:7px;cursor:pointer;min-height:44px}
 .rmenu button:hover,.rmenu button:focus-visible{background:var(--bg)}
-.rmenu button.danger{color:var(--late)}
+.rmenu button.danger,.btn.danger{color:var(--late)}
 .rmenu button.arm{background:var(--late);color:#fff}
 @media (max-width:359px){.glib .hrow>summary{padding-right:128px}.glib .hrow .ib{min-width:30px}}
 .tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px;margin-top:12px}.tc{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted)}.tc .medal{width:64px;height:64px}
@@ -789,7 +789,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
         <input type="range" id="settle" min="20" max="120" step="5">
         <p class="hint">How long the app ignores the pad after a hit. Raise it if one stroke counts twice.</p>
       </div>
-      <div class="btns"><button class="btn small" id="testMic" type="button">Test microphone</button><button class="btn small" id="micCheck" type="button">Mic check</button><button class="btn small" id="redoSetup" type="button">Redo setup</button><span class="heard" id="heard" aria-live="off"></span></div>
+      <div class="btns"><button class="btn small" id="testMic" type="button">Test microphone</button><button class="btn small" id="micCheck" type="button">Mic check</button><span class="heard" id="heard" aria-live="off"></span></div>
       <p class="err" id="micMsg" role="alert"></p>
       <p class="chkmsg" id="chkMsg" aria-live="polite"></p>
       <ul class="chkout" id="chkOut"></ul>
@@ -832,7 +832,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
       <div class="btns">
         <button class="btn small" id="recExport" type="button">Export</button>
         <button class="btn small" id="recImport" type="button">Import</button>
-        <button class="btn small" id="recClear" type="button">Clear all</button>
+        <button class="btn small" id="recClear" type="button">Clear…</button>
         <input type="file" id="recFile" accept=".json,application/json" hidden>
       </div>
       <p class="hint" id="recMsg"></p>
@@ -2549,7 +2549,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.91.0';                           /* shown beside the title */
+const VERSION='0.92.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -5338,7 +5338,7 @@ let exMode='recs';
 function openExport(){exMode='recs';tickDialog('Export','Export',EXP_PARTS,k=>!!S.expSel[k]);}
 /* One dialog of ticks for both Export and Import. */
 function tickDialog(title,go,parts,on){
-  $('exTitle').textContent=title;$('exGo').textContent=go;
+  $('exTitle').textContent=title;$('exGo').textContent=go;$('exGo').classList.remove('arm');$('exGo').classList.toggle('danger',exMode==='clr');
   const box=$('exOpts');box.textContent='';
   parts.forEach(([k,name,det])=>{
     const l=document.createElement('label');l.className='xrow';
@@ -5409,10 +5409,16 @@ function importSelected(){
   if(add)bits.push(pl(add,'new run'));if(addL)bits.push(pl(addL,'routine'));if(addS)bits.push(pl(addS,'library'));
   say(bits.length?'Imported '+bits.join(' and ')+(dup?' ('+dup+' already here)':'')+'.':'Nothing new in what you ticked.');
 }
-function clearRecs(){
-  /* Everything you made: runs and scores, saved routines and their names, linked libraries and the scratch pad. Device settings and calibration stay. The page reloads so every screen starts clean. */
-  recs.runs.length=0;recs.sum=newSum();recs.names={};recs.nu=1;recs.lib=[];
-  S.lists=hostedLists();S.listSel='';S.libId='';S.routineText=STARTER;S.startExercise=1;S.lastExport=0;S.expRuns=0;S.seeded=false;   /* back to a first start: the hosted libraries, added to the Library again */
+/* The Clear dialog: tick what to wipe. Nothing is ticked to start with, and Clear asks twice. */
+const CLR_PARTS=[EXP_PARTS[0],EXP_PARTS[1],EXP_PARTS[2],EXP_PARTS[3],['dev','Device setup',()=>'microphone level, latency, calibration']];
+function openClear(){exMode='clr';tickDialog('Clear','Clear',CLR_PARTS,()=>false);}
+function clearSelected(){
+  const sel={};$('exOpts').querySelectorAll('input').forEach(c=>{sel[c.dataset.k]=c.checked;});
+  if(sel.hist){recs.runs.length=0;recs.sum=newSum();recs.names={};recs.nu=1;S.lastExport=0;S.expRuns=0;}
+  if(sel.lib){recs.lib=[];S.libId='';S.routineText=STARTER;S.startExercise=1;S.seeded=false;}   /* back to a first start: the routines that ship with the app are added again */
+  if(sel.lists){S.lists=hostedLists();S.listSel='';}
+  if(sel.set)PORTABLE.forEach(k=>{delete S[k];});   /* the page reloads, and every one falls back to its starting value */
+  if(sel.dev){micOff(true);S.noise=null;S.latCal=false;S.latency=null;delete S.sens;delete S.settle;delete S.input;cal.L.length=0;cal.R.length=0;}   /* shows the Set up card again */
   save();saveRecs();location.reload();
 }
 
@@ -6812,12 +6818,20 @@ function wire(){
   $('hfSaved').addEventListener('click',()=>{histFilter='saved';histShown=20;histDays=7;renderHistory();});
   $('recExport').addEventListener('click',openExport);
   $('bakGo').addEventListener('click',openExport);
-  $('exGo').addEventListener('click',()=>{if(exMode==='lib')doLibExport();else if(exMode==='imp')importSelected();else exportRecs();});
+  let clrT=0;
+  $('exGo').addEventListener('click',()=>{
+    if(exMode==='clr'){
+      const g=$('exGo');
+      if(!clrT){g.textContent='Clear?';g.classList.add('arm');clrT=setTimeout(()=>{clrT=0;g.textContent='Clear';g.classList.remove('arm');},4000);return;}
+      clearTimeout(clrT);clrT=0;clearSelected();return;
+    }
+    if(exMode==='lib')doLibExport();else if(exMode==='imp')importSelected();else exportRecs();
+  });
   $('exCancel').addEventListener('click',()=>{$('expModal').hidden=true;});
   $('expModal').addEventListener('click',e=>{if(e.target===$('expModal'))$('expModal').hidden=true;});
   $('recImport').addEventListener('click',()=>$('recFile').click());
   $('recFile').addEventListener('change',async e=>{await importRecs(e.target.files&&e.target.files[0]);e.target.value='';});
-  arm($('recClear'),clearRecs);
+  $('recClear').addEventListener('click',openClear);
   $('rows').addEventListener('keydown',e=>{
     if(labelMode!=='preview'||S.mode!=='routine')return;
     if(e.key==='ArrowDown'){e.preventDefault();goExercise(S.startExercise+1,true);}
@@ -6833,7 +6847,6 @@ function wire(){
   $('latency').addEventListener('change',e=>{const v=e.target.value;S.latency=v===''?null:clamp(Math.round(+v)||0,0,400);if(v!=='')S.latCal=true;save();syncInfo();});
   $('themeBtn').addEventListener('click',()=>{S.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';applyTheme();save();});
   $('testMic').addEventListener('click',toggleMic);
-  $('redoSetup').addEventListener('click',()=>{micOff(true);S.noise=null;S.latCal=false;save();location.reload();});   /* shows the Set up card again */
   $('calL').addEventListener('click',()=>startCal('L'));
   $('calR').addEventListener('click',()=>startCal('R'));
   $('calReset').addEventListener('click',()=>{cal={L:[],R:[]};rebuildModel();save();$('calTestOut').textContent='';updateCalUI();});
