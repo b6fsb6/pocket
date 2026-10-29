@@ -1,7 +1,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const { loadCore, plain } = require('./helpers');
 const c = loadCore(['parseStrokes', 'parseExerciseLine', 'parseRoutine', 'resolveExercises', 'buildPlan', 'builderApply',
-  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runPoints', 'runScore', 'highScores']);
+  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runPoints', 'runScore', 'highScores', 'unpackStrokes']);
 
 const plan = (text, opt) => {
   const p = c.parseRoutine(text);
@@ -138,4 +138,12 @@ test('scoring: the worked examples, the streak cap, the floor at zero and a stre
   const sum = c.newSum(); sum.hs.half = 99999;
   assert.equal(c.highScores([run('half', 'oo')], sum).half, 99999, 'an older folded best still stands');
   assert.equal(c.badgeValues([run('half', 'oooo')], c.newSum()).hhalf, c.runPoints('oooo', 'half'));
+});
+
+test('a run saved without score codes is scored from its stroke data', () => {
+  // four strokes: on time, on time, off time, missed (result letters o o b m, no timing or level)
+  const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_', SPR = 'obmsl';
+  const sp = [...'oobm'].map(r => B64[SPR.indexOf(r)] + B64[63] + B64[63] + B64[63]).join('');
+  const run = { id: 'x', t: 1, lv: 'half', bpm: 60, exercises: [{ k: 'e', due: 4, within: 2, sp }] };
+  assert.equal(c.runScore(run), c.runPoints('oobm', 'half'));
 });

@@ -2124,6 +2124,16 @@ function runPoints(codes,lv){
   }
   return Math.round(tally);
 }
+/* A saved stroke is four characters: the result (on time, off time, missed, accent too soft, ghost too loud) with the accent or ghost class and a wrong-stick flag, the timing in whole milliseconds, and the level in dB below full scale. packStrokes writes them. */
+const B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',SPR='obmsl',SPD='nAg';
+function unpackStrokes(sp){
+  const out=[];
+  for(let i=0;i+3<sp.length;i+=4){
+    const c=B64.indexOf(sp[i]),v=(B64.indexOf(sp[i+1])<<6)|B64.indexOf(sp[i+2]),b=B64.indexOf(sp[i+3]);
+    out.push({r:SPR[c%5],dy:SPD[Math.floor(c/5)%3],w:c>=15,ms:v===4095?null:v-2047,db:b===63?null:-b});
+  }
+  return out;
+}
 const exCodes=b=>typeof b.q==='string'?b.q:(typeof b.sp==='string'?unpackStrokes(b.sp).map(x=>x.r==='s'||x.r==='l'?'b':x.r).join(''):'');
 const runScore=run=>runPoints(run.exercises.map(exCodes).join(''),run.lv);
 function highScores(runs,sum){const o=Object.assign({},sum&&sum.hs);runs.forEach(r=>{const v=runScore(r);if(v>(o[r.lv]||0))o[r.lv]=v;});return o;}
@@ -2570,7 +2580,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.94.1';                           /* shown beside the title */
+const VERSION='0.94.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2644,7 +2654,6 @@ function hashOf(t){
 }
 /* One stroke of a saved run is four characters. The first holds the result (on time, off time, missed, accent too soft, ghost too loud),
    the accent or ghost class and a wrong-stick flag, the next two the timing in whole milliseconds, the last the level in dB below full scale. */
-const B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',SPR='obmsl',SPD='nAg';
 function packStrokes(x){
   let o='';
   for(let i=0;i<x.sc.length;i++){
@@ -2653,14 +2662,6 @@ function packStrokes(x){
     o+=B64[r+5*(d+3*w)]+B64[v>>6]+B64[v&63]+B64[b===null||b===undefined?63:Math.max(0,Math.min(62,Math.round(-b)))];
   }
   return o;
-}
-function unpackStrokes(sp){
-  const out=[];
-  for(let i=0;i+3<sp.length;i+=4){
-    const c=B64.indexOf(sp[i]),v=(B64.indexOf(sp[i+1])<<6)|B64.indexOf(sp[i+2]),b=B64.indexOf(sp[i+3]);
-    out.push({r:SPR[c%5],dy:SPD[Math.floor(c/5)%3],w:c>=15,ms:v===4095?null:v-2047,db:b===63?null:-b});
-  }
-  return out;
 }
 const SPMAX=4*40000;
 function cleanRun(x){
