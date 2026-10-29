@@ -733,7 +733,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
       <p class="err" id="micMsg" role="alert"></p>
       <p class="chkmsg" id="chkMsg" aria-live="polite"></p>
       <ul class="chkout" id="chkOut"></ul>
-      <p class="hint">Mic check listens to the room, then to ten strokes, and sets the trigger line and settle time for you.</p>
+      <p class="hint">Mic check listens to the room, then to twelve strokes, and sets the trigger line and settle time for you.</p>
     </section>
 
     <section class="panel mic-only" aria-label="Stick calibration">
@@ -1214,7 +1214,7 @@ RLRR LRLL RLRR LRLL</pre>
     <section class="panel" id="help-setup">
       <h3>Settings details</h3>
       <ul>
-        <li><b>Mic check:</b> under Device, press it, stay quiet for two seconds, then hit the pad ten times. Echo cancellation and noise suppression are switched off for this page so stick attacks stay sharp. It sets the trigger line and settle time, and says if the signal is too quiet, clipping, uneven or double triggering.</li>
+        <li><b>Mic check:</b> under Device, press it, stay quiet for two seconds, then hit the pad twelve times. Echo cancellation and noise suppression are switched off for this page so stick attacks stay sharp. It sets the trigger line and settle time, and says if the signal is too quiet, clipping, uneven or double triggering.</li>
         <li><b>Trigger line:</b> raise it if room noise counts as hits, lower it if soft strokes are missed.</li>
         <li><b>Settle time:</b> how long the app ignores the pad after a hit. Raise it if one stroke counts twice. Fast playing lowers it automatically so real strokes are not skipped.</li>
         <li><b>Stick calibration:</b> hit the same spot with one stick only, at normal strength, until the count finishes. Do both sticks.</li>
@@ -2464,7 +2464,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.81.1';                           /* shown beside the title */
+const VERSION='0.81.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2827,7 +2827,7 @@ function syncMicBtn(){
 }
 /* ---------- mic check ---------- */
 let chk=null;
-const CHK_STROKES=10;
+const CHK_STROKES=12;
 /* Left vs right test */
 const TEST_N=20;
 let calTest=null;
@@ -5935,7 +5935,7 @@ function syncSetup(){
   setupWas=true;clearTimeout(setupTimer);setupTimer=0;box.hidden=false;
   const steps=[
     {done:S.micOk,ok:'Microphone allowed',label:'Allow the microphone.',go:async()=>{if(await ensureAudio(true))idleMic();},btn:'Allow microphone',msg:()=>$('micMsg').textContent},
-    {done:S.noise!==null,ok:'Mic check done',label:'Mic check: stay quiet for two seconds, then hit the pad ten times.',go:toggleCheck,btn:chk?'Cancel check':'Mic check',msg:()=>$('chkMsg').textContent},
+    {done:S.noise!==null,ok:'Mic check done',label:'Mic check: stay quiet for two seconds, then hit the pad twelve times.',go:toggleCheck,btn:chk?'Cancel check':'Mic check',msg:()=>$('chkMsg').textContent},
     {done:S.latCal,ok:'Latency set',label:'Calibrate latency. It plays clicks for about 20 seconds, so keep quiet.',go:startLoop,btn:loop?'Cancel':'Auto calibrate',skip:loop?null:()=>{loop&&endLoop('');markCal();setStatus('Latency calibration skipped. Set it by hand in Settings, under Device, if clicks and hits seem off.');},msg:()=>$('latMsg').textContent}
   ];
   const list=$('setSteps');list.textContent='';
