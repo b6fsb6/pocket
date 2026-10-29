@@ -283,7 +283,7 @@ body[data-run="1"][data-rm="play"] header,body[data-run="1"][data-rm="play"] .ta
 .page{display:grid;gap:22px}
 .page>*{min-width:0}
 body:not([data-state="done"]) #after,body:not([data-state="done"]) #advice{display:none}
-/* After a run the page stays in focus mode: the result card first, with Again, Next tempo and Done. */
+/* After a run the page stays in focus mode: the result card first, with Again and Done. */
 body[data-tab=pattern] header,body[data-tab=pattern] .tabs{display:none}   /* the editor is a full-screen view */
 .etop{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:8px 0;background:var(--bg)}
 .etitle{flex:1;min-width:0;display:grid;line-height:1.2}
@@ -705,9 +705,6 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
         <div class="field"><label for="pulse">Visual pulse</label>
           <select id="pulse"><option value="on">On</option><option value="off">Off</option></select></div>
       </div>
-      <div class="field"><label for="step">Speed-up step</label>
-        <select id="step"><option value="2">2 BPM</option><option value="4">4 BPM</option><option value="5">5 BPM</option><option value="8">8 BPM</option></select>
-        <p class="hint">How far the Next tempo button after a cleared run goes up. Scores never suggest a tempo.</p></div>
       <div class="field"><label for="vol">Click volume <output id="volOut"></output></label><input type="range" id="vol" min="0" max="100" step="1"></div>
       <p class="hint mic-only">Use headphones for the click. A click from the speakers is picked up by the microphone and counted as a stroke.</p>
     </section>
@@ -1019,7 +1016,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
       <ol>
         <li><b>Settings:</b> pick a tempo, use headphones for the click, tap Test microphone and hit the pad. The level bar should cross the trigger line on every stroke. Calibrating each stick is optional, but lets the app tell L from R.</li>
         <li><b>Library:</b> press <b>New</b> to write a routine or <b>Import</b> to bring one in. One exercise plays on its own. Two or more make a routine, played in order.</li>
-        <li><b>Play:</b> set the tempo, click level and how long each exercise plays, then press Start. After the count-in, play on the moving line and press Stop when you are done. Your result appears first, with <b>Again</b>, <b>Next tempo</b> (when you cleared the target) and <b>Done</b>. The staff keeps its colours and numbers so you can see which strokes were off. Done brings the controls back.</li>
+        <li><b>Play:</b> set the tempo, click level and how long each exercise plays, then press Start. After the count-in, play on the moving line and press Stop when you are done. Your result appears first, with <b>Again</b> and <b>Done</b>. The staff keeps its colours and numbers so you can see which strokes were off. Done brings the controls back.</li>
       </ol>
       <p>No microphone? Under Settings &rsaquo; Device, set Input to "Keyboard or pads" and press <b>F</b> for left, <b>J</b> for right. This is a test mode, and its timing is rougher than a pad with a microphone.</p>
       <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
@@ -1218,7 +1215,7 @@ RLRR LRLL RLRR LRLL</pre>
       <ul>
         <li><b>On time</b> is the share of due strokes inside your on-time window. With an accent or ghost rule a stroke must also be played as written: an accent clearly louder and a ghost clearly softer than its neighbours. An exercise needs at least one full pass to be scored.</li>
         <li><b>Exercise table:</b> after a routine run, each exercise gets its accuracy, average error and spread, plus your earlier best at that tempo.</li>
-        <li><b>The target is 90%.</b> An exercise is "cleared" at a tempo when it reaches 90% there. After a run the app suggests +4 BPM if every exercise cleared. Otherwise it names the weak ones and suggests staying put. Any tempo is always allowed.</li>
+        <li><b>The target is 90%.</b> An exercise is "cleared" at a tempo when it reaches 90% there. After a run the app names the weak exercises and suggests staying at that tempo until they settle. Any tempo is always allowed.</li>
         <li><b>Discard this run</b> removes it from your records, for example after a bad microphone read.</li>
         <li><b>Progress page:</b> every exercise, weakest first, with accuracy at your last tempo, trend and lead/drag bias, grouped by click level. Play loads that exercise. A routine is cleared at a tempo when one run covered every exercise and all reached 90%.</li>
         <li><b>Practise weak exercises:</b> after a routine run, this plays only the exercises below target. Restart repeats the same ones. A partial run never counts as clearing the routine.</li>
@@ -1387,7 +1384,6 @@ RLRR LRLL RLRR LRLL</pre>
       <p class="hint" id="advNext"></p>
       <div class="btns advmain" id="advBtns1">
         <button class="btn primary" id="advAgain" type="button">Again</button>
-        <button class="btn" id="advUse" type="button" hidden></button>
         <button class="btn" id="advDone" type="button" hidden>Done</button>
       </div>
       <div class="btns" id="advBtns2" style="margin-top:8px">
@@ -1995,11 +1991,11 @@ function textKey(x,subdiv){
 }
 const isRoutineKey=k=>/^p[0-9a-z]+$/.test(k||'');
 /* What to suggest after a run. exercises: [{idx,pct,passes}] for the exercises that were played. */
-function adviceFor(exercises,bpm,step){
+function adviceFor(exercises){
   const played=exercises.filter(b=>b.passes>=1);
   if(!played.length)return null;
   const weak=played.filter(b=>b.pct<TARGET);
-  return {played:played.length,weak:weak,cleared:!weak.length,next:Math.min(220,bpm+(step||4))};
+  return {played:played.length,weak:weak,cleared:!weak.length};
 }
 /* An exercise where fewer than a quarter of the strokes due were heard is mostly noise (a mic left on, a test run), so its lead or drag and loudness are left out of the averages. */
 const heardEnough=b=>b.due>0&&(b.heard||0)>=b.due*0.25;
@@ -2488,7 +2484,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.86.5';                           /* shown beside the title */
+const VERSION='0.86.6';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2518,7 +2514,6 @@ S.editTab=S.editTab==='type'?'type':'build';       /* Build or Type, remembered 
 S.bpm=clamp(Math.round(+S.bpm)||60,40,220);
 S.subdiv=4;                                        /* strokes with no note code are sixteenths */
 S.tol=[10,15,20,30].includes(+S.tol)?+S.tol:20;
-S.step=[2,4,5,8].includes(+S.step)?+S.step:4;   /* BPM added by the next-tempo button */
 S.sens=clamp(Math.round(+S.sens)||-30,-55,-8);
 S.accent=/^[gbm2-7RL]?$/.test(S.accent)?S.accent:'';   /* which strokes are accented */
 S.others=S.others==='g'?'g':'n';                          /* the other strokes: normal or ghost */
@@ -2543,7 +2538,7 @@ S.palette=S.palette==='cb'?'cb':'std';
 S.layout=S.layout==='phone'||S.layout==='desktop'?S.layout:'auto';
 if(typeof S.libId!=='string')S.libId='';
 S.startExercise=1;
-const PORTABLE=['bpm','tol','step','accent','others','vol','click','eachUnit','eachVal','gap','pulse','palette','theme'];   /* settings that travel in an export. Microphone, latency and sensitivity belong to the device and stay out. */
+const PORTABLE=['bpm','tol','accent','others','vol','click','eachUnit','eachVal','gap','pulse','palette','theme'];   /* settings that travel in an export. Microphone, latency and sensitivity belong to the device and stay out. */
 S.expSel=(S.expSel&&typeof S.expSel==='object')?{hist:S.expSel.hist!==false,lib:S.expSel.lib!==false,lists:S.expSel.lists!==false,set:S.expSel.set!==false}:{hist:true,lib:true,lists:true,set:true};   /* what the Export dialog ticks, remembered */
 if(!isFinite(+S.lastExport))S.lastExport=0;
 if(!isFinite(+S.expRuns))S.expRuns=0;
@@ -4294,14 +4289,14 @@ function renderAdvice(){
   const box=$('advice');
   if(!lastRun){box.hidden=true;return;}
   box.hidden=false;
-  const L=lastRun,adv=adviceFor(L.rows.map(x=>({idx:x.idx,pct:x.pct,passes:x.passes})),S.bpm,S.step);
-  const use=$('advUse'),disc=$('advDiscard');
+  const L=lastRun,adv=adviceFor(L.rows.map(x=>({idx:x.idx,pct:x.pct,passes:x.passes})));
+  const disc=$('advDiscard');
   const tgt=Math.round(TARGET*100)+'%';
   if(L.discarded){
     $('advRes').hidden=true;$('advHead').textContent='Run discarded.';
     $('advBody').textContent='It is not in your records.';
     $('advWin').hidden=true;$('advNext').hidden=true;
-    use.hidden=true;disc.hidden=true;$('advWeak').hidden=true;return;
+    disc.hidden=true;$('advWeak').hidden=true;return;
   }
   disc.hidden=!!L.practice;
   const n=adv.played,one=n===1;
@@ -4341,11 +4336,9 @@ function renderAdvice(){
   if(!L.saved)body+=' Your browser would not save the records.';
   if(L.practice)body='Practice run, not saved. Your time still counts today. '+body;
   $('advHead').textContent=fix;$('advBody').textContent=body;
-  use.hidden=!adv.cleared||adv.next===S.bpm;
   L.weakIdx=adv.weak.map(b=>b.idx);
   $('advWeak').hidden=S.mode!=='routine'||!L.weakIdx.length;
   $('advWeak').textContent=L.weakIdx.length===1?'Practise exercise '+L.weakIdx[0]+' only':'Practise the '+L.weakIdx.length+' weak exercises';
-  use.textContent='Next tempo: '+adv.next+' BPM';use.dataset.bpm=adv.next;
 }
 function discardRun(){
   if(!lastRun||lastRun.discarded)return;
@@ -6528,7 +6521,7 @@ function syncLayout(){
   placeAdv();
   if(!first)window.dispatchEvent(new Event('resize'));
 }
-/* On desktop the result buttons (Again, Next tempo, Done, Discard) sit where Start was; on a phone they follow the result text. */
+/* On desktop the result buttons (Again, Done, Discard) sit where Start was; on a phone they follow the result text. */
 function placeAdv(){
   const a=$('advBtns1'),b=$('advBtns2');if(!a||!b)return;
   if(document.documentElement.dataset.layout==='desktop')$('advBar').append(a,b);
@@ -6552,7 +6545,6 @@ function wire(){
   $('accent').addEventListener('change',e=>{S.accent=e.target.value;dyChanged();});
   $('others').addEventListener('change',e=>{S.others=e.target.value;dyChanged();});
   $('tol').addEventListener('change',e=>{S.tol=+e.target.value;save();renderAll();});
-  $('step').addEventListener('change',e=>{S.step=+e.target.value;save();});
   $('inputMode').addEventListener('change',e=>{S.input=e.target.value;save();setInputMode();});
   $('routineText').addEventListener('input',e=>{const v=plainText(e.target.value);if(v!==e.target.value)e.target.value=v;S.routineText=v.slice(0,MAX_TEXT);S.startExercise=1;save();onRoutineChanged();});
   $('fileBtn').addEventListener('click',()=>$('routineFile').click());
@@ -6610,7 +6602,6 @@ function wire(){
     if(run&&!run.ended)return;
     guard(()=>{setRoutineText(b.dataset.text);showTab('play');window.scrollTo(0,0);});
   }));
-  $('advUse').addEventListener('click',e=>{setBpm(+e.currentTarget.dataset.bpm);e.currentTarget.hidden=true;startPlay(lastRun&&lastRun.only||undefined);});
   $('advAgain').addEventListener('click',()=>startPlay(lastRun&&lastRun.only||undefined));
   $('advDone').addEventListener('click',()=>{setReview(false);window.scrollTo(0,0);});
   arm($('advDiscard'),discardRun);
@@ -6765,7 +6756,7 @@ function init(){
   $('routineText').value=S.routineText;
   $('bpm').value=S.bpm;
   $('click').value=S.click;$('accent').value=S.accent;$('others').value=S.others;
-  $('tol').value=String(S.tol);$('step').value=String(S.step);
+  $('tol').value=String(S.tol);
   $('gap').value=String(S.gap);
   $('pulse').value=S.pulse?'on':'off';$('palette').value=S.palette;$('layout').value=S.layout;
   syncEach();
