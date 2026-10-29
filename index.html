@@ -344,7 +344,6 @@ svg.spark{display:block;overflow:visible}
 .btn.arm{color:var(--late);border-color:var(--late)}
 .ib.del.arm{color:var(--late);border:1px solid var(--late);padding:0 8px}
 .hrow .hb{padding:0 12px 12px;display:grid;gap:8px}
-.hgrp>.hg{padding:0 8px 8px}
 .slist{display:grid}
 .sum{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .sum .big{font:700 22px var(--font-data)} .sum small{font:12px var(--font-body);color:var(--muted);margin-left:4px}
@@ -417,8 +416,6 @@ html.pgopen{overflow:hidden}
 .hgrp .tablewrap td,.hgrp .tablewrap th{padding-left:6px;padding-right:6px}
 .hgrp .tablewrap .ib{min-width:40px;height:40px;padding:0;margin:-8px -6px}
 .hgrp .tablewrap .ib svg{width:17px;height:17px}
-.hgrp tr.dt td{padding:6px;background:var(--bg)}
-.hgrp tr.dt .tablewrap{background-color:var(--surface)}
 .hgrp tbody tr:has(.cv){cursor:pointer}
 .ib.cv span{width:8px;height:8px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
 .ib.cv.open span{transform:rotate(-135deg) translate(-2px,-2px)}
@@ -551,7 +548,6 @@ body[data-mode="routine"] .single-only{display:none}
 .nh .full{grid-column:1/-1;margin:0}
 .nh .more{text-align:right}
 .hname{font:inherit;min-width:0;width:100%;padding:4px 8px;border:1px solid var(--accent);border-radius:6px;background:var(--surface);color:var(--ink)}
-.bacts2{gap:8px}
 body[data-edit=type] .buildonly{display:none}
 .osec{display:grid;gap:8px;padding-top:14px;border-top:1px solid var(--line)}
 .mbox .mhead+.osec{border-top:0;padding-top:0}
@@ -656,7 +652,6 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
 .exercises.lexs{border:0;border-radius:0;background:none}
 /* An open row is lifted with a lighter background that reaches a little past the text on both sides. */
 .page .hrow[open]{background:var(--surface);box-shadow:-10px 0 0 var(--surface),10px 0 0 var(--surface)}
-.tc1{grid-template-columns:minmax(0,1fr)}
 .bigbpm{display:block;font:800 40px/1.1 var(--font-data);margin:2px 0 8px}
 .bigrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .bigrow .hint{margin:0;text-align:right}
@@ -2162,7 +2157,6 @@ function scoreParts(parts,lv){
   }
   return Math.round(tally);
 }
-const runPoints=(codes,lv)=>scoreParts([[codes,1]],lv);
 /* A saved stroke is four characters: the result (on time, off time, missed, accent too soft, ghost too loud) with the accent or ghost class and a wrong-stick flag, the timing in whole milliseconds, and the level in dB below full scale. packStrokes writes them. */
 const B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',SPR='obmsl',SPD='nAg';
 function unpackStrokes(sp){
@@ -2647,7 +2641,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.0.1';                           /* shown beside the title */
+const VERSION='1.0.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4542,7 +4536,6 @@ function discardRun(){
   if(S.mode==='routine'&&view)renderResults(view);
 }
 /* ---------- progress page ---------- */
-function fmtDate(t){try{return new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short'});}catch(e){return '';}}
 /* A saved key back into text the pattern box understands: the signature stays, /N becomes a name. */
 function keyToText(k){
   const m=/^(\d+)\/(\d+) \([\d+]+\): /.exec(k);
@@ -4565,7 +4558,6 @@ function showKey(k){
   return nameMarkers(k.replace(/^\/4 (?![^\/]*\/)/,''),4).trim();
 }
 /* Replaces a table's contents. A cell is text, [text, class] or a node. */
-function tableWrap(){const wrap=document.createElement('div');wrap.className='tablewrap';const tb=document.createElement('table');wrap.appendChild(tb);return {wrap:wrap,tb:tb};}
 function fillTable(tbl,cols,rows){
   tbl.textContent='';
   if(cols.length){
@@ -4603,7 +4595,6 @@ function sparkline(vals){
 }
 const biasCls=v=>isNaN(v)?'':(v<-2.5?'early':(v>2.5?'late':'ok'));
 const accCls=p=>p>=TARGET?'ok':'late';
-const dbCell=v=>typeof v==='number'?'\u00B1'+v.toFixed(1):['\u2014','muted'];   /* how much the stroke loudness varies, in dB */
 const accCell=p=>[Math.round(p*100)+'%',accCls(p)];
 function renderPractice(){
   const days=practiceDays(recs.runs,recs.sum),now=new Date(),mins=k=>Math.round((days.get(k)||0)/60);
@@ -4759,7 +4750,7 @@ function renderScoreGroups(stats,practise,usual){
       const seq=document.createElement('span');seq.className='seq';seq.textContent=showKey(x.k);
       q.appendChild(seq);q.appendChild(practise(x.k,x.lv,x.dy));row.appendChild(q);
       const n=document.createElement('div');n.className='sn';
-      const stat=(txt,unit,cls)=>{const e=document.createElement('span');if(cls)e.className=cls;e.textContent=txt;if(unit){const u=document.createElement('small');u.textContent=unit;e.appendChild(u);}n.appendChild(e);};
+      const stat=(txt,unit,cls)=>statSpan(n,txt,unit,cls);
       const acc=accCell(x.recent);
       stat(String(x.bpm),'BPM');
       stat(acc[0],'ACC',acc[1]);
@@ -4797,7 +4788,7 @@ function renderRoutineRows(routines,replay){
     ch.addEventListener('click',toggle);
     row.addEventListener('click',e=>{if(!e.target.closest('button'))toggle();});
     const n=document.createElement('div');n.className='sn';
-    const stat=(txt,unit,cls)=>{const e=document.createElement('span');if(cls)e.className=cls;e.textContent=txt;if(unit){const u=document.createElement('small');u.textContent=unit;e.appendChild(u);}n.appendChild(e);};
+    const stat=(txt,unit,cls)=>statSpan(n,txt,unit,cls);
     if(x.bpm===null){stat('\u2014','ACC','muted');}
     else{
       const acc=accCell(x.recent);
@@ -4883,12 +4874,12 @@ function renderProgress(){
   renderRoutineRows(routines,replayRoutine);
   renderHistory();syncData();
 }
+const showTabs=(v,tabs)=>tabs.forEach(x=>{$(x[1]).hidden=v!==x[0];$(x[2]).setAttribute('aria-pressed',String(v===x[0]));});
+const syncFilter=saved=>{$('hfAll').classList.toggle('on',!saved);$('hfAll').setAttribute('aria-pressed',String(!saved));$('hfSaved').classList.toggle('on',saved);$('hfSaved').setAttribute('aria-pressed',String(saved));};
 let sview='pref';
 function setSview(v){
   sview=v;if(v==='data')renderStorage();
-  [['pref','svPref','svBtnPref'],['dev','svDev','svBtnDev'],['data','svData','svBtnData']].forEach(x=>{
-    $(x[1]).hidden=v!==x[0];$(x[2]).setAttribute('aria-pressed',String(v===x[0]));
-  });
+  showTabs(v,[['pref','svPref','svBtnPref'],['dev','svDev','svBtnDev'],['data','svData','svBtnData']]);
 }
 /* What the saved data takes. Sizes are characters written to browser storage, two bytes each; the limit is the browser's, about 5 MB, and is only an estimate. */
 function renderStorage(){
@@ -4912,9 +4903,7 @@ function showSetup(v){setSview(v);showTab('setup');}
 let pview='hist',histShown=20,histDays=7,histFilter='all',hview='day';
 function setPview(v){
   pview=v;
-  [['stats','pvStats','pvBtnStats'],['hist','pvHist','pvBtnHist'],['ach','pvAch','pvBtnAch']].forEach(x=>{
-    $(x[1]).hidden=v!==x[0];$(x[2]).setAttribute('aria-pressed',String(v===x[0]));
-  });
+  showTabs(v,[['stats','pvStats','pvBtnStats'],['hist','pvHist','pvBtnHist'],['ach','pvAch','pvBtnAch']]);
 }
 const partialRun=r=>!!(r.sk&&r.sk.length);   /* some exercises of the routine were not played, so there is no overall accuracy */
 const bestPct=l=>{const v=l.filter(r=>r.lv!=='off'&&!partialRun(r)).map(runPct);return v.length?Math.max.apply(null,v):null;};
@@ -4958,11 +4947,9 @@ function renameBtn(n,rk){
     n.replaceWith(inp);inp.focus();inp.select();
   });
 }
-function deleteBtn(r){return arm(iconBtn('del','Delete',()=>{}),()=>deleteRun(r.id),'Delete');}
 /* One run: Replay and Delete sit on the row. A routine run also expands to show each exercise's result. */
 /* Today and yesterday by name, otherwise the date. */
 const dayWord=t=>{const n=Date.now(),k=dayKey(t);return k===dayKey(n)?'today':k===dayKey(n-864e5)?'yesterday':new Date(t).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});};
-const fmtDay=t=>new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short'})+' '+new Date(t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
 /* One routine run, exercise by exercise, laid out like the Scores list. */
 /* Runs are grouped by exercise or routine, newest group first. A group of one run looks the same as a larger one. */
 /* A record or a level opens as a full-screen page with its own fixed header and, for a run, fixed actions. The list underneath is left alone, so Back returns to the same place. The phone's Back gesture closes it too. */
@@ -5003,9 +4990,9 @@ function openHelpMenu(){
   if(document.documentElement.dataset.layout==='desktop')return;
   if(rowMenuBtn===t){closeRowMenu();return;}
   closeRowMenu();
-  const m=document.createElement('div');m.className='rmenu';m.setAttribute('role','menu');
+  const m=newMenu();
   helpSecs().forEach(s=>{
-    const x=document.createElement('button');x.type='button';x.setAttribute('role','menuitem');x.textContent=helpName(s);
+    const x=menuBtn(helpName(s));
     if(s.id===t.dataset.sec)x.setAttribute('aria-current','true');
     x.addEventListener('click',()=>{closeRowMenu();s.scrollIntoView({block:'start'});});
     m.appendChild(x);
@@ -5115,8 +5102,7 @@ function openRunFrom(id,label){runBack=label;histStack.push({run:id});pgPush();r
 function renderHistoryDays(){
   const box=$('histList');box.textContent='';
   const saved=histFilter==='saved';
-  $('hfAll').classList.toggle('on',!saved);$('hfAll').setAttribute('aria-pressed',String(!saved));
-  $('hfSaved').classList.toggle('on',saved);$('hfSaved').setAttribute('aria-pressed',String(saved));
+  syncFilter(saved);
   const gkey=r=>r.mode==='routine'?(r.rk||''):r.exercises[0].k;
   let runs=recs.runs.slice().sort((a,b)=>b.t-a.t);
   if(saved)runs=runs.filter(r=>libFor(gkey(r)));
@@ -5311,8 +5297,7 @@ function renderHistoryGroups(){
   if(saved)list=list.filter(g=>libFor(gkey(g[0])));
   const played=new Set(recs.runs.map(gkey));
   const unplayed=saved?recs.lib.filter(e=>!played.has(libKey(e))).sort((x,y)=>y.t-x.t):[];
-  $('hfAll').classList.toggle('on',!saved);$('hfAll').setAttribute('aria-pressed',String(!saved));
-  $('hfSaved').classList.toggle('on',saved);$('hfSaved').setAttribute('aria-pressed',String(saved));
+  syncFilter(saved);
   $('histHint').textContent=saved?(list.length||unplayed.length?'Routines you saved, with their runs.':'Nothing saved yet. Tap the bookmark on a routine, or use Save in the editor.'):list.length?'Your runs grouped by exercise or routine, most recent first. Tap one to see its runs.':'No runs yet. Each run you finish is listed here.';
   const panel=document.createElement('div');panel.className='dayp';
   list.slice(0,histShown).forEach(g=>{
@@ -5480,8 +5465,9 @@ function tickDialog(title,go,parts,on){
   $('exGo').disabled=!box.querySelector('input:checked');
   $('expModal').hidden=false;$('exGo').focus();
 }
+const readSel=()=>{const sel={};$('exOpts').querySelectorAll('input').forEach(c=>{sel[c.dataset.k]=c.checked;});return sel;};
 async function exportRecs(){
-  const sel={};$('exOpts').querySelectorAll('input').forEach(c=>{sel[c.dataset.k]=c.checked;});
+  const sel=readSel();
   S.expSel=sel;save();$('expModal').hidden=true;
   const saved=await saveFile('pocket-records-'+stamp()+'.json','application/json',JSON.stringify(packRecs(sel)));
   if(!saved){$('recMsg').textContent='Export cancelled.';return;}
@@ -5509,7 +5495,7 @@ async function importRecs(file){
   }catch(e){say('That file is not a records export.');}
 }
 function importSelected(){
-  const sel={};$('exOpts').querySelectorAll('input').forEach(c=>{sel[c.dataset.k]=c.checked;});
+  const sel=readSel();
   $('expModal').hidden=true;
   const {o,u,file}=impPending;impPending=null;
   const say=t=>{$('recMsg').textContent=t;$('recMsg').classList.add('flash');};   /* shown after the page redraws, so it is not overwritten by the run count */
@@ -5543,7 +5529,7 @@ function importSelected(){
 const CLR_PARTS=[EXP_PARTS[0],EXP_PARTS[1],EXP_PARTS[2],EXP_PARTS[3],['dev','Device setup',()=>'microphone level, latency, calibration']];
 function openClear(){exMode='clr';tickDialog('Clear','Clear',CLR_PARTS,()=>false);}
 function clearSelected(){
-  const sel={};$('exOpts').querySelectorAll('input').forEach(c=>{sel[c.dataset.k]=c.checked;});
+  const sel=readSel();
   if(sel.hist){recs.runs.length=0;recs.sum=newSum();recs.names={};recs.nu=1;S.lastExport=0;S.expRuns=0;}
   if(sel.lib){recs.lib=[];S.libId='';S.routineText=STARTER;S.startExercise=1;S.seeded=false;}   /* back to a first start: the routines that ship with the app are added again */
   if(sel.lists){S.lists=hostedLists();S.listSel='';}
@@ -5998,13 +5984,16 @@ function closeRowMenu(){
 document.addEventListener('pointerdown',ev=>{if(rowMenu&&!rowMenu.contains(ev.target)&&!(rowMenuBtn&&rowMenuBtn.contains(ev.target)))closeRowMenu();},true);
 document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&rowMenu)closeRowMenu();});
 window.addEventListener('scroll',closeRowMenu,true);window.addEventListener('resize',closeRowMenu);
+function statSpan(n,txt,unit,cls){const e=document.createElement('span');if(cls)e.className=cls;e.textContent=txt;if(unit){const u=document.createElement('small');u.textContent=unit;e.appendChild(u);}n.appendChild(e);}
+const newMenu=()=>{const m=document.createElement('div');m.className='rmenu';m.setAttribute('role','menu');return m;};
+const menuBtn=text=>{const x=document.createElement('button');x.type='button';x.setAttribute('role','menuitem');x.textContent=text;return x;};
 function kebab(label,items){
   const b=iconBtn('kebab',label,()=>{
     if(rowMenuBtn===b){closeRowMenu();return;}
     closeRowMenu();
-    const m=document.createElement('div');m.className='rmenu';m.setAttribute('role','menu');
+    const m=newMenu();
     items.forEach(it=>{
-      const x=document.createElement('button');x.type='button';x.setAttribute('role','menuitem');x.textContent=it.t;if(it.danger)x.className='danger';
+      const x=menuBtn(it.t);if(it.danger)x.className='danger';
       if(it.arm)arm(x,()=>{closeRowMenu();it.fn();});else x.addEventListener('click',()=>{closeRowMenu();it.fn();});
       m.appendChild(x);
     });
