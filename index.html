@@ -2488,7 +2488,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.86.3';                           /* shown beside the title */
+const VERSION='0.86.4';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4326,9 +4326,9 @@ function renderAdvice(){
   /* One sentence on what to work on. */
   const fix=(view&&view.errs?insightParts(view)[0]:'')||'';
   if(!n)body='Stopped before one full pass, so nothing was scored.';
-  else if(adv.cleared)body=(one?'Ready for ':'All '+n+' exercises cleared. Ready for ')+adv.next+' BPM if you like. Any tempo is fine.';
-  else if(one)body='Staying at '+S.bpm+' BPM is a good idea until this settles. Any tempo is fine.';
-  else body='Work on '+adv.weak.slice().sort((a,b)=>a.pct-b.pct).slice(0,6).map(b=>'exercise '+b.idx+' ('+Math.round(b.pct*100)+'%)').join(', ')+(adv.weak.length>6?' and more':'')+'. Staying at '+S.bpm+' BPM is a good idea until they settle. Any tempo is fine.';
+  else if(adv.cleared)body=(one?'Ready for ':'All '+n+' exercises cleared. Ready for ')+adv.next+' BPM if you like.';
+  else if(one)body='Stay at '+S.bpm+' BPM until this settles.';
+  else body='Work on '+adv.weak.slice().sort((a,b)=>a.pct-b.pct).slice(0,6).map(b=>'exercise '+b.idx+' ('+Math.round(b.pct*100)+'%)').join(', ')+(adv.weak.length>6?' and more':'')+'. Stay at '+S.bpm+' BPM until they settle.';
   {   /* what was just earned gets its own moment at the top, once */
     const wins=[];
     if(L.won&&L.won.length)wins.push('New badge: '+L.won.join(', '));
