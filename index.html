@@ -442,8 +442,8 @@ html.pgopen{overflow:hidden}
 .medal.off .c2{fill:none;stroke:var(--muted);stroke-dasharray:3 4}
 .medal.gl:not(.off) svg{filter:drop-shadow(0 0 5px var(--g))}
 .medal .shim{animation:shim 3s ease-in-out infinite}
-.srow .sl{display:flex;align-items:center;gap:8px;min-width:0}
-.srow .medal{width:26px;height:26px}
+.sl{display:flex;align-items:center;gap:8px;min-width:0}
+.sl .medal{width:26px;height:26px}
 .tbar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--line);margin:10px 0 4px}
 .tbar i{display:block;height:100%}
 .tleg{font:12px var(--font-body);color:var(--muted);margin:0 0 8px}
@@ -2158,7 +2158,7 @@ BADGES.push({id:'rtc',name:'Routines cleared',unit:'routines cleared',one:'routi
 BADGES.push({id:'swp',name:'Clean routine runs',unit:'clean routine runs',one:'clean routine run',at:[1,5,10,25,50]});
 BADGES.push({id:'prf',name:'Perfect exercises',unit:'perfect exercises',one:'perfect exercise',at:LADDER});
 BADGES.push({id:'tmp',name:'Fastest clear',lead:'Fastest clear',suf:' BPM',unit:'BPM, fastest exercise cleared',at:[40,60,80,100,120,140,160]});
-/* Each step has a written name and each badge a glyph. The look of a step (its tier) follows how far up its ladder it sits, so every ladder runs from plain wood to bright gold. */
+/* Each step has a written name and each badge a glyph. The look of a step (its tier) follows how far up its ladder it sits, so every ladder runs from plain wood to diamond. */
 const STEPNAMES={ses:['Warmed up','Regular','Locked in','Dedicated','Road-tested','Veteran','Lifer'],
   str:['On a roll','Habit forming','Dialled in','A month of grooves','Two months deep','Hundred days','Half a year','A full year'],
   ladder:['First clear','A handful','Ten down','Quarter hundred','Fifty up','Centurion','Deep cut','Encyclopedia','Almost there','The whole book'],
@@ -2168,7 +2168,6 @@ const STEPNAMES={ses:['Warmed up','Regular','Locked in','Dedicated','Road-tested
   tmp:['Slow burn','Easy groove','Cruising','Hundred club','Picking up','Fast hands','Speed demon']};
 const GLYPHS={ses:'drum',str:'cal',all:'tick',dyn:'acc',rtc:'book',swp:'sweep',prf:'target',tmp:'metro'};
 BADGES.forEach(b=>{b.nm=STEPNAMES[b.id]||STEPNAMES.ladder;b.gl=GLYPHS[b.id]||'tick';});
-const TIERNAMES=['Hickory','Bronze','Silver','Gold','Gold','Gold'];
 /* Mastery of one exercise on one click level, from the fastest tempo it was cleared at, measured in strokes a minute so sixteenths count for more than eighths. Eight steps: cleared at all, then seven rates. */
 const RATE_AT=[120,180,240,320,400,480,600];
 const MTIER=['Hickory','Bronze','Silver','Gold','Platinum','Sapphire','Ruby','Diamond'];
@@ -2184,7 +2183,7 @@ function strokesPerBeat(k){
 }
 const strokeRate=(k,bpm)=>Math.round(strokesPerBeat(k)*bpm);
 const masteryTier=(k,bpm)=>{const r=strokeRate(k,bpm);return RATE_AT.filter(n=>r>=n).length;};
-const tierOf=(i,n)=>n<2?0:Math.round(i/(n-1)*5);
+const tierOf=(i,n)=>n<2?0:Math.round(i/(n-1)*7);   /* where a step sits on its ladder, as one of the eight medal looks */
 const fmtBadge=(b,n)=>b.lead?b.lead+' '+n+(b.suf||''):(n===1&&b.one?'1 '+b.one:(n+' '+b.unit).replace(/^1 exercises/,'1 exercise'));
 const BGROUPS=[{name:'Runs',d:'Runs where at least one exercise was played through once and scored.',ids:['ses']},
   {name:'Days in a row',d:'Your longest run of practice days. A day counts at 5 minutes or more. One rest day a week does not break it.',ids:['str']},
@@ -2546,7 +2545,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.89.0';                           /* shown beside the title */
+const VERSION='0.89.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4504,9 +4503,8 @@ const GL={
   book:'<path d="M48 38c-6-5-14-6-20-4v28c6-2 14-1 20 4 6-5 14-6 20-4V34c-6-2-14-1-20 4zM48 38v28" fill="none" stroke="K" stroke-width="3" stroke-linejoin="round"/>',
   sweep:'<path d="M27 50l8 8 13-16M45 50l8 8 19-24" fill="none" stroke="K" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>',
   target:'<circle cx="48" cy="48" r="21" fill="none" stroke="K" stroke-width="3"/><circle cx="48" cy="48" r="12" fill="none" stroke="K" stroke-width="3"/><circle cx="48" cy="48" r="3.5" fill="K"/>'};
-const METAL=[['#C9A878','#8E6B3E','#6B4F2B'],['#E0A074','#A8602F','#6E3A16'],['#F1F3F5','#A9B1B8','#6F7881'],['#FFE48A','#E0A91F','#9A6A00'],['#FFEFA8','#F0B52A','#A87500'],['#FFF6C2','#F7BE2E','#B07A00']];
-/* Exercise mastery uses its own eight: wood, bronze, silver, gold, then platinum, sapphire, ruby and diamond. */
-const MMETAL=[METAL[0],METAL[1],METAL[2],METAL[3],['#F4F8FB','#B9C9D8','#5E7388'],['#9CC2FF','#2F6FD0','#173F85'],['#FF9DB3','#D12A55','#7A0F2E'],['#F4FDFF','#8FE3F5','#2A8FA8']];
+/* The eight looks, shared by badges and exercise mastery: wood, bronze, silver, gold, then platinum, sapphire, ruby and diamond. */
+const MMETAL=[['#C9A878','#8E6B3E','#6B4F2B'],['#E0A074','#A8602F','#6E3A16'],['#F1F3F5','#A9B1B8','#6F7881'],['#FFE48A','#E0A91F','#9A6A00'],['#F4F8FB','#B9C9D8','#5E7388'],['#9CC2FF','#2F6FD0','#173F85'],['#FF9DB3','#D12A55','#7A0F2E'],['#F4FDFF','#8FE3F5','#2A8FA8']];
 GL.note='<ellipse cx="40" cy="62" rx="10" ry="7.5" fill="K" transform="rotate(-20 40 62)"/><path d="M48.5 59V32c1 9 15 9 15 22" fill="none" stroke="K" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>';
 let medalN=0;
 /* A round medal: glyph, colours, a glow on the higher tiers and a slow shimmer on the top one. An unearned step is a dotted outline. */
@@ -4518,7 +4516,7 @@ function drawMedal(gl,m,glow,shim,earned,title){
     +GL[gl].replace(/K/g,'currentColor')+(shim?'<circle class="shim" cx="48" cy="48" r="38" fill="#fff"/>':'')+'</svg>';
   return span;
 }
-function medal(b,i,earned){const t=tierOf(i,b.at.length);return drawMedal(b.gl,METAL[t],t>=4,t===5,earned,b.nm[i]+' \u00b7 '+fmtBadge(b,b.at[i]));}
+function medal(b,i,earned){const t=tierOf(i,b.at.length);return drawMedal(b.gl,MMETAL[t],t>=4,t===7,earned,b.nm[i]+' \u00b7 '+fmtBadge(b,b.at[i]));}
 /* The mastery medal of one exercise on one level, from its fastest cleared tempo. */
 function masteryMedal(k,bpm){const t=masteryTier(k,bpm);return drawMedal('note',MMETAL[t],t>=4,t===7,true,MTIER[t]+' \u00b7 '+strokeRate(k,bpm)+' strokes/min');}
 /* The unlocked panel on the result: the best step this run earned, and how far the next one is. */
@@ -4532,7 +4530,7 @@ function renderUnlocked(L){
   const tx=document.createElement('div');tx.className='bwt';
   const lb=document.createElement('span');lb.className='lbl';lb.textContent='Unlocked';
   const h=document.createElement('b');h.textContent=b.nm[w.i];
-  const tr=document.createElement('span');tr.className='tier';tr.textContent=TIERNAMES[t]+' · step '+(w.i+1)+' of '+n;
+  const tr=document.createElement('span');tr.className='tier';tr.textContent=MTIER[t]+' · step '+(w.i+1)+' of '+n;
   const p=document.createElement('span');p.className='sent';p.textContent=fmtBadge(b,b.at[w.i])+'.'+(won.length>1?' And '+(won.length-1)+' more.':'');
   tx.append(lb,h,tr,p);
   box.append(med,tx);
@@ -5103,20 +5101,23 @@ function renderRunPage(r){
     items.forEach(x=>{const c=document.createElement('span');c.className='cell '+(!x.b?'skip':off?'':(pctOf(x)>=TARGET?'ok':'late'));strip.appendChild(c);});
     page.appendChild(strip);
     const key2=document.createElement('div');key2.className='key';key2.textContent=off?'Count-in only: nothing is scored.':'Green: 90% or more. Pink: below 90%. Dashed: not played.';page.appendChild(key2);
+    const cl=new Map();   /* the fastest tempo each exercise has been cleared at, on this run's level */
+    if(!off)patStats(recs.runs,recs.sum).forEach(e=>{if(e.cleared&&e.lv===r.lv&&e.dy===(r.dy||''))cl.set(e.k,e.cleared);});
+    const lead=(b,seq)=>{const sl=document.createElement('span');sl.className='sl';if(cl.has(b.k))sl.appendChild(masteryMedal(b.k,cl.get(b.k)));sl.appendChild(seq);return sl;};
     if(!off&&played.length>1){
       page.appendChild(lbl('Weakest'));
       played.slice().sort((x,y)=>pctOf(x)-pctOf(y)).slice(0,3).forEach(x=>{
         const w=document.createElement('div');w.className='wr';
         const n=document.createElement('div');n.className='seq';n.textContent=showKey(x.b.k);
         const c=accCell(pctOf(x)),ac=document.createElement('div');ac.className='ac '+c[1];ac.textContent=c[0];const u=document.createElement('small');u.textContent='ACC';ac.appendChild(u);
-        w.appendChild(n);w.appendChild(ac);w.appendChild(practiseBtn(x.b.k,x.i,r));page.appendChild(w);});
+        w.appendChild(lead(x.b,n));w.appendChild(ac);w.appendChild(practiseBtn(x.b.k,x.i,r));page.appendChild(w);});
     }
     page.appendChild(lbl('All exercises'));
     played.forEach(x=>{
       const b=x.b,row=document.createElement('div');row.className='exr';
       const en=document.createElement('div');en.className='en';en.textContent=String(x.i||'');
       const eb=document.createElement('div');
-      const n=document.createElement('div');n.className='seq';n.textContent=showKey(b.k);eb.appendChild(n);
+      const n=document.createElement('div');n.className='seq';n.textContent=showKey(b.k);eb.appendChild(lead(b,n));
       const sn=document.createElement('div');sn.className='sn';
       const stat=(txt,unit,cls)=>{const m=document.createElement('span');if(cls)m.className=cls;m.textContent=txt;if(unit){const u=document.createElement('small');u.textContent=unit;m.appendChild(u);}sn.appendChild(m);};
       const c=off?['—','muted']:accCell(pctOf(x));
