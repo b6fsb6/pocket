@@ -114,7 +114,7 @@ body[data-run="1"] .notice{display:none}
 #helpNav{display:none}
 #pageHelp>.panel{scroll-margin-top:14px}   /* a section jumped to lands under the page's own padding, level with the list */
 #helpNav+.panel{border-top:0;padding-top:0}
-:root[data-layout=desktop] #pg[data-owner=help]{--pgx:max(16px,calc((100% - 1200px)/2))}
+:root[data-layout=desktop] #pg{--pgx:max(16px,calc((100% - 1200px)/2))}
 :root[data-layout=desktop] .page#pageHelp{max-width:none;margin:0;display:grid;grid-template-columns:230px minmax(0,760px);column-gap:56px;align-items:start}
 :root[data-layout=desktop] #pageHelp>.panel{grid-column:2}
 :root[data-layout=desktop] #helpNav{display:grid;grid-column:1;grid-row:1/span 20;position:sticky;top:0;gap:2px;align-content:start}
@@ -2549,7 +2549,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.90.0';                           /* shown beside the title */
+const VERSION='0.90.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
