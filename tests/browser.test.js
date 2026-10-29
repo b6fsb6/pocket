@@ -286,3 +286,33 @@ test('the exercise list starts collapsed, Start is full width and the time sits 
   await p.evaluate(() => document.querySelectorAll('#exerciseList .erow')[6].click());
   assert.equal(await p.evaluate(() => document.getElementById('routineInfo').textContent), '24 exercises · from 7');
 });
+
+test('Help: a menu in the title on a phone, a contents list beside the text on desktop', async () => {
+  const ph = await open({ seeded: true, input: 'kb' }, { width: 390, height: 844 });
+  await ph.evaluate(() => document.getElementById('helpBtn').click());
+  await ph.waitForTimeout(200);
+  assert.equal(await ph.evaluate(() => document.getElementById('pgTtl').textContent), 'Help · How it works');
+  assert.equal(await ph.evaluate(() => getComputedStyle(document.getElementById('helpNav')).display), 'none');
+  await ph.evaluate(() => document.getElementById('pgTtl').click());
+  const items = await ph.evaluate(() => [...document.querySelectorAll('.rmenu button')].map(b => b.textContent));
+  assert.equal(items.length, 9);
+  await ph.evaluate(() => [...document.querySelectorAll('.rmenu button')].find(b => b.textContent === 'Scores, tempo and progress').click());
+  await ph.waitForTimeout(400);
+  assert.equal(await ph.evaluate(() => document.getElementById('pgTtl').textContent), 'Help · Scores, tempo and progress');
+  assert.equal(await ph.evaluate(() => document.querySelectorAll('.rmenu').length), 0);
+
+  const dk = await open({ seeded: true, input: 'kb' }, { width: 1440, height: 900 });
+  await dk.evaluate(() => document.getElementById('helpBtn').click());
+  await dk.waitForTimeout(200);
+  const g = await dk.evaluate(() => {
+    const n = document.getElementById('helpNav').getBoundingClientRect(), s = document.getElementById('help-how').getBoundingClientRect(), pg = document.getElementById('pageHelp').getBoundingClientRect();
+    return { navRight: n.right, secLeft: s.left, navTop: n.top, secTop: s.top, wide: pg.width, title: document.getElementById('pgTtl').textContent };
+  });
+  assert.ok(g.navRight < g.secLeft, 'list is left of the text');
+  assert.ok(Math.abs(g.navTop - g.secTop) < 4, 'list and text start together');
+  assert.ok(g.wide > 900, 'Help uses the wide page ' + g.wide);
+  assert.equal(g.title, 'Help');
+  await dk.evaluate(() => [...document.querySelectorAll('#helpNav button')].find(b => b.textContent === 'If something is off').click());
+  await dk.waitForTimeout(400);
+  assert.equal(await dk.evaluate(() => document.querySelector('#helpNav button[aria-current]').textContent), 'If something is off');
+});

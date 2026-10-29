@@ -110,6 +110,21 @@ body[data-run="1"] .notice{display:none}
 .htools .seg button{min-height:34px;padding:0 12px;font-size:12px}
 /* Desktop: Library, Scores, Achievements and Settings use the width; History and Help stay one column */
 :root[data-layout=desktop] .page#pageSetup,:root[data-layout=desktop] .page#pageLibrary,:root[data-layout=desktop] .page#pageProgress{max-width:1100px}
+/* Help: on a wide screen a contents list stays on the left and the text sits beside it; on a phone the page title is the menu. */
+#helpNav{display:none}
+#pageHelp>.panel{scroll-margin-top:14px}   /* a section jumped to lands under the page's own padding, level with the list */
+#helpNav+.panel{border-top:0;padding-top:0}
+:root[data-layout=desktop] #pg[data-owner=help]{--pgx:max(16px,calc((100% - 1100px)/2))}
+:root[data-layout=desktop] .page#pageHelp{max-width:none;margin:0;display:grid;grid-template-columns:230px minmax(0,760px);column-gap:56px;align-items:start}
+:root[data-layout=desktop] #pageHelp>.panel{grid-column:2}
+:root[data-layout=desktop] #helpNav{display:grid;grid-column:1;grid-row:1/span 20;position:sticky;top:0;gap:2px;align-content:start}
+#helpNav b{font:700 12px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 10px 8px}
+#helpNav button{border:0;background:none;color:var(--ink);font:600 14px var(--font-body);text-align:left;padding:8px 10px;border-radius:8px;cursor:pointer}
+#helpNav button:hover{background:var(--surface)}
+#helpNav button[aria-current],.rmenu button[aria-current]{background:var(--surface);box-shadow:inset 3px 0 0 var(--accent)}
+.rmenu button[aria-current]{background:var(--bg)}
+.ttl.hmenu{cursor:pointer}
+:root:not([data-layout=desktop]) .ttl.hmenu::after{content:"";display:inline-block;width:7px;height:7px;margin:0 0 3px 8px;border:solid var(--muted);border-width:0 2px 2px 0;transform:rotate(45deg)}
 :root[data-layout=desktop] #pvStats:not([hidden]),:root[data-layout=desktop] #pvAch:not([hidden]){grid-template-columns:minmax(280px,340px) minmax(0,1fr);column-gap:28px;align-items:start}
 :root[data-layout=desktop] .pv>.pcol{display:grid;gap:22px;align-content:start;min-width:0}
 :root[data-layout=desktop] #pvAch .pside{position:sticky;top:16px}
@@ -499,7 +514,6 @@ body[data-mode="routine"] .single-only{display:none}
 .ln pre .bad{color:var(--late)}
 .ln textarea{display:block;border:0;border-radius:0;flex:1;min-width:0;white-space:pre;overflow:auto;background:transparent;outline:0}
 .mbox.scroll{overflow-y:auto}
-.totop{margin:0;text-align:right}
 .nh{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:13px;color:var(--muted)}
 .nh code{font:700 13px var(--font-data);color:var(--accent);white-space:nowrap}
 .nh .full{grid-column:1/-1;margin:0}
@@ -1008,7 +1022,6 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
       <h3>How it works</h3>
       <p>The app plays a click and listens to your pad through the microphone. It matches each hit to the stroke that was due and measures how early (<b>leading</b>) or late (<b>dragging</b>) it was, in milliseconds. Nothing is uploaded. Everything stays in this browser.</p>
       <p>Pick a sticking, press Start on the Play page and play along with the moving line. The numbers appear when you stop.</p>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
 
     <section class="panel" id="help-start">
@@ -1019,7 +1032,6 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
         <li><b>Play:</b> set the tempo, click level and how long each exercise plays, then press Start. After the count-in, play on the moving line and press Stop when you are done. Your result appears first, with <b>Again</b> and <b>Done</b>. The staff keeps its colours and numbers so you can see which strokes were off. Done brings the controls back.</li>
       </ol>
       <p>No microphone? Under Settings &rsaquo; Device, set Input to "Keyboard or pads" and press <b>F</b> for left, <b>J</b> for right. This is a test mode, and its timing is rougher than a pad with a microphone.</p>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
 
     <section class="panel" id="help-pages">
@@ -1031,7 +1043,6 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
         <li><b>Progress:</b> <b>History</b> lists your runs by exercise or routine, with Play. <b>Scores</b> shows each exercise (weakest first) and each routine: tempo, accuracy, trend, lead or drag, and evenness. <b>Achievements</b> shows your practice days for the last four weeks, a streak that forgives one rest day a week, and badges.</li>
         <li><b>Settings:</b> <b>Preferences</b> (on-time window, visual pulse, click volume, colours), <b>Device</b> (input, microphone level, stick calibration, latency) and <b>Data</b> (export, import, clear, storage, library links).</li>
       </ul>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
 
     <section class="panel" id="help-play">
@@ -1056,7 +1067,6 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
         <p>Choose the click level on the Play page. Easy clicks every stroke (none on rests), Medium every beat, Hard the strong beats (1 and 3, or the start of each group), and Extreme beat 1 of each bar. Master only clicks the count-in, so you hold the tempo yourself. Each level is scored on its own, against the same grid. Set Scoring to Practice to try something without saving it: you still see the result, but nothing is added to your records. It is back on the next time you open the app. Use headphones, or the click is heard as strokes.</p>
         <button class="btn small" type="button" data-try="single" data-text="RLRR LRLL RLRR LRLL">Try it</button>
       </div>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
 
     <section class="panel" id="help-format">
@@ -1187,7 +1197,6 @@ LRLR LRLR LRLR LRLR  x8</pre>
       <p><b>Save</b> keeps the routine in <b>your library</b>. If you change only the title, Save renames it. If you change the exercises, Save keeps the original and adds a new routine, so past runs still replay as played. The <b>&#8942;</b> beside Save has <b>Save as new</b> (a copy without changes) and <b>Download file</b> (a .txt to send).</p>
       <p>On the Library page, <b>Import</b> adds a routine from a .txt, .json or .csv file, or opens one from a link in the editor to review and Save. Text with errors opens in the editor to fix. <b>New</b> starts an empty exercise. In History, the bookmark on a routine saves it or deletes it from your library, and <b>In library</b> lists your library, including routines you have not played. A title such as "Rudiment: Single stroke roll" groups it under Rudiment on the Library page.</p>
       <p>JSON also works: a list such as <b>["RLRR LRLL", {"sticking":"RLRL RLRL","passes":16}]</b>, or an object with <b>title</b>, <b>each</b> and <b>exercises</b>.</p>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
 
     <section class="panel" id="help-library">
@@ -1207,7 +1216,6 @@ RLRR LRLL RLRR LRLL</pre>
         <li>Put the file anywhere that serves plain text, such as a GitHub repository. Use its <b>Raw</b> button and paste that address (it starts with <b>raw.githubusercontent.com</b>).</li>
         <li>The host must let other sites read the file. GitHub's raw addresses do. Many sites do not, and the app will say it could not reach the address.</li>
       </ul>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
 
     <section class="panel" id="help-scores">
@@ -1223,7 +1231,6 @@ RLRR LRLL RLRR LRLL</pre>
         <li><b>Staff of a run:</b> each run keeps the result of every stroke. A run's page has a <b>Staff</b> group showing the notation with each stroke coloured and read out, and the Play page rebuilds its review from the same record.</li>
         <li><b>History:</b> on the Progress page, switch to History for your last 300 runs, by exercise or routine, newest first. Tap a group for its runs and a run for its exercises. <b>Play</b> loads the same routine, tempo, click level and settings, ready to start. <b>Delete</b> deletes the run. The ⋮ beside an exercise deletes just that exercise from the run, for one that was in the editor by mistake. An exercise nothing was heard in is listed as not played and is never scored. An untitled routine is called "Untitled 1", "Untitled 2" and so on. The pencil renames it everywhere, and a title typed in the editor replaces it. Runs beyond 300 are folded into your totals, streaks, achievements and cleared tempos, which are kept for good, but they can no longer be replayed.</li>
       </ul>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
 
     <section class="panel" id="help-setup">
@@ -1240,7 +1247,6 @@ RLRR LRLL RLRR LRLL</pre>
         <li><b>Flams and drags:</b> only the main stroke is scored, as early or late against the click. Hits just before it (up to 80 ms for a flam, 120 ms for a drag) are its grace notes and are not counted as extras. While an exercise has them, the microphone also accepts a clearly louder strike soon after a hit, so a soft grace does not hide the main stroke. A grace as loud as the main stroke can, so play it softer. Keyboard play has no graces, so use one key per main stroke.</li>
         <li><b>Records and storage:</b> records are saved in this browser only. Export keeps a copy or moves it to another device, and Import brings it back. The app reminds you if you have never exported, or the last copy is two weeks old. On iPhone and iPad, Safari can clear a site's data after about a week without use, so add the page to your Home Screen. <b>Settings &rsaquo; Data &rsaquo; Storage</b> shows what takes space. Stroke detail (what rebuilds a run's staff) may use about 40% of what the browser allows. Past that, the oldest runs lose their detail first and keep their totals.</li>
       </ul>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
 
     <section class="panel" id="help-trouble">
@@ -1251,7 +1257,6 @@ RLRR LRLL RLRR LRLL</pre>
         <li><b>Extra hits show up:</b> raise the trigger line, or use headphones for the click.</li>
         <li><b>Wrong-hand tags look random:</b> calibrate both sticks again on the same spot of the pad.</li>
       </ul>
-      <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
   </div>
 
@@ -2484,7 +2489,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.86.7';                           /* shown beside the title */
+const VERSION='0.87.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4722,12 +4727,54 @@ function openHelp(id){
   if(!(pgOwner==='help'&&!$('pg').hidden))pgPush();
   helpEl.hidden=false;
   showPage({owner:'help',key:'help',back:'\u2039 Back',title:'Help',body:helpEl});
-  if(id)$(id).scrollIntoView({block:'start'});
+  if(id){$(id).scrollIntoView({block:'start'});syncHelpNav();}
+}
+const helpSecs=()=>[...$('pageHelp').querySelectorAll(':scope>.panel')];
+const helpName=s=>s.querySelector('h3').textContent;
+function buildHelpNav(){
+  const nav=document.createElement('nav');nav.id='helpNav';nav.setAttribute('aria-label','Help sections');
+  const h=document.createElement('b');h.textContent='Contents';nav.appendChild(h);
+  helpSecs().forEach(s=>{const b=document.createElement('button');b.type='button';b.dataset.id=s.id;b.textContent=helpName(s);b.addEventListener('click',()=>{s.scrollIntoView({block:'start'});});nav.appendChild(b);});
+  $('pageHelp').insertBefore(nav,$('pageHelp').firstChild);
+}
+/* The section being read: the last one whose top has reached the top of the page, or the final one at the very bottom. */
+function helpCurrent(){
+  const bd=$('pgBody'),top=bd.getBoundingClientRect().top,secs=helpSecs();
+  if(bd.scrollTop+bd.clientHeight>=bd.scrollHeight-2&&bd.scrollTop>0)return secs[secs.length-1];
+  let cur=secs[0];secs.forEach(s=>{if(s.getBoundingClientRect().top-top<=60)cur=s;});
+  return cur;
+}
+function syncHelpNav(){
+  const cur=helpCurrent();if(!cur)return;
+  document.querySelectorAll('#helpNav button').forEach(b=>{if(b.dataset.id===cur.id)b.setAttribute('aria-current','true');else b.removeAttribute('aria-current');});
+  $('pgTtl').textContent='Help'+(document.documentElement.dataset.layout==='desktop'?'':' \u00b7 '+helpName(cur));
+  $('pgTtl').dataset.sec=cur.id;
+}
+function openHelpMenu(){
+  const t=$('pgTtl');
+  if(document.documentElement.dataset.layout==='desktop')return;
+  if(rowMenuBtn===t){closeRowMenu();return;}
+  closeRowMenu();
+  const m=document.createElement('div');m.className='rmenu';m.setAttribute('role','menu');
+  helpSecs().forEach(s=>{
+    const x=document.createElement('button');x.type='button';x.setAttribute('role','menuitem');x.textContent=helpName(s);
+    if(s.id===t.dataset.sec)x.setAttribute('aria-current','true');
+    x.addEventListener('click',()=>{closeRowMenu();s.scrollIntoView({block:'start'});});
+    m.appendChild(x);
+  });
+  document.body.appendChild(m);
+  const r=t.getBoundingClientRect();
+  m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px';m.style.top=(r.bottom+4)+'px';
+  rowMenu=m;rowMenuBtn=t;t.setAttribute('aria-expanded','true');
 }
 function showPage(o){
   stashHelp();
   $('pgBack').textContent=o.back;$('pgBack').onclick=pageBack;
   const t=$('pgTtl');t.textContent=o.title;t.className='ttl'+(o.mono?' seq':'');
+  const hm=o.owner==='help';$('pg').dataset.owner=o.owner;
+  t.onclick=hm?openHelpMenu:null;t.onkeydown=hm?e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openHelpMenu();}}:null;
+  if(hm){t.classList.add('hmenu');t.setAttribute('role','button');t.tabIndex=0;t.setAttribute('aria-haspopup','menu');}
+  else{t.removeAttribute('role');t.removeAttribute('tabindex');t.removeAttribute('aria-haspopup');}
   const bd=$('pgBody'),keep=o.key===pgKey&&!$('pg').hidden,y=bd.scrollTop;
   bd.textContent='';bd.appendChild(o.body);
   const ft=$('pgFoot');ft.textContent='';
@@ -4736,6 +4783,7 @@ function showPage(o){
   pgOwner=o.owner;pgKey=o.key;
   $('pg').hidden=false;document.documentElement.classList.add('pgopen');
   bd.scrollTop=keep?y:0;
+  if(hm)syncHelpNav();
 }
 function hidePage(owner){
   if(owner&&pgOwner!==owner)return;
@@ -6597,7 +6645,8 @@ function wire(){
   document.querySelectorAll('[data-help]').forEach(b=>b.addEventListener('click',()=>{
     openHelp(b.dataset.help);
   }));
-  document.querySelectorAll('.totop button').forEach(b=>b.addEventListener('click',()=>{$('pgBody').scrollTop=0;}));
+  $('pgBody').addEventListener('scroll',()=>{if(pgOwner==='help')syncHelpNav();},{passive:true});
+  buildHelpNav();
   document.querySelectorAll('[data-try]').forEach(b=>b.addEventListener('click',()=>{
     if(run&&!run.ended)return;
     guard(()=>{setRoutineText(b.dataset.text);showTab('play');window.scrollTo(0,0);});
