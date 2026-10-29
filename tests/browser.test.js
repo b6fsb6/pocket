@@ -249,3 +249,17 @@ test('staff rows stack their label above the staff, whatever else is on the page
   const d = await p.evaluate(() => { const r = document.querySelector('#rowsTrack .prow'); return r ? getComputedStyle(r).display : 'none'; });
   assert.equal(d, 'grid');
 });
+
+test('no empty box sits between the tabs and the page on any tab', async () => {
+  const p = await open({ seeded: true, input: 'kb' });
+  for (const t of ['Play', 'Library', 'Progress', 'Settings']) {
+    await p.evaluate(t => [...document.querySelectorAll('.switch.tabs button')].find(x => x.textContent.trim() === t).click(), t);
+    await p.waitForTimeout(150);
+    const gap = await p.evaluate(() => {
+      const tabs = document.querySelector('.switch.tabs').getBoundingClientRect().bottom;
+      const pg = [...document.querySelectorAll('main > [id^=page]')].find(x => !x.hidden);
+      return pg.getBoundingClientRect().top - tabs;
+    });
+    assert.ok(gap <= 24, t + ' gap ' + gap);
+  }
+});

@@ -62,7 +62,7 @@ h3{font:600 12px var(--font-body);letter-spacing:.09em;text-transform:uppercase;
 .transport{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
 .status{font:400 13px/1.4 var(--font-data);color:var(--muted);margin:0}
 .status:empty{display:none}
-#stTop:empty{display:none}   /* on Play the message moves under the staff, and the empty box would add a second gap */
+#stTop:empty,#stTop:has(.status:empty){display:none}   /* on Play the message moves under the staff, and the empty box would add a second gap */
 .btn{font:600 14px var(--font-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer;min-height:40px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.small{min-height:40px;padding:6px 12px;font-size:14px}
@@ -2477,7 +2477,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.86.0';                           /* shown beside the title */
+const VERSION='0.86.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
