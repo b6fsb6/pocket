@@ -354,12 +354,24 @@ test('Import asks what to bring in, offers only what the file holds, and imports
   assert.equal(after.lib, 1);
 });
 
-test('a scored run is scored, announces a new high score once, and keeps the per-stroke codes', async () => {
-  const o = await runOnce({ click: 'half' }, false);
-  assert.match(o.win, /New high score! [\d,]+ on Hard/);
-  assert.match(o.text, /Score [\d,]+/);
+test('a scored run shows its score against the maximum, flags a new high score, and a practice run has no score', async () => {
+  const p = await open({ input: 'kb', bpm: 120, routineText: '8 RLRL', eachUnit: 'pass', eachVal: 1, click: 'half', seeded: true });
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
+  await p.evaluate(() => { const T = window.__T, r = T.run(), pl = r.plan; pl.slots.forEach(s => { const hand = pl.segs[s.seg].notes[s.pos].slice(-1); T.hit({ t: r.t0 + s.t + 0.005, kb: true, f: null, det: { hand, conf: 1 } }); }); });
+  await p.waitForFunction(() => window.__T.run().ended, null, { timeout: 40000 });
+  await p.waitForTimeout(300);
+  const o = await p.evaluate(() => ({ score: document.getElementById('advScore').textContent, max: document.getElementById('advMax').textContent, chip: !document.getElementById('advHs').hidden, solo: document.getElementById('advRes').classList.contains('solo'), prev: document.getElementById('advPrev').textContent }));
+  assert.match(o.score, /^[\d,]+$/);
+  assert.match(o.max, /^\/ [\d,]+$/);
+  assert.ok(o.chip, 'the first score is a new high score');
+  assert.ok(!o.solo);
+  assert.match(o.prev, /^First score on Hard$/);
+  assert.equal(await p.evaluate(() => document.querySelector('#advRes .slab').textContent), 'Score');
+  const bd = await p.evaluate(() => ({ shown: !document.getElementById('scoreBox').hidden, on: document.getElementById('bOn').textContent, note: document.getElementById('scoreNote').textContent, discardInDetails: !!document.querySelector('#detBox #advDiscard') }));
+  assert.ok(bd.shown); assert.match(bd.on, /^\d+$/); assert.match(bd.note, /Hard: 10 points on time/); assert.ok(bd.discardInDetails, 'Discard lives in Details');
   const p0 = await runOnce({ click: 'half' }, true);
-  assert.doesNotMatch(p0.win, /high score/i, 'a practice run is not scored');
+  assert.doesNotMatch(p0.text, /high score/i, 'a practice run is not scored');
 });
 
 test('rests keep the streak and score nothing unless hit, and a hit on a rest is a miss', async () => {
@@ -384,4 +396,35 @@ test('Play settings sit in aligned columns: Click beside Scoring, tops level', a
   const r = await p.evaluate(() => { const a = document.getElementById('click').getBoundingClientRect(), b = document.getElementById('score').getBoundingClientRect(); return { dy: Math.abs(a.top - b.top), side: b.left > a.right - 1 }; });
   assert.ok(r.side, 'Scoring is beside Click');
   assert.ok(r.dy < 1, 'tops are level');
+});
+
+test('a routine shows the most a flawless run could score, and a flawless run reaches it', async () => {
+  const p = await open({ input: 'kb', bpm: 120, routineText: 'RLRL RLRL\nLRLR LRLR', eachUnit: 'pass', eachVal: 1, click: 'half', seeded: true });
+  const max = await p.evaluate(() => document.getElementById('maxLine').textContent);
+  assert.match(max, /^Max score: [\d,]+$/);
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
+  await p.evaluate(() => { const T = window.__T, r = T.run(), pl = r.plan; pl.slots.forEach(s => { const hand = pl.segs[s.seg].notes[s.pos].slice(-1); T.hit({ t: r.t0 + s.t + 0.005, kb: true, f: null, det: { hand, conf: 1 } }); }); });
+  await p.waitForFunction(() => window.__T.run().ended, null, { timeout: 40000 });
+  await p.waitForTimeout(400);
+  const got = await p.evaluate(() => document.getElementById('advScore').textContent + '|' + document.getElementById('advMax').textContent);
+  const [sc, mx] = got.split('|');
+  assert.equal(sc, max.replace('Max score: ', ''), 'a flawless run scores the maximum');
+  assert.equal(mx, '/ ' + sc);
+});
+
+test('History shows each run\'s score in the list and on the run page', async () => {
+  const p = await open({ input: 'kb', bpm: 120, routineText: 'RLRL RLRL', eachUnit: 'pass', eachVal: 1, click: 'half', seeded: true });
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
+  await p.evaluate(() => { const T = window.__T, r = T.run(), pl = r.plan; pl.slots.forEach(s => { const hand = pl.segs[s.seg].notes[s.pos].slice(-1); T.hit({ t: r.t0 + s.t + 0.005, kb: true, f: null, det: { hand, conf: 1 } }); }); });
+  await p.waitForFunction(() => window.__T.run().ended, null, { timeout: 40000 });
+  await p.waitForTimeout(300);
+  await p.evaluate(() => { document.getElementById('tabProgress').click(); document.getElementById('pvBtnHist').click(); }); await p.waitForTimeout(400);
+  const row = await p.evaluate(() => document.getElementById('pvHist').innerText);
+  assert.match(row, /Score: [\d,]+/);
+  await p.evaluate(() => { const b = [...document.querySelectorAll('#pvHist summary, #pvHist .sm, #pvHist button')].find(x => /Score: /.test(x.innerText)); b.click(); });
+  await p.waitForTimeout(300);
+  const page = await p.evaluate(() => document.getElementById('pgBody').innerText + ' ' + document.getElementById('pvHist').innerText);
+  assert.match(page, /Score: [\d,]+ of [\d,]+/);
 });

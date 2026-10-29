@@ -358,14 +358,16 @@ svg.spark{display:block;overflow:visible}
 .dayh{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 8px;color:var(--muted);font:600 12px var(--font-body);letter-spacing:.1em;text-transform:uppercase}
 .dayh span:last-child{font-weight:400;letter-spacing:0;text-transform:none}
 .dayp{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
-.lrow{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;color:inherit;font:inherit}
+.lrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:start;column-gap:10px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;color:inherit;font:inherit}
 .dayp .lrow:first-child{border-top:0}
-.lrow .l{flex:1;min-width:0}
+.lrow .l{display:contents}   /* title, accuracy and chevron share the top row; the summary lines run the full width beneath */
+.lrow .nm{grid-column:1;grid-row:1}.lrow .ac{grid-column:2;grid-row:1}.lrow .ar{grid-column:3;grid-row:1}.lrow .sb{grid-column:1/-1}
 .lrow .nm,.rp h2{font-weight:600;overflow-wrap:anywhere}.lrow .nm.seq,.rp h2.seq{font:700 14px/1.5 var(--font-data);letter-spacing:.05em}
+.lrow .nm,.lrow .nm.seq{line-height:24px}   /* the accuracy and chevron sit level with the first line of the title */
 .lrow .sb,.rp .sb{font-size:12px;color:var(--muted)} .lrow .sb.dy,.rp .sb.dy{color:var(--accent)}
-.lrow .ac{font:700 16px var(--font-data);white-space:nowrap} .lrow .ac small{font:600 11px var(--font-body);letter-spacing:.06em;color:var(--muted);margin-left:3px}
+.lrow .ac{font:700 16px/24px var(--font-data);white-space:nowrap} .lrow .ac small{font:600 11px var(--font-body);letter-spacing:.06em;color:var(--muted);margin-left:3px}
 .ac.ok{color:var(--ok)} .ac.late{color:var(--late)} .ac.muted{color:var(--muted)}
-.lrow .ar{color:var(--muted);font-size:22px;line-height:1}
+.lrow .ar{color:var(--muted);font-size:22px;line-height:24px}
 .rp{display:grid;gap:4px}
 
 .rp .back{justify-self:start;padding-left:0}
@@ -678,12 +680,25 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
 :root:not([data-layout=desktop]) body[data-review="1"] #advBtns1{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line);margin:0}
 :root:not([data-layout=desktop]) body[data-review="1"] #advBtns1 .btn{min-height:64px;font-size:18px}
 :root:not([data-layout=desktop]) body[data-review="1"] #pagePlay{padding-bottom:120px}
-.res{display:flex;align-items:center;gap:16px}
+.res{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .res[hidden]{display:none}
-.resbig{font:800 64px/1 var(--font-data);color:var(--ink)}
-.res[data-ok="1"] .resbig{color:var(--ok)}
-.resbig small{font:700 16px var(--font-body);margin-left:6px;color:var(--muted)}
-.resside{display:grid;gap:2px}.resside b{font-size:18px}.resside span{color:var(--muted);font-size:15px}
+.res .sacc small{display:block;color:var(--muted);font-size:13px}
+.res .slab{font:700 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:-6px}
+.res .shd{display:flex;align-items:baseline;gap:8px}
+.res .shd b{font:800 64px/1 var(--font-display)}
+.res .shd span{font:500 16px var(--font-body);color:var(--muted)}
+.res .shd em{margin-left:auto;align-self:center;font:800 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;background:var(--fill);color:var(--accent-ink);padding:4px 9px;border-radius:999px;font-style:normal}
+.res .sbar{position:relative;height:10px;border-radius:999px;background:var(--line)}
+.res .sbar i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--fill);min-width:10px}
+.res .sbar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);opacity:.7}
+.res .scap{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.res .sacc{display:flex;gap:14px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px}
+.res .sacc b{font:800 28px var(--font-display);white-space:nowrap}
+.res[data-ok="1"] .sacc b{color:var(--ok)}
+.res .sacc>span{font-size:13px;color:var(--muted)}
+.res.solo .slab,.res.solo .shd,.res.solo .sbar,.res.solo .scap{display:none}
+.res.solo .sacc{border-top:0;padding-top:0}
+.res.solo .sacc b{font-size:56px}
 #advice{gap:10px}
 .key .k{font:800 15px var(--font-data)}
 .key .k.ok{color:var(--ok)}.key .k.early{color:var(--early);font-style:italic}
@@ -693,7 +708,9 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
 @media (max-width:359px){.switch.tabs button{font-size:13px;letter-spacing:.02em}}   /* four tab names fit the narrowest phones */
 .dur{display:grid;grid-template-columns:minmax(70px,1fr) minmax(110px,1.4fr);gap:8px}
 .pickrow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:48px;padding:8px 12px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;cursor:pointer}
-.pickrow small{color:var(--muted);font:500 13px var(--font-body);white-space:nowrap}
+.pickrow small{color:var(--muted);font:500 13px var(--font-body);white-space:nowrap;text-align:right;line-height:1.4}
+.maxline{margin:-10px 0 0;font-size:13px;color:var(--muted);text-align:right}
+.maxline:empty{display:none}
 .pickrow.on{background:var(--bg);box-shadow:inset 3px 0 0 var(--fill)}
 #pickList{display:grid;gap:10px}
 .ib.down svg{transition:transform .18s}
@@ -1252,7 +1269,7 @@ RLRR LRLL RLRR LRLL</pre>
       <h3>Scores, tempo and progress</h3>
       <ul>
         <li><b>On time</b> is the share of due strokes inside your on-time window. With an accent or ghost rule a stroke must also be played as written: an accent clearly louder and a ghost clearly softer than its neighbours. An exercise needs at least one full pass to be scored.</li>
-        <li><b>Score:</b> every run is scored when Scored is on. Each stroke earns points by its timing and the click level: on time scores most, off time a little, and a miss scores nothing (it costs 2 on Extreme and 5 on Master). A rest keeps the streak going and scores nothing, and a hit on it is a miss. Strokes on time in a row add a quarter to a multiplier, up to five times, and anything else resets it. The streak carries from one exercise to the next. The total never goes below zero. Your best score at each click level is an achievement, and a new one is announced when the run ends.</li>
+        <li><b>Score:</b> every run is scored when Scored is on. Each stroke earns points by its timing and the click level: on time scores most, off time a little, and a miss scores nothing (it costs 2 on Extreme and 5 on Master). A rest keeps the streak going and scores nothing, and a hit on it is a miss. Strokes on time in a row add a quarter to a multiplier, up to five times, and anything else resets it. Faster strokes score more: 240 strokes a minute (sixteenths at 60 BPM) counts once, and the range is half to double. The streak carries from one exercise to the next. The total never goes below zero. Your best score at each click level is an achievement, and a new one is announced when the run ends.</li>
         <li><b>Medals:</b> each exercise gets a medal for each click level, from the fastest tempo you have cleared it at. It is measured in strokes a minute, so sixteenths count for more than eighths at the same BPM. Hickory is cleared at any speed, then Bronze at 120 strokes a minute, Silver 180, Gold 240, Platinum 320, Sapphire 400, Ruby 480 and Diamond 600. Sixteenths at 60 BPM is 240, so Gold.</li>
         <li><b>Exercise table:</b> after a routine run, each exercise gets its accuracy, average error and spread, plus your earlier best at that tempo.</li>
         <li><b>The target is 90%.</b> An exercise is "cleared" at a tempo when it reaches 90% there. After a run the app names the weak exercises and suggests staying at that tempo until they settle. Any tempo is always allowed.</li>
@@ -1307,6 +1324,7 @@ RLRR LRLL RLRR LRLL</pre>
         <div class="exercises" id="exerciseList" role="listbox" aria-label="Exercises in this routine. Choose the exercise to start at."></div>
         <p class="hint">Tap an exercise to choose where to start.</p>
       </details>
+      <p class="maxline routine-only" id="maxLine"></p>
     </section>
 
     <section class="panel cfg" id="tempoPanel" aria-label="Tempo">
@@ -1414,8 +1432,11 @@ RLRR LRLL RLRR LRLL</pre>
       <div id="advBadge" hidden></div>
       <div id="advWin" hidden></div>
       <div class="res" id="advRes">
-        <div class="resbig"><span id="advPct"></span><small>on time</small></div>
-        <div class="resside"><b id="advStat"></b><span id="advSub"></span></div>
+        <span class="slab">Score</span>
+        <div class="shd"><b id="advScore"></b><span id="advMax"></span><em id="advHs" hidden>New high score</em></div>
+        <div class="sbar" id="advScoreBar"><i></i><u></u></div>
+        <div class="scap"><span id="advOfMax"></span><span id="advPrev"></span></div>
+        <div class="sacc"><b id="advPct"></b><span>on time<small><span id="advStat"></span> &middot; <span id="advSub"></span></small></span></div>
       </div>
       <p class="insight" id="advHead"></p>
       <p class="hint" id="advBody"></p>
@@ -1426,7 +1447,6 @@ RLRR LRLL RLRR LRLL</pre>
       </div>
       <div class="btns" id="advBtns2" style="margin-top:8px">
         <button class="btn small" id="advWeak" type="button" hidden></button>
-        <button class="btn small" id="advDiscard" type="button">Discard this run</button>
       </div>
     </section>
 
@@ -1471,20 +1491,33 @@ RLRR LRLL RLRR LRLL</pre>
         <p class="cap">Up is late, down is early. Ring is the left stick, solid dot the right.</p>
       </section>
 
+      <section class="panel" id="scoreBox" hidden aria-label="Score breakdown">
+        <h3>Score breakdown</h3>
+        <div class="stats">
+          <div class="stat"><div class="v" id="bDue">—</div><div class="k">Strokes due</div></div>
+          <div class="stat"><div class="v" id="bOn">—</div><div class="k">On time</div></div>
+          <div class="stat"><div class="v" id="bOff">—</div><div class="k">Off time</div></div>
+          <div class="stat"><div class="v" id="bMiss">—</div><div class="k">Missed</div></div>
+          <div class="stat"><div class="v" id="bBest">—</div><div class="k">Longest streak</div></div>
+          <div class="stat" id="bRestBox"><div class="v" id="bRest">—</div><div class="k">Hit on a rest</div></div>
+        </div>
+        <p class="cap" id="scoreNote"></p>
+      </section>
+
       <section class="panel" aria-label="Run numbers">
         <h3>Run numbers</h3>
         <div class="stats">
           <div class="stat"><div class="v" id="sWithin">—</div><div class="k">On time</div></div>
-          <div class="stat"><div class="v" id="sSpread">—</div><div class="k">Spread σ (ms)</div></div>
-          <div class="stat"><div class="v" id="sStreak">—</div><div class="k">Best streak</div></div>
-          <div class="stat"><div class="v" id="sHits">—</div><div class="k">Heard / due</div></div>
-          <div class="stat"><div class="v" id="sL">—</div><div class="k">Left avg (ms)</div></div>
-          <div class="stat"><div class="v" id="sR">—</div><div class="k">Right avg (ms)</div></div>
+          <div class="stat"><div class="v" id="sSpread">—</div><div class="k">Spread (ms)</div></div>
+          <div class="stat"><div class="v" id="sHits">—</div><div class="k">Strokes heard</div></div>
+          <div class="stat"><div class="v" id="sL">—</div><div class="k">Left stick (ms)</div></div>
+          <div class="stat"><div class="v" id="sR">—</div><div class="k">Right stick (ms)</div></div>
           <div class="stat"><div class="v" id="sStick">—</div><div class="k">Sticking correct</div></div>
           <div class="stat"><div class="v" id="sExtra">—</div><div class="k">Extra hits</div></div>
-          <div class="stat mic-only"><div class="v" id="sLevel">—</div><div class="k">Level spread σ (dB)</div></div>
+          <div class="stat mic-only"><div class="v" id="sLevel">—</div><div class="k">Level spread (dB)</div></div>
           <div class="stat mic-only"><div class="v" id="sLR">—</div><div class="k">Left vs right (dB)</div></div>
         </div>
+        <p class="cap">Extra hits are strokes played where none was due, such as on a rest.</p>
         <p class="insight" id="insight"></p>
       </section>
 
@@ -1494,6 +1527,7 @@ RLRR LRLL RLRR LRLL</pre>
         <p class="insight" id="resInsight"></p>
         <div class="btns"><button class="btn small" id="csvBtn" type="button">Download CSV</button></div>
       </section>
+      <div class="btns"><button class="btn small" id="advDiscard" type="button">Discard this run</button></div>
     </div>
       </div>
     </details>
@@ -2105,24 +2139,30 @@ function clearedBefore(runs,k,lv,sum,dy){
   return m;
 }
 /* Runs that age out of the detail list are folded into a small permanent summary, so totals, streaks, badges and cleared tempos never shrink. */
-const newSum=()=>({runs:0,sec:0,days:{},pat:{},rt:{},cr:0,pf:0,hs:{}});
+const newSum=()=>({runs:0,sec:0,days:{},pat:{},rt:{},cr:0,pf:0,hs:{},hr:{}});
 /* A clean routine run: two or more exercises played right through, every one at the target. A perfect exercise: at least 16 strokes, every one on time. */
 const sweepRun=run=>run.lv!=='off'&&run.ne>=2&&run.exercises.length>=run.ne&&run.exercises.every(b=>b.due>0&&b.within/b.due>=TARGET);
 const perfectN=run=>run.lv==='off'?0:run.exercises.filter(b=>b.due>=16&&b.within>=b.due).length;
 /* Score. Every stroke scores by its timing at the run's click level, and strokes on time in a row build a bonus. The codes are o on time, b off time, m missed, r a rest left alone, in the order played. */
 const LV_PTS={strokes:[1,3,0],beat:[2,5,0],half:[3,10,0],bar:[4,15,-2],none:[5,20,-5]};   /* off time, on time, miss */
 const STREAK_MOD=0.25,STREAK_CAP=16;   /* each stroke on time in a row adds a quarter to the multiplier, up to 16 in a row (x5) */
-function runPoints(codes,lv){
+/* Faster strokes score more: 240 strokes a minute (Gold pace, sixteenths at 60 BPM) is x1, between half and double. */
+const tempoMult=(k,bpm)=>{const r=strokeRate(k,bpm);return r>0?Math.min(2,Math.max(0.5,r/240)):1;};
+/* parts: [codes, tempo multiplier] for each exercise in order, so the streak carries from one to the next. */
+function scoreParts(parts,lv){
   const p=LV_PTS[lv];if(!p)return 0;
   let tally=0,streak=0;   /* the first stroke of a run, and the first on time after a slip, have no bonus. A rest (r) scores nothing and leaves the streak alone. */
-  for(const c of codes){
-    if(c==='r')continue;
-    if(c==='o'){tally+=p[1]*(1+STREAK_MOD*Math.min(streak,STREAK_CAP));streak++;}
-    else{streak=0;tally+=c==='m'?p[2]:p[0];}
-    if(tally<0)tally=0;
+  for(const [codes,m] of parts){
+    for(const c of codes){
+      if(c==='r')continue;
+      if(c==='o'){tally+=m*p[1]*(1+STREAK_MOD*Math.min(streak,STREAK_CAP));streak++;}
+      else{streak=0;tally+=m*(c==='m'?p[2]:p[0]);}
+      if(tally<0)tally=0;
+    }
   }
   return Math.round(tally);
 }
+const runPoints=(codes,lv)=>scoreParts([[codes,1]],lv);
 /* A saved stroke is four characters: the result (on time, off time, missed, accent too soft, ghost too loud) with the accent or ghost class and a wrong-stick flag, the timing in whole milliseconds, and the level in dB below full scale. packStrokes writes them. */
 const B64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',SPR='obmsl',SPD='nAg';
 function unpackStrokes(sp){
@@ -2134,11 +2174,38 @@ function unpackStrokes(sp){
   return out;
 }
 const exCodes=b=>typeof b.q==='string'?b.q:(typeof b.sp==='string'?unpackStrokes(b.sp).map(x=>x.r==='s'||x.r==='l'?'b':x.r).join(''):'');
-const runScore=run=>runPoints(run.exercises.map(exCodes).join(''),run.lv);
+const runScore=run=>scoreParts(run.exercises.map(b=>[exCodes(b),tempoMult(b.k,b.bpm||run.bpm)]),run.lv);
+/* The score of a flawless run at a level: every stroke on time. segs is [strokes, tempo multiplier] for each exercise in order. */
+const maxPoints=(segs,lv)=>{
+  const p=LV_PTS[lv];if(!p)return 0;const c=STREAK_CAP;
+  const F=n=>n+STREAK_MOD*(n<=c+1?n*(n-1)/2:c*(c+1)/2+c*(n-c-1));   /* the bonus-weighted count of the first n strokes */
+  let at=0,t=0;segs.forEach(([n,m])=>{if(n>0){t+=m*(F(at+n)-F(at));at+=n;}});
+  return Math.round(p[1]*t);
+};
+/* A run's score as a share of its own flawless maximum, so runs of different length can be compared. */
+const runMax=run=>maxPoints(run.exercises.map(b=>[b.due,tempoMult(b.k,b.bpm||run.bpm)]),run.lv);
+const runShare=run=>{const m=runMax(run);return m>0?runScore(run)/m:0;};
+function bestShares(runs,sum){const o=Object.assign({},sum&&sum.hr);runs.forEach(r=>{const v=runShare(r);if(v>(o[r.lv]||0))o[r.lv]=v;});return o;}
+/* How a run's score came about: strokes due, on time, off time and missed, hits on a rest, the longest streak on time, and the average tempo multiplier. */
+function scoreBreakdown(run){
+  let on=0,off=0,miss=0,streak=0,best=0,n=0,mw=0,due=0,unplayed=0;
+  run.exercises.forEach(b=>{
+    const m=tempoMult(b.k,b.bpm||run.bpm);due+=b.due||0;unplayed+=b.miss||0;
+    for(const c of exCodes(b)){
+      if(c==='r')continue;
+      n++;mw+=m;
+      if(c==='o'){on++;streak++;if(streak>best)best=streak;}
+      else{streak=0;if(c==='m')miss++;else off++;}
+    }
+  });
+  const missed=Math.min(miss,unplayed);   /* a Miss is a stroke that was due and not played, or a hit on a rest */
+  return {due:due,on:on,off:off,miss:missed,rest:miss-missed,best:best,tempo:n?mw/n:1};
+}
 function highScores(runs,sum){const o=Object.assign({},sum&&sum.hs);runs.forEach(r=>{const v=runScore(r);if(v>(o[r.lv]||0))o[r.lv]=v;});return o;}
 function foldRun(sum,run){
   sum.runs++;sum.sec+=run.sec||0;
   {const v=runScore(run);sum.hs=sum.hs||{};if(v>(sum.hs[run.lv]||0))sum.hs[run.lv]=v;}
+  {const v=Math.round(runShare(run)*1e4)/1e4;sum.hr=sum.hr||{};if(v>(sum.hr[run.lv]||0))sum.hr[run.lv]=v;}
   if(sweepRun(run))sum.cr=Math.max(sum.cr||0,run.sec||0);
   sum.pf=(sum.pf||0)+perfectN(run);
   const dk=dayKey(run.t);sum.days[dk]=(sum.days[dk]||0)+(run.sec||0);
@@ -2223,7 +2290,7 @@ const BGROUPS=[{name:'Runs',d:'Runs where at least one exercise was played throu
   {name:'Days in a row',d:'Your longest run of practice days. A day counts at 5 minutes or more. One rest day a week does not break it.',ids:['str']},
   {name:'Exercises cleared',d:'An exercise is cleared on a level when you play it at 90% or more of strokes on time at that click level. Each exercise counts once on each level, whatever the accent rule. Each level is cleared on its own. The table counts exercises by the fastest tempo they were cleared at.',grid:true,ids:['lstrokes','lbeat','lhalf','lbar','lnone','all']},
   {name:'Accents and ghosts',d:'Exercises cleared with an accent or ghost rule: 90% or more of strokes on time and played as written. The same exercise with another rule counts again.',ids:['dyn']},
-  {name:'High score',d:'Your best score in one run, at each click level. Every stroke scores by its timing: on time scores most, off time a little, a miss nothing (it costs points on Extreme and Master). Strokes on time in a row build a bonus of up to five times. Harder levels score more.',ids:['hstrokes','hbeat','hhalf','hbar','hnone']},
+  {name:'High score',d:'Your best score in one run, at each click level. Every stroke scores by its timing: on time scores most, off time a little, a miss nothing (it costs points on Extreme and Master). Strokes on time in a row build a bonus of up to five times. Harder levels score more, and so do faster strokes: 240 strokes a minute counts once, from half to double.',ids:['hstrokes','hbeat','hhalf','hbar','hnone']},
   {name:'Longest clean run',d:'The most minutes of one routine, played start to finish, with every exercise at 90% or more.',ids:['cln']},
   {name:'Perfect exercises',d:'An exercise of at least 16 strokes with every stroke on time.',ids:['prf']},
   {name:'Tempo',d:'The fastest tempo at which you have cleared any exercise.',ids:['tmp']}];
@@ -2580,7 +2647,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.95.0';                           /* shown beside the title */
+const VERSION='1.0.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2714,7 +2781,7 @@ function unpackRecs(o){
   const q=o.sum;
   if(q&&typeof q==='object'){
     sum.runs=Math.max(0,num(q.runs));sum.sec=Math.max(0,num(q.sec));sum.cr=Math.max(0,num(q.cr));sum.pf=Math.max(0,num(q.pf));
-    LEVELS.forEach(l=>{const v=Math.max(0,Math.round(num(q.hs&&q.hs[l.v])));if(v)sum.hs[l.v]=v;});
+    LEVELS.forEach(l=>{const v=Math.max(0,Math.round(num(q.hs&&q.hs[l.v])));if(v)sum.hs[l.v]=v;const h=Math.min(1,Math.max(0,num(q.hr&&q.hr[l.v])));if(h)sum.hr[l.v]=h;});
     Object.keys(q.days||{}).forEach(k=>{if(/^\d{4}-\d\d-\d\d$/.test(k))sum.days[k]=Math.max(0,num(q.days[k]));});
     (q.pat||[]).forEach(e=>{
       const k=items[e&&e.k];if(typeof k!=='string'||!Array.isArray(e.tr)||!e.tr.length||!LEVELS.some(l=>l.v===e.lv))return;
@@ -2737,7 +2804,7 @@ function packRecs(sel){   /* sel says which parts to include; none given means t
     return o;
   });
   const q=recs.sum,out={v:2};
-  if(sel.hist)out.sum={runs:q.runs,sec:q.sec,cr:q.cr||0,pf:q.pf||0,hs:q.hs||{},days:q.days,rt:q.rt,pat:Object.keys(q.pat).map(k=>Object.assign({},q.pat[k],{k:hk(q.pat[k].k)}))};
+  if(sel.hist)out.sum={runs:q.runs,sec:q.sec,cr:q.cr||0,pf:q.pf||0,hs:q.hs||{},hr:q.hr||{},days:q.days,rt:q.rt,pat:Object.keys(q.pat).map(k=>Object.assign({},q.pat[k],{k:hk(q.pat[k].k)}))};
   if(sel.lib)out.lib=recs.lib.map(e=>({id:e.id,x:hk(e.x),t:e.t}));
   if(sel.lists)out.lists=S.lists.map(l=>({url:l.url,name:l.name||undefined}));
   if(sel.set){out.settings={};PORTABLE.forEach(k=>{out.settings[k]=S[k];});}
@@ -3084,8 +3151,8 @@ async function lockScreen(){try{if(navigator.wakeLock&&!wake)wake=await navigato
 function unlockScreen(){try{if(wake){wake.release();wake=null;}}catch(e){wake=null;}}
 
 /* ---------- exercises for the current mode ---------- */
-function eachDefault(){
-  if(routineParsed.each)return routineParsed.each;
+function eachDefault(p){
+  if((p||routineParsed).each)return (p||routineParsed).each;
   return S.eachUnit==='pass'?{unit:'pass',v:Math.max(1,Math.round(S.eachVal))}:{unit:'sec',v:S.eachVal*60};
 }
 function allExercises(){
@@ -4190,8 +4257,7 @@ function updateStats(r){
   const sp=r?sd(r.errs.slice(-32)):NaN;
   $('sWithin').textContent=r&&r.slots?Math.round(r.within/r.slots*100)+'%':'—';
   $('sSpread').textContent=isNaN(sp)?'—':sp.toFixed(1);
-  $('sStreak').textContent=r?String(r.best):'—';
-  $('sHits').textContent=r?r.errs.length+'/'+r.slots:'—';
+  $('sHits').textContent=r?r.errs.length+' of '+r.slots:'—';
   $('sL').textContent=r&&r.hand.L.length?fmtMs(mean(r.hand.L),1):'—';
   $('sR').textContent=r&&r.hand.R.length?fmtMs(mean(r.hand.R),1):'—';
   $('sStick').textContent=r&&r.checked?Math.round((1-r.bad/r.checked)*100)+'%':'off';
@@ -4363,14 +4429,14 @@ function recordRun(r){
   const prevBest=new Map();
   rows.forEach(x=>{const b=bestBefore(recs.runs,x.key,x.bpm,S.click,r.dyc);if(b!==null)prevBest.set(x.key,b);});
   const newTempo=rows.filter(x=>x.pct>=TARGET&&x.bpm>clearedBefore(recs.runs,x.key,S.click,recs.sum,r.dyc)&&scoreOn);
-  const bv0=badgeValues(recs.runs,recs.sum),score=runScore(run),hs0=highScores(recs.runs,recs.sum)[run.lv]||0;
+  const bv0=badgeValues(recs.runs,recs.sum),score=runScore(run),hs0=highScores(recs.runs,recs.sum)[run.lv]||0,share0=bestShares(recs.runs,recs.sum)[run.lv]||0;
   if(scoreOn)recs.runs.push(run);   /* a practice run is shown but not kept */
   const bv1=badgeValues(recs.runs,recs.sum),won=[];
   BADGES.forEach(b=>b.at.forEach((n,i)=>{if(bv0[b.id]<n&&bv1[b.id]>=n)won.push({id:b.id,i:i,v:bv1[b.id]});}));
   if(!scoreOn){const dk=dayKey(run.t);recs.sum.days[dk]=(recs.sum.days[dk]||0)+run.sec;}   /* the time of a practice run still counts toward today and the streak */
   const saved=saveRecs();
   if(scoreOn)askPersist();
-  lastRun={run:run,only:r.only||null,prevBest:prevBest,newTempo:newTempo,won:won,rows:rows,skipped:skipped,saved:saved,discarded:false,practice:!scoreOn,score:score,hsNew:scoreOn&&score>hs0};
+  lastRun={run:run,only:r.only||null,prevBest:prevBest,newTempo:newTempo,won:won,rows:rows,skipped:skipped,saved:saved,discarded:false,practice:!scoreOn,score:score,share0:share0,hsNew:scoreOn&&score>hs0};
 }
 /* After a run the score is brought into view. The run layout is still being undone, so the jump repeats once the page has settled. */
 function showResult(){
@@ -4421,7 +4487,26 @@ function renderAdvice(){
       $('advStat').textContent=played.filter(x=>x.pct>=TARGET).length+' of '+n+' cleared';
       $('advSub').textContent=nb?nb+(nb===1?' new best':' new bests'):(played.every(x=>pb(x)===null)?'First run at this tempo':'No new bests');
     }
-    if(!L.practice&&L.score)$('advSub').textContent+=' \u00b7 Score '+L.score.toLocaleString('en-US');
+    {   /* how the score came about */
+      const sb=$('scoreBox'),on=!L.practice&&!L.discarded;sb.hidden=!on;
+      if(on){
+        const d=scoreBreakdown(L.run),p=LV_PTS[L.run.lv],f=n=>n.toLocaleString('en-US');
+        $('bDue').textContent=f(d.due);$('bRestBox').hidden=!d.rest;$('bRest').textContent=f(d.rest);$('bOn').textContent=f(d.on);$('bOff').textContent=f(d.off);$('bMiss').textContent=f(d.miss);$('bBest').textContent=f(d.best);
+        $('scoreNote').textContent=levelName(L.run.lv)+': '+p[1]+' points on time, '+p[0]+' off time, '+(p[2]<0?'minus '+(-p[2]):p[2])+' for a miss or a hit on a rest. Strokes on time in a row add a bonus of up to five times, reached after 16. Tempo ×'+(Math.round(d.tempo*100)/100)+'.';
+      }
+    }
+    {   /* the score, against a flawless run of what was played and against the best before */
+      const mx=L.practice?0:maxPoints(L.rows.map(x=>[x.due,tempoMult(x.key,x.bpm)]),L.run.lv),r=$('advRes');
+      r.classList.toggle('solo',!mx);
+      if(mx){
+        const f=n=>n.toLocaleString('en-US'),lv=levelName(L.run.lv);
+        $('advScore').textContent=f(L.score);$('advMax').textContent='/ '+f(mx);$('advHs').hidden=!L.hsNew;
+        const bar=$('advScoreBar');bar.firstChild.style.width=Math.min(100,100*L.score/mx)+'%';
+        const tk=bar.lastChild,showTk=L.share0>0&&L.share0<1;tk.hidden=!showTk;if(showTk)tk.style.left=(100*L.share0)+'%';
+        $('advPrev').textContent=L.share0>0?'Best on '+lv+': '+Math.round(100*L.share0)+'%':'First score on '+lv;
+        $('advOfMax').textContent='This run: '+Math.round(100*L.score/mx)+'%';
+      }
+    }
   }
   /* One sentence on what to work on. */
   const fix=(view&&view.errs?insightParts(view)[0]:'')||'';
@@ -4431,7 +4516,6 @@ function renderAdvice(){
   else body='Work on '+adv.weak.slice().sort((a,b)=>a.pct-b.pct).slice(0,6).map(b=>'exercise '+b.idx+' ('+Math.round(b.pct*100)+'%)').join(', ')+(adv.weak.length>6?' and more':'')+'. Stay at '+S.bpm+' BPM until they settle.';
   {   /* what was just earned gets its own moment at the top, once */
     const wins=[];
-    if(L.hsNew)wins.push('New high score! '+L.score.toLocaleString('en-US')+' on '+levelName(L.run.lv));
     if(L.newTempo&&L.newTempo.length)wins.push('New best tempo: '+(L.newTempo.length<=2?L.newTempo.map(x=>showKey(x.key)+' at '+x.bpm+' BPM').join(', '):L.newTempo.length+' exercises at a new tempo'));
     const win=$('advWin');win.hidden=!wins.length;win.textContent=wins.join(' · ');
     if(wins.length&&!L.celebrated){win.classList.remove('pop');void win.offsetWidth;win.classList.add('pop');}
@@ -4991,13 +5075,14 @@ const isUntitled=rk=>/^Untitled \d+$/.test(routineName(rk));
 const plainRun=r=>r.mode!=='routine'||(r.ne===1&&isUntitled(r.rk));
 const runTitle=r=>plainRun(r)?{text:showKey(r.exercises[0].k),mono:true}:{text:routineName(r.rk),mono:false};
 const runMins=r=>r.sec>=30?Math.max(1,Math.round(r.sec/60))+' min':'';
-function runMeta(r,withTime){
+function runMeta(r,withTime,noScore){
   const bits=[];
   if(withTime)bits.push(new Date(r.t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}));
   bits.push(r.lv==='off'?'Count-in only':levelName(r.lv));
   if(r.mode==='routine'&&r.ne>1){const n=r.exercises.length;bits.push((n<r.ne?n+' of '+r.ne:r.ne)+' exercises');}   /* a partial run says how many were played */
   bits.push(r.bpm+' BPM');
   const m=runMins(r);if(m)bits.push(m);
+  if(!noScore&&r.lv!=='off'){const v=runScore(r);if(v)bits.push('Score: '+v.toLocaleString('en-US'));}
   return bits.join(' · ');
 }
 const dyLine=r=>{if(!r.dy)return '';const t=dynText(r.dy);return t.charAt(0).toUpperCase()+t.slice(1);};
@@ -5123,7 +5208,7 @@ function renderRunPage(r){
   const page=document.createElement('div');page.className='rp';
   const t=runTitle(r),key=r.mode==='routine'?(r.rk||''):r.exercises[0].k,off=r.lv==='off';
   const h=document.createElement('h2');h.className=t.mono?'seq':'';h.textContent=t.text;page.appendChild(h);
-  const sb=document.createElement('div');sb.className='sb';sb.textContent=dayWord(r.t).replace(/^./,c=>c.toUpperCase())+' · '+runMeta(r,true);page.appendChild(sb);
+  const sb=document.createElement('div');sb.className='sb';sb.textContent=dayWord(r.t).replace(/^./,c=>c.toUpperCase())+' · '+runMeta(r,true,true);page.appendChild(sb);
   const dl=dyLine(r);if(dl){const d=document.createElement('div');d.className='sb dy';d.textContent=dl;page.appendChild(d);}
   const f=runFigures(r),a=accHtml(f.acc);
   const stats=document.createElement('div');stats.className='stats';
@@ -5132,6 +5217,10 @@ function renderRunPage(r){
   stats.appendChild(statBox(isNaN(f.ms)?'—':fmtMs(f.ms,1),'ms',isNaN(f.ms)?'muted':biasCls(f.ms)));
   stats.appendChild(statBox(isNaN(f.db)?'—':'±'+f.db.toFixed(1),'dB'));
   page.appendChild(stats);
+  if(!off){   /* the score, against a flawless run of what was played */
+    const sc=runScore(r),mx=maxPoints(r.exercises.map(b=>[b.due,tempoMult(b.k,b.bpm||r.bpm)]),r.lv);
+    if(mx){const d=document.createElement('div');d.className='sb';d.textContent='Score: '+sc.toLocaleString('en-US')+' of '+mx.toLocaleString('en-US');page.appendChild(d);}
+  }
   const lc=runLevelText(r);if(lc){const d=document.createElement('div');d.className='sb lvl';d.textContent=lc;page.appendChild(d);}
   if(r.exercises.length===1&&r.exercises[0].sp&&!off)runStrokes(page,r);
   if(!off&&r.rp&&r.exercises.some(b=>b.sp))staffSection(page,r);
@@ -5833,6 +5922,19 @@ function closeConfirm(go){
   const fn=cfFn;cfFn=null;
   if(go&&fn)fn();
 }
+/* The most a flawless run of the routine could score at today's tempo, click and time per exercise. */
+function routineInfoOf(parsed){
+  const ex=resolveExercises(parsed.exercises,eachDefault(parsed),{bpm:S.bpm,subdiv:S.subdiv});
+  const keys=ex.map(b=>patKey(b.notes,b.groupStart,b.subs,b.defSub,b.sig));
+  return {max:maxPoints(ex.map((b,i)=>[b.passes*b.notes.filter(x=>x!=='_').length,tempoMult(keys[i],b.bpm)]),S.click),rk:routineKeyOf(keys)};
+}
+const maxText=max=>'Max score: '+max.toLocaleString('en-US');
+function syncMaxScore(){
+  const el=$('maxLine');el.textContent='';
+  if(S.mode!=='routine'||!routineParsed.exercises.length)return;
+  const i=routineInfoOf(routineParsed);
+  if(i.max)el.textContent=maxText(i.max);
+}
 function syncPlayName(){
   $('playName').textContent=curName();
 }
@@ -5944,6 +6046,7 @@ function openPick(){
       const b=document.createElement('button');b.type='button';b.className='pickrow'+(e.id===S.libId?' on':'');
       const n=exerciseCount(e.x);
       b.innerHTML='<span></span><small></small>';b.firstChild.textContent=label;b.lastChild.textContent=n+(n===1?' exercise':' exercises');
+      if(n>1){const i=routineInfoOf(parseRoutine(e.x));if(i.max){b.lastChild.appendChild(document.createElement('br'));b.lastChild.appendChild(document.createTextNode(maxText(i.max)));}}
       b.addEventListener('click',()=>{
         if(e.id===S.libId){closePick();return;}
         closePick();guard(()=>loadEntry(e));
@@ -6298,6 +6401,7 @@ function syncInfo(){
     $('routineErr').textContent=n===0&&!S.routineText.trim()?'':(errs.length?errs.slice(0,3).join(' ')+(errs.length>3?' (+'+(errs.length-3)+' more)':''):(n===0?'No exercises found. Type one exercise per line using L and R.':''));
     const total=playTime(exercises);
     $('routineInfo').textContent=ok?n+(n===1?' exercise':' exercises')+(S.startExercise>1?' · from '+S.startExercise:''):'';
+    syncMaxScore();
     $('tempoNote').textContent=ok?'about '+fmtTime(total)+pulseNote(exercises):'';
     const en=$('eachNote');
     en.hidden=!routineParsed.each;

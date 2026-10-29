@@ -1,7 +1,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const { loadCore, plain } = require('./helpers');
 const c = loadCore(['parseStrokes', 'parseExerciseLine', 'parseRoutine', 'resolveExercises', 'buildPlan', 'builderApply',
-  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runPoints', 'runScore', 'highScores', 'unpackStrokes', 'BADGES']);
+  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runPoints', 'runScore', 'highScores', 'unpackStrokes', 'BADGES', 'maxPoints', 'tempoMult', 'scoreParts', 'runShare', 'bestShares', 'scoreBreakdown']);
 
 const plan = (text, opt) => {
   const p = c.parseRoutine(text);
@@ -154,4 +154,37 @@ test('each level has its own high-score ladder, scaled by points per on-time str
   assert.deepEqual(h('hstrokes')[9], 38000);
   assert.deepEqual(h('hhalf')[9], 130000);
   ['hstrokes', 'hbeat', 'hhalf', 'hbar', 'hnone'].forEach(id => h(id).forEach((n, i, a) => { if (i) assert.ok(n > a[i - 1], id + ' climbs'); }));
+});
+
+test('maxPoints equals a flawless run, across exercises of different speed', () => {
+  [1, 2, 8, 17, 18, 40, 500].forEach(n => ['strokes', 'half', 'none'].forEach(lv => assert.equal(c.maxPoints([[n, 1]], lv), c.runPoints('o'.repeat(n), lv), n + ' ' + lv)));
+  assert.equal(c.maxPoints([[10, 2], [10, 0.5]], 'half'), c.scoreParts([['o'.repeat(10), 2], ['o'.repeat(10), 0.5]], 'half'), 'the streak carries across exercises of different speed');
+});
+
+test('tempo multiplier: 240 strokes a minute is x1, between x0.5 and x2', () => {
+  assert.equal(c.tempoMult('RLRL RLRL RLRL RLRL', 60), 1);        // sixteenths at 60 BPM = 240
+  assert.equal(c.tempoMult('RLRL RLRL RLRL RLRL', 120), 2);       // 480, at the cap
+  assert.equal(c.tempoMult('RLRL RLRL RLRL RLRL', 200), 2);       // capped
+  assert.equal(c.tempoMult('RLRL RLRL RLRL RLRL', 30), 0.5);      // 120, at the floor
+  assert.ok(Math.abs(c.tempoMult('RLRL RLRL RLRL RLRL', 40) - 160 / 240) < 1e-9, '160 strokes a minute');
+  const run = bpm => ({ id: 'x', t: 1, lv: 'half', bpm, exercises: [{ k: 'RLRL RLRL RLRL RLRL', bpm, due: 4, within: 4, q: 'oooo' }] });
+  assert.equal(c.runScore(run(120)), 2 * c.runScore(run(60)));
+});
+
+test('score breakdown counts strokes and the longest streak, and best shares compare runs of different length', () => {
+  const run = (lv, q, extra) => Object.assign({ id: q, t: 1, lv, bpm: 60, exercises: [{ k: 'RLRL RLRL RLRL RLRL', bpm: 60, due: q.replace(/r/g, '').length, miss: (q.match(/m/g) || []).length, within: 0, q }] }, extra);
+  const d = c.scoreBreakdown(run('half', 'ooobormo'));
+  assert.deepEqual([d.on, d.off, d.miss, d.best, d.tempo], [5, 1, 1, 3, 1]);
+  const short = run('half', 'oo'), long = run('half', 'o'.repeat(40) + 'b'.repeat(40));
+  assert.equal(c.runShare(short), 1);
+  assert.ok(c.runShare(long) < 1 && c.runShare(long) > 0.3);
+  assert.equal(c.bestShares([short, long], c.newSum()).half, 1);
+  const sum = c.newSum(); sum.hr.half = 0.9;
+  assert.equal(c.bestShares([long], sum).half, 0.9, 'an older folded best still stands');
+});
+
+test('score breakdown separates unplayed strokes from hits on a rest', () => {
+  const run = { id: 1, t: 1, lv: 'half', bpm: 60, exercises: [{ k: 'RLRL', bpm: 60, due: 4, miss: 1, within: 0, q: 'ooomrm' }] };
+  const d = c.scoreBreakdown(run);
+  assert.deepEqual([d.due, d.on, d.miss, d.rest], [4, 3, 1, 1]);
 });
