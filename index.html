@@ -287,6 +287,7 @@ body[data-tab=pattern] header,body[data-tab=pattern] .tabs{display:none}   /* th
 .etitle b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .etitle .hint{margin:0;font-size:12px}
 .rtname{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.rtname+.patrow{margin-top:-10px}   /* the name and its line read as one block */
 .rtname b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}.rtname .linkbtn{flex:none}
 :root:not([data-layout=desktop]) body[data-review="1"] header,:root:not([data-layout=desktop]) body[data-review="1"] .tabs,:root:not([data-layout=desktop]) body[data-review="1"] .cfg,:root:not([data-layout=desktop]) body[data-review="1"] .transport,:root:not([data-layout=desktop]) body[data-review="1"] .notice{display:none}
 .advmain{margin-top:10px}
@@ -2476,7 +2477,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.85.4';                           /* shown beside the title */
+const VERSION='0.85.5';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
