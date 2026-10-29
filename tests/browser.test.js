@@ -1,7 +1,7 @@
 /* End-to-end checks in a real browser. The app is served from memory with a small hook added, so a test can
    feed it hits at exact times instead of playing. Nothing is changed on disk. */
 const test = require('node:test'), assert = require('node:assert/strict');
-const http = require('http'), fs = require('fs'), path = require('path');
+const http = require('http'), fs = require('fs'), path = require('path'), os = require('os');
 const { chromium } = require('playwright');
 const { ROOT, html } = require('./helpers');
 
@@ -331,4 +331,23 @@ test('every badge has one medal, with a written step name, on the Achievements p
   assert.equal(r.off, 13);
   const txt = await p.evaluate(() => document.getElementById('badges').innerText);
   assert.doesNotMatch(txt, /undefined|NaN/);
+});
+
+test('Import asks what to bring in, offers only what the file holds, and imports only the ticks', async () => {
+  const p = await open({ seeded: true });
+  const file = path.join(os.tmpdir(), 'pocket-imp-test.json');
+  fs.writeFileSync(file, JSON.stringify({ lib: [{ id: 'zz1', x: '8 R L R L', t: 1 }], settings: { bpm: 77 } }));
+  await p.click('#tabProgress');
+  await p.setInputFiles('#recFile', file);
+  await p.waitForTimeout(300);
+  const rows = await p.evaluate(() => ({ title: document.getElementById('exTitle').textContent, go: document.getElementById('exGo').textContent, parts: [...document.querySelectorAll('#exOpts input')].map(c => c.dataset.k) }));
+  assert.equal(rows.title, 'Import');
+  assert.equal(rows.go, 'Import');
+  assert.deepEqual(rows.parts, ['lib', 'set']);
+  await p.evaluate(() => { document.querySelector('#exOpts input[data-k=set]').click(); });
+  await p.click('#exGo');
+  await p.waitForTimeout(400);
+  const after = await p.evaluate(() => ({ bpm: JSON.parse(localStorage.getItem('stick-timing-trainer.v1')).settings.bpm, lib: JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')).lib.length }));
+  assert.notEqual(after.bpm, 77, 'settings were unticked');
+  assert.equal(after.lib, 1);
 });
