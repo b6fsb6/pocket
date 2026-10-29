@@ -207,7 +207,6 @@ async function runOnce(settings, practice, init) {
     discard: !document.getElementById('advDiscard').hidden,
     win: document.getElementById('advWin').hidden ? '' : document.getElementById('advWin').textContent,
     next: document.getElementById('advNext').textContent,
-    tag: document.getElementById('tag').textContent,
     days: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).sum || {}).days || {},
   }));
   assert.deepEqual(p.errors, []);
@@ -227,10 +226,9 @@ test('a practice run shows its result but saves nothing', async () => {
   assert.ok(!o.discard);
 });
 
-test('a practice run still counts its time, and the header shows it', async () => {
+test('a practice run still counts its time toward the day', async () => {
   const o = await runOnce({ click: 'beat' }, true);
   assert.equal(Object.keys(o.days).length, 1);
-  assert.match(o.tag, /^No streak yet · today \d+ of 5 min$/);
 });
 
 test('a new badge is announced on the result, with the next one in sight', async () => {

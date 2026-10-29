@@ -661,7 +661,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
       <h1>Pocket</h1>
       <span class="headbtns"><button class="pill" id="helpBtn" type="button" data-help="help-how">Help</button><button class="pill" id="themeBtn" type="button"></button><span class="pill on" id="micPill" role="status" hidden><i id="micDot"></i><span id="micTxt">Mic on</span></span></span>
     </div>
-    <p class="sub"><span id="tag">Go from trailing to nailing the beat</span><small class="ver" id="ver"></small></p>
+    <p class="sub"><span>Go from trailing to nailing the beat</span><small class="ver" id="ver"></small></p>
   </header>
 
 
@@ -2476,7 +2476,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.85.1';                           /* shown beside the title */
+const VERSION='0.85.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4009,7 +4009,6 @@ function showTab(t){
   if(t==='setup')syncData();
   if(t==='library')renderLibraryPage();
   if(t==='pattern'){renderBuilder();syncInfo();}
-  syncTagline();
 }
 const spreadWord=v=>(v<=2?'even':(v<=4?'a little uneven':'uneven'))+' ±'+v.toFixed(1)+' dB';
 const fmtDb=v=>(Math.abs(v)<0.05?'0':(v>0?'+':'\u2212')+Math.abs(v).toFixed(1));
@@ -4260,7 +4259,6 @@ function recordRun(r){
   if(!scoreOn){const dk=dayKey(run.t);recs.sum.days[dk]=(recs.sum.days[dk]||0)+run.sec;}   /* the time of a practice run still counts toward today and the streak */
   const saved=saveRecs();
   if(scoreOn)askPersist();
-  syncTagline();
   lastRun={run:run,only:r.only||null,prevBest:prevBest,newTempo:newTempo,won:won,rows:rows,skipped:skipped,saved:saved,discarded:false,practice:!scoreOn};
 }
 /* After a run the score is brought into view. The run layout is still being undone, so the jump repeats once the page has settled. */
@@ -4279,15 +4277,6 @@ function nextBadge(){
   if(!best)return '';
   const b=best.b,what=b.lead?b.lead+' '+best.next+(b.suf||''):best.next+' '+(b.one&&best.next===1?b.one:b.unit);
   return 'Next badge: '+what+' ('+(b.lead?v[b.id]+(b.suf||''):v[b.id]+' of '+best.next)+')';
-}
-/* On Play the header shows the streak and today's practice, so the reward is in sight. */
-const TAGLINE='Go from trailing to nailing the beat';
-function syncTagline(){
-  const el=$('tag');if(!el)return;
-  const days=practiceDays(recs.runs,recs.sum);
-  if(curTab!=='play'||!days.size){el.textContent=TAGLINE;return;}
-  const now=new Date(),n=streakOf(days,now),sec=days.get(dayKey(now.getTime()))||0;
-  el.textContent=(n?n+(n===1?' day':' days')+' in a row':'No streak yet')+' · '+(sec>=STREAK_MIN?'today done':'today '+Math.floor(sec/60)+' of '+STREAK_MIN/60+' min');
 }
 function renderAdvice(){
   const box=$('advice');
@@ -6734,7 +6723,7 @@ function wire(){
   });
   $('updLater').addEventListener('click',()=>{updLater=true;showUpd();});
   setTimeout(checkUpdate,2000);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){micTest=false;if(run&&!run.ended)pauseRun();idleMic();}if(!document.hidden){syncTagline();checkUpdate();if(run&&!run.ended)lockScreen();}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){micTest=false;if(run&&!run.ended)pauseRun();idleMic();}if(!document.hidden){checkUpdate();if(run&&!run.ended)lockScreen();}});
   let lastW=0,rzT=0;
   window.addEventListener('resize',()=>{
     drawTrace();
