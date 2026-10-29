@@ -2465,7 +2465,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.81.3';                           /* shown beside the title */
+const VERSION='0.81.4';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -5928,7 +5928,7 @@ function syncSetup(){
       setupWas=false;box.hidden=false;
       $('setN').textContent='';$('setSteps').textContent='';
       ['Microphone allowed','Mic check done','Latency set'].forEach(t=>{const li=document.createElement('li');li.className='ok';li.textContent=t;$('setSteps').appendChild(li);});
-      const m=document.createElement('li');m.textContent='You\u2019re all set. Press Start.';m.style.fontWeight='700';$('setSteps').appendChild(m);
+      const m=document.createElement('li');m.textContent='You\u2019re all set. Pick a routine, then press Start.';m.style.fontWeight='700';$('setSteps').appendChild(m);
       clearTimeout(setupTimer);setupTimer=setTimeout(()=>{box.hidden=true;setupTimer=0;},6000);
     }else if(!setupTimer)box.hidden=true;
     return;
