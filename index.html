@@ -126,7 +126,7 @@ body[data-run="1"] .notice{display:none}
 .hand.R{background:var(--ink);color:var(--bg)}
 .hand.rest{border:2px dashed var(--line);color:var(--muted);font-size:18px}
 .rowswrap{position:relative}
-.exnav{margin:0 0 10px}
+#exBox .hint{margin:8px 0 0}
 .rows.pick .prow{cursor:pointer}
 .rows.pick{user-select:none;-webkit-user-select:none}   /* the page scrolls over it; only a finished run's staff scrolls on its own */
 .rows.pick:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
@@ -1268,6 +1268,7 @@ RLRR LRLL RLRR LRLL</pre>
       <details id="exBox" class="setbox routine-only">
         <summary id="routineInfo"></summary>
         <div class="exercises" id="exerciseList" role="listbox" aria-label="Exercises in this routine. Choose the exercise to start at."></div>
+        <p class="hint">Tap an exercise to choose where to start.</p>
       </details>
     </section>
 
@@ -1358,7 +1359,6 @@ RLRR LRLL RLRR LRLL</pre>
 
 
     <section aria-label="Strokes">
-      <p class="hint routine-only cfg exnav">Tap an exercise to choose where to start.</p>
       <div class="rowswrap">
       <div class="bigcount" id="bigCount" hidden aria-hidden="true"></div>
       <div class="rows" id="rows" tabindex="0"><div class="rows-track" id="rowsTrack"></div></div>
@@ -2484,7 +2484,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.86.6';                           /* shown beside the title */
+const VERSION='0.86.7';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
