@@ -442,8 +442,6 @@ html.pgopen{overflow:hidden}
 .medal.off .c2{fill:none;stroke:var(--muted);stroke-dasharray:3 4}
 .medal.gl:not(.off) svg{filter:drop-shadow(0 0 5px var(--g))}
 .medal .shim{animation:shim 3s ease-in-out infinite}
-.sl{display:flex;align-items:center;gap:8px;min-width:0}
-.sl .medal{width:26px;height:26px}
 .tbar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--line);margin:10px 0 4px}
 .tbar i{display:block;height:100%}
 .tleg{font:12px var(--font-body);color:var(--muted);margin:0 0 8px}
@@ -2545,7 +2543,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.89.1';                           /* shown beside the title */
+const VERSION='0.89.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4518,7 +4516,6 @@ function drawMedal(gl,m,glow,shim,earned,title){
 }
 function medal(b,i,earned){const t=tierOf(i,b.at.length);return drawMedal(b.gl,MMETAL[t],t>=4,t===7,earned,b.nm[i]+' \u00b7 '+fmtBadge(b,b.at[i]));}
 /* The mastery medal of one exercise on one level, from its fastest cleared tempo. */
-function masteryMedal(k,bpm){const t=masteryTier(k,bpm);return drawMedal('note',MMETAL[t],t>=4,t===7,true,MTIER[t]+' \u00b7 '+strokeRate(k,bpm)+' strokes/min');}
 /* The unlocked panel on the result: the best step this run earned, and how far the next one is. */
 function renderUnlocked(L){
   const box=$('advBadge'),won=(L.won||[]).slice().sort((a,b)=>{const A=BADGES.find(x=>x.id===a.id),B=BADGES.find(x=>x.id===b.id);return tierOf(b.i,B.at.length)-tierOf(a.i,A.at.length)||b.i-a.i;});
@@ -4628,8 +4625,7 @@ function renderScoreGroups(stats,practise,usual){
       const row=document.createElement('div');row.className='srow';
       const q=document.createElement('div');q.className='sq';
       const seq=document.createElement('span');seq.className='seq';seq.textContent=showKey(x.k);
-      const sl=document.createElement('span');sl.className='sl';if(x.cleared)sl.appendChild(masteryMedal(x.k,x.cleared));sl.appendChild(seq);
-      q.appendChild(sl);q.appendChild(practise(x.k,x.lv,x.dy));row.appendChild(q);
+      q.appendChild(seq);q.appendChild(practise(x.k,x.lv,x.dy));row.appendChild(q);
       const n=document.createElement('div');n.className='sn';
       const stat=(txt,unit,cls)=>{const e=document.createElement('span');if(cls)e.className=cls;e.textContent=txt;if(unit){const u=document.createElement('small');u.textContent=unit;e.appendChild(u);}n.appendChild(e);};
       const acc=accCell(x.recent);
@@ -5101,23 +5097,20 @@ function renderRunPage(r){
     items.forEach(x=>{const c=document.createElement('span');c.className='cell '+(!x.b?'skip':off?'':(pctOf(x)>=TARGET?'ok':'late'));strip.appendChild(c);});
     page.appendChild(strip);
     const key2=document.createElement('div');key2.className='key';key2.textContent=off?'Count-in only: nothing is scored.':'Green: 90% or more. Pink: below 90%. Dashed: not played.';page.appendChild(key2);
-    const cl=new Map();   /* the fastest tempo each exercise has been cleared at, on this run's level */
-    if(!off)patStats(recs.runs,recs.sum).forEach(e=>{if(e.cleared&&e.lv===r.lv&&e.dy===(r.dy||''))cl.set(e.k,e.cleared);});
-    const lead=(b,seq)=>{const sl=document.createElement('span');sl.className='sl';if(cl.has(b.k))sl.appendChild(masteryMedal(b.k,cl.get(b.k)));sl.appendChild(seq);return sl;};
     if(!off&&played.length>1){
       page.appendChild(lbl('Weakest'));
       played.slice().sort((x,y)=>pctOf(x)-pctOf(y)).slice(0,3).forEach(x=>{
         const w=document.createElement('div');w.className='wr';
         const n=document.createElement('div');n.className='seq';n.textContent=showKey(x.b.k);
         const c=accCell(pctOf(x)),ac=document.createElement('div');ac.className='ac '+c[1];ac.textContent=c[0];const u=document.createElement('small');u.textContent='ACC';ac.appendChild(u);
-        w.appendChild(lead(x.b,n));w.appendChild(ac);w.appendChild(practiseBtn(x.b.k,x.i,r));page.appendChild(w);});
+        w.appendChild(n);w.appendChild(ac);w.appendChild(practiseBtn(x.b.k,x.i,r));page.appendChild(w);});
     }
     page.appendChild(lbl('All exercises'));
     played.forEach(x=>{
       const b=x.b,row=document.createElement('div');row.className='exr';
       const en=document.createElement('div');en.className='en';en.textContent=String(x.i||'');
       const eb=document.createElement('div');
-      const n=document.createElement('div');n.className='seq';n.textContent=showKey(b.k);eb.appendChild(lead(b,n));
+      const n=document.createElement('div');n.className='seq';n.textContent=showKey(b.k);eb.appendChild(n);
       const sn=document.createElement('div');sn.className='sn';
       const stat=(txt,unit,cls)=>{const m=document.createElement('span');if(cls)m.className=cls;m.textContent=txt;if(unit){const u=document.createElement('small');u.textContent=unit;m.appendChild(u);}sn.appendChild(m);};
       const c=off?['—','muted']:accCell(pctOf(x));
