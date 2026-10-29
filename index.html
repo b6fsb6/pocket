@@ -59,7 +59,10 @@ h3{font:600 12px var(--font-body);letter-spacing:.09em;text-transform:uppercase;
 .pill{font:600 12px var(--font-data);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);white-space:nowrap;background:var(--surface)}
 .pill.on{color:var(--ok);border-color:var(--ok)}
 
-.transport{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.transport{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.transport #startBtn{width:100%}
+#playSummary{text-align:right;margin:0}
+#playSummary:empty{display:none}
 .status{font:400 13px/1.4 var(--font-data);color:var(--muted);margin:0}
 .status:empty{display:none}
 #stTop:empty,#stTop:has(.status:empty){display:none}   /* on Play the message moves under the staff, and the empty box would add a second gap */
@@ -609,12 +612,17 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
 .page .hrow[open]{background:var(--surface);box-shadow:-10px 0 0 var(--surface),10px 0 0 var(--surface)}
 .tc1{grid-template-columns:minmax(0,1fr)}
 .bigbpm{display:block;font:800 40px/1.1 var(--font-data);margin:2px 0 8px}
+.bigrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.bigrow .hint{margin:0;text-align:right}
 .setbox{border:0;border-radius:0;background:none}
 .sbody{display:grid;gap:22px}
-#setBox>summary,#detBox>summary{font:700 15px var(--font-body);text-transform:none;letter-spacing:0;padding:12px 0;border-top:1px solid var(--line)}
-#setBox>summary,#detBox>summary{display:flex;align-items:center;justify-content:space-between;gap:10px}   /* the chevron stays beside the text, not under it */
-#setBox>summary::after,#detBox>summary::after{float:none;flex:none;margin:0 4px 4px 0}
-:root[data-layout=desktop] #setBox>summary,:root[data-layout=desktop] #detBox>summary,body:not([data-review="1"]) #detBox>summary{display:none}
+#setBox>summary,#detBox>summary,#exBox>summary{font:700 15px var(--font-body);text-transform:none;letter-spacing:0;padding:12px 0;border-top:1px solid var(--line)}
+#setBox>summary,#detBox>summary,#exBox>summary{display:flex;align-items:center;justify-content:space-between;gap:10px}   /* the chevron stays beside the text, not under it */
+#setBox>summary::after,#detBox>summary::after,#exBox>summary::after{float:none;flex:none;margin:0 4px 4px 0}
+:root[data-layout=desktop] #setBox>summary,:root[data-layout=desktop] #detBox>summary,body:not([data-review="1"]) #detBox>summary,:root[data-layout=desktop] #exBox>summary{display:none}
+#exBox>summary{border-top:0;padding:4px 0 0}
+#exBox[open]>summary{padding-bottom:10px}
+.rtname+#exBox{margin-top:-8px}
 :root[data-layout=desktop] #setBox .sbody{margin-top:0}
 :root:not([data-layout=desktop]) body[data-run="1"] #setBox,:root:not([data-layout=desktop]) body[data-review="1"] #setBox{display:none}
 /* On a phone the run controls are large and pinned to the bottom of the screen, where a thumb can reach them. */
@@ -1259,14 +1267,17 @@ RLRR LRLL RLRR LRLL</pre>
     <div class="pcol pctl">
     <section class="panel cfg" aria-label="Exercises">
       <div class="rtname"><b id="playName"></b><button class="ib" id="editPlay" type="button" aria-label="Edit routine" title="Edit routine"></button><button class="linkbtn" id="playChange" type="button">Change</button></div>
-      <div class="patrow"><p class="patline single-only" id="playPat"></p><p class="hint routine-only" id="routineInfo"></p></div>
-      <div class="exercises routine-only" id="exerciseList" role="listbox" aria-label="Exercises in this routine. Choose the exercise to start at."></div>
+      <div class="patrow single-only"><p class="patline" id="playPat"></p></div>
+      <details id="exBox" class="setbox routine-only">
+        <summary id="routineInfo"></summary>
+        <div class="exercises" id="exerciseList" role="listbox" aria-label="Exercises in this routine. Choose the exercise to start at."></div>
+      </details>
     </section>
 
     <section class="panel cfg" id="tempoPanel" aria-label="Tempo">
       <div class="field">
         <label for="bpm">Tempo</label>
-        <output id="bpmOut" class="bigbpm"></output>
+        <div class="bigrow"><output id="bpmOut" class="bigbpm"></output><span class="hint routine-only" id="tempoNote"></span></div>
         <div class="tempo">
           <button class="btn" id="bpmDown" type="button" aria-label="Slower">&#8722;</button>
           <input type="range" id="bpm" min="40" max="220" step="1">
@@ -2477,7 +2488,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.86.2';                           /* shown beside the title */
+const VERSION='0.86.3';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -6052,10 +6063,9 @@ function syncInfo(){
     $('startBtn').disabled=(!ok||setupNeeded())&&!(run&&!run.ended);
     const errs=routineParsed.errors;
     $('routineErr').textContent=n===0&&!S.routineText.trim()?'':(errs.length?errs.slice(0,3).join(' ')+(errs.length>3?' (+'+(errs.length-3)+' more)':''):(n===0?'No exercises found. Type one exercise per line using L and R.':''));
-    const total=playTime(all);
-    $('routineInfo').textContent=ok
-      ?n+(n===1?' exercise':' exercises')+' · about '+fmtTime(total)+' in all'
-      :'';
+    const total=playTime(exercises);
+    $('routineInfo').textContent=ok?n+(n===1?' exercise':' exercises')+(S.startExercise>1?' · from '+S.startExercise:''):'';
+    $('tempoNote').textContent=ok?'about '+fmtTime(total)+pulseNote(exercises):'';
     const en=$('eachNote');
     en.hidden=!routineParsed.each;
     if(routineParsed.each)en.textContent='This routine sets its own time per exercise (each:), so the two settings above are not used. Exercises with their own x, time or @ still win.';
@@ -6065,7 +6075,7 @@ function syncInfo(){
   const sum=$('playSummary');
   if(!exercises.length)sum.textContent=S.mode==='single'?'Type an exercise in the editor, then press Start.':'Add some exercises in the editor, then press Start.';
   else if(S.mode==='single'){const b=exercises[0];sum.textContent=S.bpm+' BPM'+pulseNote(exercises)+playsFor();}
-  else{const tt=playTime(exercises);sum.textContent=(routineParsed.title||recs.names[routineKeyOf(allExercises().map(b=>patKey(b.notes,b.groupStart,b.subs,b.defSub,b.sig)))]||'Routine')+' · '+exercises.length+(exercises.length===1?' exercise':' exercises')+(S.startExercise>1?' from exercise '+S.startExercise:'')+' · about '+fmtTime(tt)+' · '+S.bpm+' BPM'+pulseNote(exercises)+routineGuide();}
+  else{const g=routineGuide();sum.textContent=g?'Routine cleared at '+g.split(' at ')[1]:'';}
   {const b=exercises[0];$('playPat').textContent=exercises.length&&S.mode==='single'?showPattern(b.notes,b.groupStart,b.subs,b.defSub,b.sig,b.src):'';}
   $('bpmOut').textContent=S.bpm+' BPM';
   {   /* what the closed Settings drawer holds, so a setting that matters is never hidden */
@@ -6514,7 +6524,7 @@ function syncLayout(){
   if(document.documentElement.dataset.layout===want)return;
   const first=!document.documentElement.dataset.layout;
   document.documentElement.dataset.layout=want;
-  if(want==='desktop'){$('setBox').open=true;$('detBox').open=true;}   /* nothing is tucked away where there is room */
+  if(want==='desktop'){$('setBox').open=true;$('detBox').open=true;$('exBox').open=true;}   /* nothing is tucked away where there is room */
   placeAdv();
   if(!first)window.dispatchEvent(new Event('resize'));
 }

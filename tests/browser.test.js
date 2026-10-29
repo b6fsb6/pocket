@@ -263,3 +263,26 @@ test('no empty box sits between the tabs and the page on any tab', async () => {
     assert.ok(gap <= 24, t + ' gap ' + gap);
   }
 });
+
+test('the exercise list starts collapsed, Start is full width and the time sits in the Tempo box', async () => {
+  const text = 'title: Test\n' + Array.from({ length: 24 }, () => '8 RLRL RLRL').join('\n') + '\n';
+  const p = await open({ seeded: true, input: 'kb', mode: 'routine', routineText: text, bpm: 70, eachUnit: 'pass', eachVal: 8 }, { width: 390, height: 844 });
+  const r = await p.evaluate(() => {
+    const w = x => document.getElementById(x).getBoundingClientRect();
+    return {
+      open: document.getElementById('exBox').open,
+      sum: document.getElementById('routineInfo').textContent,
+      note: document.getElementById('tempoNote').textContent,
+      startW: w('startBtn').width, panelW: w('exBox').width,
+      startBottom: w('startBtn').bottom,
+    };
+  });
+  assert.equal(r.open, false);
+  assert.equal(r.sum, '24 exercises');
+  assert.match(r.note, /^about \d+:\d\d/);
+  assert.ok(r.startW >= r.panelW - 1, 'Start is full width ' + r.startW + ' vs ' + r.panelW);
+  assert.ok(r.startBottom < 844, 'Start is on the first screen ' + r.startBottom);
+  await p.evaluate(() => document.querySelector('#exBox>summary').click());
+  await p.evaluate(() => document.querySelectorAll('#exerciseList .erow')[6].click());
+  assert.equal(await p.evaluate(() => document.getElementById('routineInfo').textContent), '24 exercises · from 7');
+});
