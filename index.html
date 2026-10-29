@@ -109,12 +109,12 @@ body[data-run="1"] .notice{display:none}
 .htools .seg{margin:0}
 .htools .seg button{min-height:34px;padding:0 12px;font-size:12px}
 /* Desktop: Library, Scores, Achievements and Settings use the width; History and Help stay one column */
-:root[data-layout=desktop] .page#pageSetup,:root[data-layout=desktop] .page#pageLibrary,:root[data-layout=desktop] .page#pageProgress{max-width:1100px}
+:root[data-layout=desktop] .page#pageSetup,:root[data-layout=desktop] .page#pageLibrary,:root[data-layout=desktop] .page#pageProgress{max-width:none}   /* as wide as the tab bar and the Play page */
 /* Help: on a wide screen a contents list stays on the left and the text sits beside it; on a phone the page title is the menu. */
 #helpNav{display:none}
 #pageHelp>.panel{scroll-margin-top:14px}   /* a section jumped to lands under the page's own padding, level with the list */
 #helpNav+.panel{border-top:0;padding-top:0}
-:root[data-layout=desktop] #pg[data-owner=help]{--pgx:max(16px,calc((100% - 1100px)/2))}
+:root[data-layout=desktop] #pg[data-owner=help]{--pgx:max(16px,calc((100% - 1200px)/2))}
 :root[data-layout=desktop] .page#pageHelp{max-width:none;margin:0;display:grid;grid-template-columns:230px minmax(0,760px);column-gap:56px;align-items:start}
 :root[data-layout=desktop] #pageHelp>.panel{grid-column:2}
 :root[data-layout=desktop] #helpNav{display:grid;grid-column:1;grid-row:1/span 20;position:sticky;top:0;gap:2px;align-content:start}
@@ -2489,7 +2489,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.87.0';                           /* shown beside the title */
+const VERSION='0.87.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
