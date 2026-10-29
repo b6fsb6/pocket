@@ -378,3 +378,10 @@ test('rests keep the streak and score nothing unless hit, and a hit on a rest is
   assert.equal((q.match(/m/g) || []).length, 1, 'one rest was hit: ' + q);
   assert.ok(/r/.test(q), 'the other rests are kept: ' + q);
 });
+
+test('Play settings sit in aligned columns: Click beside Scoring, tops level', async () => {
+  const p = await open({ seeded: true }, { width: 390, height: 900 });
+  const r = await p.evaluate(() => { const a = document.getElementById('click').getBoundingClientRect(), b = document.getElementById('score').getBoundingClientRect(); return { dy: Math.abs(a.top - b.top), side: b.left > a.right - 1 }; });
+  assert.ok(r.side, 'Scoring is beside Click');
+  assert.ok(r.dy < 1, 'tops are level');
+});
