@@ -1039,7 +1039,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
         <pre>RLRR LRLL RLRR LRLL</pre>
         <div class="clk" style="--c:16"><div class="clt">4/4: one bar, sixteen strokes</div><span class="cln">Easy</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><span class="cln">Medium</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><span class="cln">Hard</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><span class="cln">Extreme</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><p class="clc">Each mark is one stroke. A filled mark has a click.</p>
         <div class="clk" style="--c:6"><div class="clt">6/8: one bar, six eighths</div><span class="cln">Medium</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><span class="cln">Hard</span><i class="on"></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><span class="cln">Extreme</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><p class="clc">Hard follows the two groups of three. Easy is every stroke, as above.</p>
-        <p>Choose the click level on the Play page. Easy clicks every stroke (none on rests), Medium every beat, Hard the strong beats (1 and 3, or the start of each group), and Extreme beat 1 of each bar. Count-in only clicks the count-in and is not scored. Each level is scored on its own, against the same grid. Use headphones, or the click is heard as strokes.</p>
+        <p>Choose the click level on the Play page. Easy clicks every stroke (none on rests), Medium every beat, Hard the strong beats (1 and 3, or the start of each group), and Extreme beat 1 of each bar. Master only clicks the count-in, so you hold the tempo yourself. Each level is scored on its own, against the same grid. Set Scoring to Practice to try something without saving it: you still see the result, but nothing is added to your records. It is back on the next time you open the app. Use headphones, or the click is heard as strokes.</p>
         <button class="btn small" type="button" data-try="single" data-text="RLRR LRLL RLRR LRLL">Try it</button>
       </div>
       <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
@@ -1279,18 +1279,19 @@ RLRR LRLL RLRR LRLL</pre>
       <p class="hint" id="eachNote" hidden></p>
     </section>
 
-    <section class="panel cfg tc tc1" aria-label="Click">
+    <section class="panel cfg tc" aria-label="Click" style="grid-template-columns:minmax(0,3fr) minmax(0,2fr)">
       <div class="field"><label for="click">Click</label>
         <select id="click">
-          <optgroup label="Scored">
-            <option value="strokes">Easy: every stroke</option>
-            <option value="beat">Medium: the beat</option>
-            <option value="half">Hard: strong beats</option>
-            <option value="bar">Extreme: 1 of each bar</option>
-          </optgroup>
-          <optgroup label="Practice">
-            <option value="off">Count-in only: not scored</option>
-          </optgroup>
+          <option value="strokes">Easy: every stroke</option>
+          <option value="beat">Medium: the beat</option>
+          <option value="half">Hard: strong beats</option>
+          <option value="bar">Extreme: 1 of each bar</option>
+          <option value="none">Master: count-in only</option>
+        </select></div>
+      <div class="field"><label for="score">Scoring</label>
+        <select id="score">
+          <option value="1">Scored</option>
+          <option value="0">Practice</option>
         </select></div>
     </section>
     <section class="panel cfg tc" aria-label="Accents and ghost notes">
@@ -1955,8 +1956,8 @@ function nameMarkers(str,d){
 const showSig=sig=>sig?sig.n+'/'+sig.d+(sig.groups.join('+')===defGroups(sig.n,sig.d).join('+')?'':' ('+sig.groups.join('+')+')')+': ':'';
 const showPattern=(notes,gs,subs,def,sig,src)=>showSig(sig)+(src||nameMarkers(fmtPattern(notes,gs,subs,def),sig?sig.d:4));
 /* ---------- records: scores kept per exercise and tempo ---------- */
-/* Click levels. Each one is scored on its own: easy is a click on every stroke, extreme only the first beat of each bar. */
-const LEVELS=[{v:'strokes',n:'Easy'},{v:'beat',n:'Medium'},{v:'half',n:'Hard'},{v:'bar',n:'Extreme'}];
+/* Click levels. Each one is scored on its own: easy is a click on every stroke, extreme only the first beat of each bar, master only the count-in. */
+const LEVELS=[{v:'strokes',n:'Easy'},{v:'beat',n:'Medium'},{v:'half',n:'Hard'},{v:'bar',n:'Extreme'},{v:'none',n:'Master'}];   /* the click fades out; an old run saved as 'off' was count-in only and was never scored */
 const levelName=v=>(LEVELS.find(l=>l.v===v)||{n:''}).n;
 const TARGET=0.9;                                /* accuracy that counts as cleared at a tempo */
 function hash32(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))>>>0;return h.toString(36);}
@@ -2465,7 +2466,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.83.0';                           /* shown beside the title */
+const VERSION='0.84.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2509,7 +2510,8 @@ S.vol=clamp(Math.round(+S.vol),0,100);if(isNaN(S.vol))S.vol=60;
 S.latency=(S.latency==null||isNaN(+S.latency))?null:clamp(Math.round(+S.latency),0,400);
 if(S.input!=='kb')S.input='mic';
 if(S.click==='note')S.click='strokes';
-if(!['beat','strokes','half','bar','off'].includes(S.click))S.click='beat';
+if(S.click==='off')S.click='none';
+if(!['beat','strokes','half','bar','none'].includes(S.click))S.click='beat';
 if(typeof S.routineText!=='string'||S.routineText.length>MAX_TEXT)S.routineText='RLRL RLRL RLRL RLRL';
 S.eachUnit=S.eachUnit==='pass'?'pass':'min';
 S.eachVal=S.eachUnit==='pass'?clamp(Math.round(+S.eachVal)||8,1,200):clamp(+S.eachVal||1,0.25,60);
@@ -2559,7 +2561,7 @@ function unpackStrokes(sp){
 }
 const SPMAX=4*40000;
 function cleanRun(x){
-  if(!x||typeof x!=='object'||typeof x.id!=='string'||!Array.isArray(x.exercises)||!isFinite(+x.t)||!isFinite(+x.bpm)||!['strokes','beat','half','bar','off'].includes(x.lv))return null;
+  if(!x||typeof x!=='object'||typeof x.id!=='string'||!Array.isArray(x.exercises)||!isFinite(+x.t)||!isFinite(+x.bpm)||!['strokes','beat','half','bar','none','off'].includes(x.lv))return null;
   const exercises=[];
   x.exercises.forEach(b=>{
     if(!b||typeof b.k!=='string'||b.k.length>400||!(+b.due>0)||!isFinite(+b.within))return;
@@ -2713,6 +2715,7 @@ registerProcessor('onset',class extends AudioWorkletProcessor{
 });`;
 
 /* ---------- state ---------- */
+let scoreOn=true;   /* a switch for this visit only: it is on again at every launch */
 let ctx=null,node=null,micSrc=null,workletReady=false,noWorklet=false,stream=null,sendDet=null,wake=null;
 let run=null,view=null,timer=0,raf=0;
 let calMode=null,routineParsed=parseRoutine(S.routineText),prevPlan=null,rowMap=new Map(),rowTop=0,slideTimer=0,curTab='play';
@@ -4195,7 +4198,7 @@ function guide(){
   return guideMemo;
 }
 function exerciseGuide(sg){
-  if(S.click==='off')return 'not scored';
+  if(!scoreOn)return 'practice';
   const e=guide().pat.get(patKey(sg.notes,sg.groupStart,sg.subs,sg.defSub,sg.sig)+'|'+S.click+(dynCode()?'|'+dynCode():''));
   if(!e)return 'new';
   return e.cleared?'cleared at '+e.cleared:'not cleared yet';
@@ -4217,12 +4220,12 @@ function dynSaved(r,si){   /* accents and ghost notes judged in this exercise: h
 }
 function recordRun(r){
   lastRun=null;
-  const rows=exerciseRows(r).filter(x=>x.passes>=1&&(x.heard>0||S.click==='off'));   /* nothing heard counts as not played */
+  const rows=exerciseRows(r).filter(x=>x.passes>=1&&x.heard>0);   /* nothing heard counts as not played */
   const skipped=exerciseRows(r).length-rows.length;
   if(!rows.length)return;
   const all=S.mode==='routine'?allExercises().map(b=>patKey(b.notes,b.groupStart,b.subs,b.defSub,b.sig)):null;
   const rk=all?routineKeyOf(all):null;
-  if(rk){   /* a title in the text wins, else the name it already has, else the next Untitled number */
+  if(rk&&scoreOn){   /* a title in the text wins, else the name it already has, else the next Untitled number */
     if(routineParsed.title)recs.names[rk]=routineParsed.title.slice(0,80);
     else if(!recs.names[rk])recs.names[rk]='Untitled '+(recs.nu++);
   }
@@ -4238,14 +4241,14 @@ function recordRun(r){
   }
   const prevBest=new Map();
   rows.forEach(x=>{const b=bestBefore(recs.runs,x.key,x.bpm,S.click,r.dyc);if(b!==null)prevBest.set(x.key,b);});
-  const newTempo=rows.filter(x=>x.pct>=TARGET&&x.bpm>clearedBefore(recs.runs,x.key,S.click,recs.sum,r.dyc)&&S.click!=='off');
+  const newTempo=rows.filter(x=>x.pct>=TARGET&&x.bpm>clearedBefore(recs.runs,x.key,S.click,recs.sum,r.dyc)&&scoreOn);
   const bv0=badgeValues(recs.runs,recs.sum);
-  recs.runs.push(run);
+  if(scoreOn)recs.runs.push(run);   /* a practice run is shown but not kept */
   const bv1=badgeValues(recs.runs,recs.sum),won=[];
   BADGES.forEach(b=>b.at.forEach(n=>{if(bv0[b.id]<n&&bv1[b.id]>=n)won.push(n===1&&b.one?'1 '+b.one:(n+' '+b.unit).replace(/^1 exercises/,'1 exercise'));}));
-  const saved=saveRecs();
-  askPersist();
-  lastRun={run:run,only:r.only||null,prevBest:prevBest,newTempo:newTempo,won:won,rows:rows,skipped:skipped,saved:saved,discarded:false};
+  const saved=scoreOn?saveRecs():true;
+  if(scoreOn)askPersist();
+  lastRun={run:run,only:r.only||null,prevBest:prevBest,newTempo:newTempo,won:won,rows:rows,skipped:skipped,saved:saved,discarded:false,practice:!scoreOn};
 }
 /* After a run the score is brought into view. The run layout is still being undone, so the jump repeats once the page has settled. */
 function showResult(){
@@ -4264,7 +4267,7 @@ function renderAdvice(){
     $('advBody').textContent='It is not in your records.';
     use.hidden=true;disc.hidden=true;$('advWeak').hidden=true;return;
   }
-  disc.hidden=false;
+  disc.hidden=!!L.practice;
   const n=adv.played,one=n===1;
   let body;
   const played=L.rows.filter(x=>x.passes>=1&&x.due>0),due=played.reduce((t,x)=>t+x.due,0);
@@ -4294,6 +4297,7 @@ function renderAdvice(){
   if(L.won&&L.won.length)body='★ Achievement: '+L.won.join(', ')+'. '+body;
   if(L.skipped)body+=' '+L.skipped+(L.skipped===1?' exercise was':' exercises were')+' stopped before one full pass and not scored.';
   if(!L.saved)body+=' Your browser would not save the records.';
+  if(L.practice)body='Practice run, not saved. '+body;
   $('advHead').textContent=fix;$('advBody').textContent=body;
   use.hidden=!adv.cleared||adv.next===S.bpm;
   L.weakIdx=adv.weak.map(b=>b.idx);
@@ -5020,7 +5024,7 @@ function dropExercise(r,b){
 const replayRun=r=>{if(!(run&&!run.ended))guard(()=>loadRun(r));};
 function loadRun(r){
   const q=r.rp;if(!q)return;
-  S.click=r.lv;$('click').value=r.lv;
+  S.click=r.lv==='off'?'none':r.lv;$('click').value=S.click;
   applyDy(r.dy);
   S.tol=r.tol;$('tol').value=String(r.tol);
   S.bpm=clamp(Math.round(r.bpm),40,220);$('bpm').value=S.bpm;
@@ -6032,7 +6036,8 @@ function syncInfo(){
   {   /* what the closed Settings drawer holds, so a setting that matters is never hidden */
     const ck=$('click'),ac=$('accent');
     const dur=S.eachVal+(S.eachUnit==='pass'?(S.eachVal===1?' pass':' passes'):' min')+(S.mode==='routine'?' each':'');
-    const parts=[dur,ck.options[ck.selectedIndex].text.split(':')[0]+(S.click==='off'?'':' click')];
+    const parts=[dur,ck.options[ck.selectedIndex].text.split(':')[0]+(S.click==='none'?'':' click')];
+    if(!scoreOn)parts.push('Not scoring');
     if(S.accent)parts.push('Accent: '+ac.options[ac.selectedIndex].text.toLowerCase());
     if(S.others==='g')parts.push('Ghost notes');
     $('setSum').textContent=$('setBox').open?'Settings':parts.join(' · ');   /* open: just the name; closed: what is inside */
@@ -6496,6 +6501,7 @@ function wire(){
   $('bpm').addEventListener('input',e=>setBpm(+e.target.value));
   $('bpmDown').addEventListener('click',()=>setBpm(S.bpm-1));
   $('bpmUp').addEventListener('click',()=>setBpm(S.bpm+1));
+  $('score').addEventListener('change',e=>{scoreOn=e.target.value==='1';syncInfo();});
   $('click').addEventListener('change',e=>{S.click=e.target.value;save();if(S.mode==='routine')buildExerciseList();syncInfo();});
   const dyChanged=()=>{save();pushDet();refreshPreview();};
   $('accent').addEventListener('change',e=>{S.accent=e.target.value;dyChanged();});

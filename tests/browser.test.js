@@ -184,3 +184,40 @@ test('a stray exercise is deleted from a run, and an unheard one is not scored',
   assert.deepEqual(p.errors, []);
   await ctx.close();
 });
+
+/* One keyboard run with perfect hits. Returns how many runs were saved and the result text. */
+async function runOnce(settings, practice) {
+  const p = await open(Object.assign({ input: 'kb', bpm: 120, routineText: '8 RLRL', eachUnit: 'pass', eachVal: 1, seeded: true }, settings));
+  if (practice) await p.evaluate(() => { const s = document.getElementById('score'); s.value = '0'; s.dispatchEvent(new Event('change')); });
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
+  await p.evaluate(() => {
+    const T = window.__T, r = T.run(), pl = r.plan;
+    pl.slots.forEach(s => {
+      const hand = pl.segs[s.seg].notes[s.pos].slice(-1);
+      T.hit({ t: r.t0 + s.t + 0.005, kb: true, f: null, det: { hand, conf: 1 } });
+    });
+  });
+  await p.waitForFunction(() => window.__T.run().ended, null, { timeout: 40000 });
+  await p.waitForTimeout(300);
+  const out = await p.evaluate(() => ({
+    saved: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).runs || []).map(r => r.lv),
+    text: document.getElementById('advice').innerText,
+    discard: !document.getElementById('advDiscard').hidden,
+  }));
+  assert.deepEqual(p.errors, []);
+  return out;
+}
+
+test('Master (count-in only) is scored and saved', async () => {
+  const o = await runOnce({ click: 'none' }, false);
+  assert.deepEqual(o.saved, ['none']);
+  assert.ok(o.discard);
+});
+
+test('a practice run shows its result but saves nothing', async () => {
+  const o = await runOnce({ click: 'beat' }, true);
+  assert.deepEqual(o.saved, []);
+  assert.match(o.text, /Practice run, not saved/);
+  assert.ok(!o.discard);
+});
