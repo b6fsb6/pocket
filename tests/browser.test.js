@@ -362,7 +362,7 @@ test('a scored run is scored, announces a new high score once, and keeps the per
   assert.doesNotMatch(p0.win, /high score/i, 'a practice run is not scored');
 });
 
-test('rests are scored: on time unless hit, and a hit on a rest is a miss', async () => {
+test('rests keep the streak and score nothing unless hit, and a hit on a rest is a miss', async () => {
   const p = await open({ input: 'kb', bpm: 120, routineText: 'R_L_ R_L_', eachUnit: 'pass', eachVal: 2, seeded: true });
   await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
   await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
@@ -376,4 +376,5 @@ test('rests are scored: on time unless hit, and a hit on a rest is a miss', asyn
   const q = await p.evaluate(() => JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')).runs[0].exercises[0].q);
   assert.ok(q && q.length > 8, 'rests are in the sequence: ' + q);
   assert.equal((q.match(/m/g) || []).length, 1, 'one rest was hit: ' + q);
+  assert.ok(/r/.test(q), 'the other rests are kept: ' + q);
 });

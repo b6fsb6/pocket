@@ -121,11 +121,12 @@ test('mastery is measured in strokes a minute, so sixteenths count for more than
   assert.equal(c.strokeRate(key('2/2: RLRL RLRL'), 70), 280);
 });
 
-test('scoring: the three worked examples, the streak cap, the floor at zero and a streak carried across exercises', () => {
-  assert.equal(c.runPoints('oooboomo', 'strokes'), 24);
-  assert.equal(c.runPoints('oooboomo', 'half'), 81);
-  assert.equal(c.runPoints('oooboomo', 'none'), 155);
-  assert.equal(c.runPoints('o'.repeat(20), 'strokes'), 198);   // 3 x (51 for the first 17 strokes + 3 x 5 for the rest): the bonus stops growing at x5
+test('scoring: the worked examples, the streak cap, the floor at zero and a streak carried across exercises', () => {
+  assert.equal(c.runPoints('oooboomo', 'strokes'), 22);
+  assert.equal(c.runPoints('oooboomo', 'half'), 73);
+  assert.equal(c.runPoints('oooboomo', 'none'), 140);
+  assert.equal(c.runPoints('ooroo', 'strokes'), c.runPoints('oooo', 'strokes'), 'a rest scores nothing and keeps the streak');
+  assert.equal(c.runPoints('o'.repeat(20), 'strokes'), 198);   // 3 x (51 for the first 17 strokes + 5 for each of the next 3): the bonus stops growing at x5
   assert.equal(c.runPoints('mmm', 'none'), 0, 'never below zero');
   assert.equal(c.runPoints('obm', 'bar'), 17);
   const ex = q => ({ k: 'e', due: q.length, within: 0, q });

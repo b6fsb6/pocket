@@ -1253,7 +1253,7 @@ RLRR LRLL RLRR LRLL</pre>
       <h3>Scores, tempo and progress</h3>
       <ul>
         <li><b>On time</b> is the share of due strokes inside your on-time window. With an accent or ghost rule a stroke must also be played as written: an accent clearly louder and a ghost clearly softer than its neighbours. An exercise needs at least one full pass to be scored.</li>
-        <li><b>Score:</b> every run is scored when Scored is on. Each stroke earns points by its timing and the click level: on time scores most, off time a little, and a miss scores nothing (it costs 2 on Extreme and 5 on Master). A rest counts as on time unless you hit it. Strokes on time in a row add a quarter to a multiplier, up to five times, and anything else resets it. The streak carries from one exercise to the next. The total never goes below zero. Your best score at each click level is an achievement, and a new one is announced when the run ends.</li>
+        <li><b>Score:</b> every run is scored when Scored is on. Each stroke earns points by its timing and the click level: on time scores most, off time a little, and a miss scores nothing (it costs 2 on Extreme and 5 on Master). A rest keeps the streak going and scores nothing, and a hit on it is a miss. Strokes on time in a row add a quarter to a multiplier, up to five times, and anything else resets it. The streak carries from one exercise to the next. The total never goes below zero. Your best score at each click level is an achievement, and a new one is announced when the run ends.</li>
         <li><b>Medals:</b> each exercise gets a medal for each click level, from the fastest tempo you have cleared it at. It is measured in strokes a minute, so sixteenths count for more than eighths at the same BPM. Hickory is cleared at any speed, then Bronze at 120 strokes a minute, Silver 180, Gold 240, Platinum 320, Sapphire 400, Ruby 480 and Diamond 600. Sixteenths at 60 BPM is 240, so Gold.</li>
         <li><b>Exercise table:</b> after a routine run, each exercise gets its accuracy, average error and spread, plus your earlier best at that tempo.</li>
         <li><b>The target is 90%.</b> An exercise is "cleared" at a tempo when it reaches 90% there. After a run the app names the weak exercises and suggests staying at that tempo until they settle. Any tempo is always allowed.</li>
@@ -2110,14 +2110,15 @@ const newSum=()=>({runs:0,sec:0,days:{},pat:{},rt:{},cr:0,pf:0,hs:{}});
 /* A clean routine run: two or more exercises played right through, every one at the target. A perfect exercise: at least 16 strokes, every one on time. */
 const sweepRun=run=>run.lv!=='off'&&run.ne>=2&&run.exercises.length>=run.ne&&run.exercises.every(b=>b.due>0&&b.within/b.due>=TARGET);
 const perfectN=run=>run.lv==='off'?0:run.exercises.filter(b=>b.due>=16&&b.within>=b.due).length;
-/* Score. Every stroke scores by its timing at the run's click level, and strokes on time in a row build a bonus. The codes are o on time, b off time, m missed, in the order played, rests included. */
+/* Score. Every stroke scores by its timing at the run's click level, and strokes on time in a row build a bonus. The codes are o on time, b off time, m missed, r a rest left alone, in the order played. */
 const LV_PTS={strokes:[1,3,0],beat:[2,5,0],half:[3,10,0],bar:[4,15,-2],none:[5,20,-5]};   /* off time, on time, miss */
 const STREAK_MOD=0.25,STREAK_CAP=16;   /* each stroke on time in a row adds a quarter to the multiplier, up to 16 in a row (x5) */
 function runPoints(codes,lv){
   const p=LV_PTS[lv];if(!p)return 0;
-  let tally=0,streak=-1;   /* the first stroke of a run has no bonus; after a slip, the next stroke on time starts at one */
+  let tally=0,streak=0;   /* the first stroke of a run, and the first on time after a slip, have no bonus. A rest (r) scores nothing and leaves the streak alone. */
   for(const c of codes){
-    if(c==='o'){streak++;tally+=p[1]*(1+STREAK_MOD*Math.min(streak,STREAK_CAP));}
+    if(c==='r')continue;
+    if(c==='o'){tally+=p[1]*(1+STREAK_MOD*Math.min(streak,STREAK_CAP));streak++;}
     else{streak=0;tally+=c==='m'?p[2]:p[0];}
     if(tally<0)tally=0;
   }
@@ -2569,7 +2570,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.94.0';                           /* shown beside the title */
+const VERSION='0.94.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2670,7 +2671,7 @@ function cleanRun(x){
     exercises.push({k:b.k,bpm:isFinite(+b.bpm)?+b.bpm:+x.bpm,due:+b.due,within:Math.max(0,Math.min(+b.due,+b.within)),heard:+b.heard||0,
       avg:typeof b.avg==='number'&&isFinite(b.avg)?b.avg:null,sd:typeof b.sd==='number'&&isFinite(b.sd)?b.sd:null,miss:+b.miss||0,i:+b.i||0,
       ls:typeof b.ls==='number'&&isFinite(b.ls)?b.ls:null,ld:typeof b.ld==='number'&&isFinite(b.ld)?b.ld:null,
-      da:+b.da>0?Math.floor(+b.da):undefined,dg:+b.dg>0?Math.floor(+b.dg):undefined,sp:typeof b.sp==='string'&&b.sp.length%4===0&&b.sp.length<=SPMAX&&/^[A-Za-z0-9_-]+$/.test(b.sp)?b.sp:undefined,q:typeof b.q==='string'&&b.q.length<=SPMAX&&/^[obm]+$/.test(b.q)?b.q:undefined,
+      da:+b.da>0?Math.floor(+b.da):undefined,dg:+b.dg>0?Math.floor(+b.dg):undefined,sp:typeof b.sp==='string'&&b.sp.length%4===0&&b.sp.length<=SPMAX&&/^[A-Za-z0-9_-]+$/.test(b.sp)?b.sp:undefined,q:typeof b.q==='string'&&b.q.length<=SPMAX&&/^[obmr]+$/.test(b.q)?b.q:undefined,
       an:+b.an>0?Math.floor(+b.an):undefined,ac:+b.ac>0?Math.floor(+b.ac):undefined,as:typeof b.as==='number'&&isFinite(b.as)?b.as:undefined,
       gn:+b.gn>0?Math.floor(+b.gn):undefined,gc:+b.gc>0?Math.floor(+b.gc):undefined,gs:typeof b.gs==='number'&&isFinite(b.gs)?b.gs:undefined});
   });
@@ -3150,13 +3151,13 @@ function restAt(r,tc){
   if(!r.rests){r.rests=r.plan.cells.filter(c=>c.rest);r.restHit=new Set();}
   return r.rests.find(c=>Math.abs(tc-c.t)<=c.d/2)||null;
 }
-/* A rest nobody hit counts as on time, up to the last stroke that was scored. */
+/* A rest nobody hit keeps the streak and scores nothing, up to the last stroke that was scored. */
 function restEvents(r){
   restAt(r,-1e9);
   if(r.restDone)return;
   r.restDone=true;
   const last=r.nextFin>0?r.plan.slots[r.nextFin-1].t:-1;
-  r.rests.forEach(c=>{if(c.t<last&&!r.restHit.has(c))r.seg[c.seg].ev.push({t:c.t,c:'o'});});
+  r.rests.forEach(c=>{if(c.t<last&&!r.restHit.has(c))r.seg[c.seg].ev.push({t:c.t,c:'r'});});
 }
 function finalizeSlot(i){
   const r=run,sl=r.plan.slots[i],sg=r.plan.segs[sl.seg],Q=r.seg[sl.seg],pos=sl.pos,exp=hnd(sg.notes[pos]);
