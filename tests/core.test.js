@@ -1,7 +1,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const { loadCore, plain } = require('./helpers');
 const c = loadCore(['parseStrokes', 'parseExerciseLine', 'parseRoutine', 'resolveExercises', 'buildPlan', 'builderApply',
-  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runPoints', 'runScore', 'highScores', 'unpackStrokes']);
+  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runPoints', 'runScore', 'highScores', 'unpackStrokes', 'BADGES']);
 
 const plan = (text, opt) => {
   const p = c.parseRoutine(text);
@@ -146,4 +146,12 @@ test('a run saved without score codes is scored from its stroke data', () => {
   const sp = [...'oobm'].map(r => B64[SPR.indexOf(r)] + B64[63] + B64[63] + B64[63]).join('');
   const run = { id: 'x', t: 1, lv: 'half', bpm: 60, exercises: [{ k: 'e', due: 4, within: 2, sp }] };
   assert.equal(c.runScore(run), c.runPoints('oobm', 'half'));
+});
+
+test('each level has its own high-score ladder, scaled by points per on-time stroke', () => {
+  const h = id => c.BADGES.find(b => b.id === id).at;
+  assert.deepEqual(h('hnone')[9], 250000);
+  assert.deepEqual(h('hstrokes')[9], 38000);
+  assert.deepEqual(h('hhalf')[9], 130000);
+  ['hstrokes', 'hbeat', 'hhalf', 'hbar', 'hnone'].forEach(id => h(id).forEach((n, i, a) => { if (i) assert.ok(n > a[i - 1], id + ' climbs'); }));
 });

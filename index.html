@@ -2186,8 +2186,9 @@ const LADDER=[1,5,10,25,50,100,250,500,750,1000];
 LEVELS.forEach(l=>BADGES.push({id:'l'+l.v,lv:l.v,name:l.n,unit:'exercises cleared on '+l.n,at:LADDER}));
 BADGES.push({id:'all',name:'On every level',unit:'exercises cleared on every level',at:LADDER});
 BADGES.push({id:'dyn',name:'Accents and ghosts',unit:'accent or ghost exercises cleared',one:'accent or ghost exercise cleared',at:LADDER});
-const HSL=[100,500,1000,2500,5000,10000,25000,50000,100000,250000];   /* high scores, in points */
-LEVELS.forEach(l=>BADGES.push({id:'h'+l.v,lv:l.v,name:l.n,unit:'points',one:'point',at:HSL}));
+/* High scores, in points. Master's ladder is the base; each other level's is scaled by what an on-time stroke is worth there, so every level reaches its top step with the same effort. */
+const HSL=[100,500,1000,2500,5000,10000,25000,50000,100000,250000];
+LEVELS.forEach(l=>BADGES.push({id:'h'+l.v,lv:l.v,hs:true,name:l.n,unit:'points',one:'point',at:HSL.map(n=>+(n*LV_PTS[l.v][1]/LV_PTS.none[1]).toPrecision(2))}));
 BADGES.push({id:'cln',name:'Longest clean run',lead:'Longest clean run',suf:' min',unit:'min, longest routine run with every exercise cleared',at:[5,10,15,20,30,45,60]});
 BADGES.push({id:'prf',name:'Perfect exercises',unit:'perfect exercises',one:'perfect exercise',at:LADDER});
 BADGES.push({id:'tmp',name:'Fastest clear',lead:'Fastest clear',suf:' BPM',unit:'BPM, fastest exercise cleared',at:[40,60,80,100,120,140,160]});
@@ -2200,7 +2201,7 @@ const STEPNAMES={ses:['Warmed up','Regular','Locked in','Dedicated','Road-tested
   cln:['Warmed through','Ten straight','Quarter hour','Twenty flat','Half hour','Three quarters','Full hour'],
   tmp:['Slow burn','Easy groove','Cruising','Hundred club','Picking up','Fast hands','Speed demon']};
 const GLYPHS={lstrokes:'lv1',lbeat:'lv2',lhalf:'lv3',lbar:'lv4',lnone:'lvM',hstrokes:'lv1',hbeat:'lv2',hhalf:'lv3',hbar:'lv4',hnone:'lvM',ses:'drum',str:'cal',all:'lvA',dyn:'acc',cln:'sweep',prf:'target',tmp:'metro'};
-BADGES.forEach(b=>{b.nm=STEPNAMES[b.id]||(b.at===HSL?STEPNAMES.hs:STEPNAMES.ladder);b.gl=GLYPHS[b.id]||'tick';});
+BADGES.forEach(b=>{b.nm=STEPNAMES[b.id]||(b.hs?STEPNAMES.hs:STEPNAMES.ladder);b.gl=GLYPHS[b.id]||'tick';});
 /* Mastery of one exercise on one click level, from the fastest tempo it was cleared at, measured in strokes a minute so sixteenths count for more than eighths. Eight steps: cleared at all, then seven rates. */
 const RATE_AT=[120,180,240,320,400,480,600];
 const MTIER=['Hickory','Bronze','Silver','Gold','Platinum','Sapphire','Ruby','Diamond'];
@@ -2579,7 +2580,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.94.3';                           /* shown beside the title */
+const VERSION='0.95.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
