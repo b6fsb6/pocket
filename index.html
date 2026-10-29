@@ -433,8 +433,13 @@ html.pgopen{overflow:hidden}
 .bd .bt{font-size:13px;color:var(--muted);flex-basis:100%}
 .bd .bc{min-width:32px;text-align:center;padding:3px 6px;border:1px solid var(--accent);border-radius:999px;font:700 13px var(--font-display);color:var(--muted);opacity:.55}
 .bd .bc.on{background:var(--fill);color:var(--accent-ink);opacity:1}
-.bm{display:flex;flex-wrap:wrap;gap:6px;flex-basis:100%}
-.bc2{margin:4px 0 0;font-size:13px;color:var(--muted);flex-basis:100%}
+.bd{display:flex;align-items:center;gap:14px;flex-wrap:nowrap}.bd .bt{flex-basis:auto;font-size:15px;color:var(--ink);font-weight:600}.bw .bd{margin-top:14px}
+.bd .medal{width:56px;height:56px}
+.bx{flex:1;min-width:0}
+.bc2{margin:2px 0 6px;font-size:13px;color:var(--muted)}
+.bbar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bbar i{display:block;height:100%;background:var(--accent,#E0A91F)}
+.bgo{margin:5px 0 0;font-size:12px;color:var(--muted)}
 .medal{display:inline-block;width:40px;height:40px;flex:none}
 .medal svg{display:block;width:100%;height:100%}
 .medal.off{color:var(--muted)!important;opacity:.45}
@@ -700,6 +705,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
 .rmenu button.danger{color:var(--late)}
 .rmenu button.arm{background:var(--late);color:#fff}
 @media (max-width:359px){.glib .hrow>summary{padding-right:128px}.glib .hrow .ib{min-width:30px}}
+.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px;margin-top:12px}.tc{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted)}.tc .medal{width:64px;height:64px}
 </style>
 </head>
 <body data-input="mic" data-mode="single" data-tab="pattern" data-state="idle" data-run="0" data-review="0">
@@ -2164,7 +2170,7 @@ const STEPNAMES={ses:['Warmed up','Regular','Locked in','Dedicated','Road-tested
   rtc:['First routine','Three down','Five down','Ten routines','Setlist master'],
   swp:['Clean sweep','Smooth five','Smooth ten','Smooth 25','Smooth fifty'],
   tmp:['Slow burn','Easy groove','Cruising','Hundred club','Picking up','Fast hands','Speed demon']};
-const GLYPHS={ses:'drum',str:'cal',all:'tick',dyn:'acc',rtc:'book',swp:'sweep',prf:'target',tmp:'metro'};
+const GLYPHS={lstrokes:'lv1',lbeat:'lv2',lhalf:'lv3',lbar:'lv4',lnone:'lvM',ses:'drum',str:'cal',all:'lvA',dyn:'acc',rtc:'book',swp:'sweep',prf:'target',tmp:'metro'};
 BADGES.forEach(b=>{b.nm=STEPNAMES[b.id]||STEPNAMES.ladder;b.gl=GLYPHS[b.id]||'tick';});
 /* Mastery of one exercise on one click level, from the fastest tempo it was cleared at, measured in strokes a minute so sixteenths count for more than eighths. Eight steps: cleared at all, then seven rates. */
 const RATE_AT=[120,180,240,320,400,480,600];
@@ -2543,7 +2549,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.89.2';                           /* shown beside the title */
+const VERSION='0.90.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4492,7 +4498,9 @@ function renderPractice(){
   $('streakLine').textContent=n?n+(n===1?' day':' days')+' in a row':'No streak yet';
   $('stripHint').textContent=days.size?'This week: '+weekDays+(weekDays===1?' day':' days')+', '+week+' min. A day counts at 5 minutes or more, and one rest day a week keeps the streak going. Darker means more minutes.':'Play an exercise and your practice days show up here. One rest day a week keeps the streak going.';
 }
-const GL={
+const chev=n=>{let o='<g fill="none" stroke="K" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">';for(let i=0;i<n;i++){const y=48+(i-(n-1)/2)*11;o+='<path d="M30 '+(y+6)+' L48 '+(y-6)+' L66 '+(y+6)+'"/>';}return o+'</g>';};
+const stars=n=>{let o='<g fill="K">';for(let i=0;i<n;i++){const x=48+(i-(n-1)/2)*(n>1?20:0),r=n>1?11:17;let p='';for(let k=0;k<10;k++){const q=k%2?r*.45:r,a=-Math.PI/2+k*Math.PI/5;p+=(k?'L':'M')+(x+q*Math.cos(a)).toFixed(1)+' '+(48+q*Math.sin(a)).toFixed(1);}o+='<path d="'+p+'Z"/>';}return o+'</g>';};
+const GL={lv1:chev(1),lv2:chev(2),lv3:chev(3),lv4:chev(4),lvM:stars(1),lvA:stars(3),
   drum:'<ellipse cx="48" cy="40" rx="20" ry="7" fill="none" stroke="K" stroke-width="3"/><path d="M28 40v16c0 4 9 7 20 7s20-3 20-7V40" fill="none" stroke="K" stroke-width="3"/><path d="M34 26l12 10M62 26L50 36" stroke="K" stroke-width="3" stroke-linecap="round"/>',
   tick:'<path d="M26 34h44M26 44h44M26 54h44" stroke="K" stroke-width="2" opacity=".55"/><path d="M34 46l9 9 19-21" fill="none" stroke="K" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>',
   metro:'<path d="M38 66l-6-4 10-34h12l10 34-6 4z" fill="none" stroke="K" stroke-width="3" stroke-linejoin="round"/><path d="M48 58l8-24" stroke="K" stroke-width="3" stroke-linecap="round"/><circle cx="53" cy="44" r="3" fill="K"/>',
@@ -4560,15 +4568,14 @@ function renderBadges(){
     }
     g.ids.forEach(id=>{
       const b=BADGES.find(x=>x.id===id),row=document.createElement('div');row.className='bd';
-      const done=b.at.filter(n=>v[id]>=n).length,next=b.at[done];
-      if(g.ids.length>1){const t=document.createElement('span');t.className='bt';t.textContent=b.name;row.appendChild(t);}
-      const ms=document.createElement('div');ms.className='bm';
-      b.at.forEach((n,i)=>ms.appendChild(medal(b,i,i<done)));
-      row.appendChild(ms);
-      const c=document.createElement('p');c.className='bc2';
-      c.textContent=fmtBadge(b,v[id])+'. '+(next?(b.lead?(next-v[id])+' BPM':String(next-v[id]))+' to go for '+b.nm[done]+'.':'Every step earned.');
-      row.appendChild(c);
-      w.appendChild(row);
+      const done=b.at.filter(n=>v[id]>=n).length,next=b.at[done],prev=done?b.at[done-1]:0;
+      row.appendChild(medal(b,Math.max(done-1,0),done>0));
+      const tx=document.createElement('div');tx.className='bx';
+      const t=document.createElement('span');t.className='bt';t.textContent=g.ids.length>1?b.name:g.name;tx.appendChild(t);
+      const c=document.createElement('p');c.className='bc2';c.textContent=(done?b.nm[done-1]+' \u00b7 ':'')+fmtBadge(b,v[id]);tx.appendChild(c);
+      const bar=document.createElement('div');bar.className='bbar';const f=document.createElement('i');f.style.width=(next?100*(v[id]-prev)/(next-prev):100)+'%';bar.appendChild(f);tx.appendChild(bar);
+      const g2=document.createElement('p');g2.className='bgo';g2.textContent=next?(b.lead?(next-v[id])+' BPM':String(next-v[id]))+' to go for '+b.nm[done]+'':'Every step earned';tx.appendChild(g2);
+      row.appendChild(tx);w.appendChild(row);
     });
     box.appendChild(w);
   });

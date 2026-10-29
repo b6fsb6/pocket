@@ -320,15 +320,15 @@ test('Help: a menu in the title on a phone, a contents list beside the text on d
   assert.equal(await dk.evaluate(() => document.querySelector('#helpNav button[aria-current]').textContent), 'If something is off');
 });
 
-test('every badge step has a written name and a medal on the Achievements page', async () => {
+test('every badge has one medal, with a written step name, on the Achievements page', async () => {
   const p = await open({ seeded: true, input: 'kb' }, { width: 1440, height: 900 });
   await p.evaluate(() => [...document.querySelectorAll('.switch.tabs button')].find(x => x.textContent.trim() === 'Progress').click());
   await p.evaluate(() => document.getElementById('pvBtnAch').click());
   await p.waitForTimeout(200);
   const r = await p.evaluate(() => ({ n: document.querySelectorAll('#badges .medal').length, bad: [...document.querySelectorAll('#badges .medal')].filter(m => /undefined|NaN/.test(m.title) || !m.title).length, off: document.querySelectorAll('#badges .medal.off').length }));
-  assert.equal(r.n, 112);
+  assert.equal(r.n, 13);
   assert.equal(r.bad, 0);
-  assert.equal(r.off, 112);
+  assert.equal(r.off, 13);
   const txt = await p.evaluate(() => document.getElementById('badges').innerText);
   assert.doesNotMatch(txt, /undefined|NaN/);
 });
