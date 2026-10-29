@@ -243,3 +243,9 @@ test('a new badge is announced on the result, with the next one in sight', async
   assert.match(o.win, /New badge: 5 runs/);
   assert.match(o.next, /^Next badge: /);
 });
+
+test('staff rows stack their label above the staff, whatever else is on the page', async () => {
+  const p = await open({ seeded: true, input: 'kb' });
+  const d = await p.evaluate(() => { const r = document.querySelector('#rowsTrack .prow'); return r ? getComputedStyle(r).display : 'none'; });
+  assert.equal(d, 'grid');
+});

@@ -639,9 +639,9 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
 .hint .linkbtn{font-size:inherit}
 @media (max-width:359px){.switch.tabs button{font-size:13px;letter-spacing:.02em}}   /* four tab names fit the narrowest phones */
 .dur{display:grid;grid-template-columns:minmax(70px,1fr) minmax(110px,1.4fr);gap:8px}
-.prow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:48px;padding:8px 12px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;cursor:pointer}
-.prow small{color:var(--muted);font:500 13px var(--font-body);white-space:nowrap}
-.prow.on{background:var(--bg);box-shadow:inset 3px 0 0 var(--fill)}
+.pickrow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:48px;padding:8px 12px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;cursor:pointer}
+.pickrow small{color:var(--muted);font:500 13px var(--font-body);white-space:nowrap}
+.pickrow.on{background:var(--bg);box-shadow:inset 3px 0 0 var(--fill)}
 #pickList{display:grid;gap:10px}
 .ib.down svg{transition:transform .18s}
 .hrow[open] .ib.down svg{transform:rotate(180deg)}
@@ -2476,7 +2476,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.85.2';                           /* shown beside the title */
+const VERSION='0.85.3';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -5696,7 +5696,7 @@ function openPick(){
     const sm=document.createElement('summary');sm.textContent=g+' ('+items.length+')';
     const body=document.createElement('div');body.className='gb';
     items.forEach(([e,label])=>{
-      const b=document.createElement('button');b.type='button';b.className='prow'+(e.id===S.libId?' on':'');
+      const b=document.createElement('button');b.type='button';b.className='pickrow'+(e.id===S.libId?' on':'');
       const n=exerciseCount(e.x);
       b.innerHTML='<span></span><small></small>';b.firstChild.textContent=label;b.lastChild.textContent=n+(n===1?' exercise':' exercises');
       b.addEventListener('click',()=>{
