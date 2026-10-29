@@ -128,7 +128,8 @@ body[data-run="1"] .notice{display:none}
 :root[data-layout=desktop] #pvStats:not([hidden]),:root[data-layout=desktop] #pvAch:not([hidden]){grid-template-columns:minmax(280px,340px) minmax(0,1fr);column-gap:28px;align-items:start}
 :root[data-layout=desktop] .pv>.pcol{display:grid;gap:22px;align-content:start;min-width:0}
 :root[data-layout=desktop] #pvAch .pside{position:sticky;top:16px}
-:root[data-layout=desktop] #badges{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;align-content:start;align-items:start}
+:root[data-layout=desktop] #badges{display:block;columns:300px;column-gap:28px}   /* cards of different heights pack into columns with no gaps */
+:root[data-layout=desktop] #badges>.bw{break-inside:avoid;margin:0 0 22px;border-top:1px solid var(--line);padding-top:16px}
 :root[data-layout=desktop] #svPref:not([hidden]),:root[data-layout=desktop] #svDev:not([hidden]),:root[data-layout=desktop] #svData:not([hidden]){display:block;columns:2 340px;column-gap:22px}
 :root[data-layout=desktop] #svPref>*,:root[data-layout=desktop] #svDev>*,:root[data-layout=desktop] #svData>*{break-inside:avoid;margin-bottom:22px}
 .libsec{display:grid;gap:14px}
@@ -2489,7 +2490,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.87.1';                           /* shown beside the title */
+const VERSION='0.87.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
