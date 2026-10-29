@@ -48,7 +48,7 @@ body{
   padding-left:max(16px,env(safe-area-inset-left,0px));
   padding-right:max(16px,env(safe-area-inset-right,0px));
 }
-.app{max-width:760px;margin:0 auto;display:grid;gap:22px}
+.app{max-width:760px;margin:0 auto;display:grid;gap:12px}
 .app>*{min-width:0}
 header .sub{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
 header .ver{font:600 12px var(--font-data);letter-spacing:.04em;text-transform:none;color:var(--muted);white-space:nowrap;vertical-align:baseline}
@@ -2477,7 +2477,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.86.1';                           /* shown beside the title */
+const VERSION='0.86.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
