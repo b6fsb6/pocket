@@ -206,6 +206,7 @@ async function runOnce(settings, practice, init) {
     text: document.getElementById('advice').innerText,
     discard: !document.getElementById('advDiscard').hidden,
     win: document.getElementById('advWin').hidden ? '' : document.getElementById('advWin').textContent,
+    badge: document.getElementById('advBadge').hidden ? '' : document.getElementById('advBadge').innerText,
     next: document.getElementById('advNext').textContent,
     days: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).sum || {}).days || {},
   }));
@@ -240,8 +241,10 @@ test('a new badge is announced on the result, with the next one in sight', async
     localStorage.setItem('stick-timing-trainer.records.v2', JSON.stringify({ v: 1, names: {}, nu: 1, lib: [], runs: [0, 1, 2, 3].map(run) }));
   };
   const o = await runOnce({ click: 'beat' }, false, seed);
-  assert.match(o.win, /New badge: 5 runs/);
-  assert.match(o.next, /^Next badge: /);
+  assert.match(o.badge, /Unlocked/i);
+  assert.match(o.badge, /Next: /);
+  assert.match(o.badge, /step \d+ of \d+/i);
+  assert.doesNotMatch(o.badge, /undefined|NaN/);
 });
 
 test('staff rows stack their label above the staff, whatever else is on the page', async () => {
@@ -315,4 +318,17 @@ test('Help: a menu in the title on a phone, a contents list beside the text on d
   await dk.evaluate(() => [...document.querySelectorAll('#helpNav button')].find(b => b.textContent === 'If something is off').click());
   await dk.waitForTimeout(400);
   assert.equal(await dk.evaluate(() => document.querySelector('#helpNav button[aria-current]').textContent), 'If something is off');
+});
+
+test('every badge step has a written name and a medal on the Achievements page', async () => {
+  const p = await open({ seeded: true, input: 'kb' }, { width: 1440, height: 900 });
+  await p.evaluate(() => [...document.querySelectorAll('.switch.tabs button')].find(x => x.textContent.trim() === 'Progress').click());
+  await p.evaluate(() => document.getElementById('pvBtnAch').click());
+  await p.waitForTimeout(200);
+  const r = await p.evaluate(() => ({ n: document.querySelectorAll('#badges .medal').length, bad: [...document.querySelectorAll('#badges .medal')].filter(m => /undefined|NaN/.test(m.title) || !m.title).length, off: document.querySelectorAll('#badges .medal.off').length }));
+  assert.equal(r.n, 112);
+  assert.equal(r.bad, 0);
+  assert.equal(r.off, 112);
+  const txt = await p.evaluate(() => document.getElementById('badges').innerText);
+  assert.doesNotMatch(txt, /undefined|NaN/);
 });
