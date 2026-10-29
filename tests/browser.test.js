@@ -148,3 +148,39 @@ test('destructive buttons ask twice', async () => {
   });
   assert.equal(label, 'Clear all?|true');
 });
+
+test('a stray exercise is deleted from a run, and an unheard one is not scored', async () => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
+  const p = await ctx.newPage();
+  p.errors = [];
+  p.on('pageerror', e => p.errors.push(e.message));
+  await p.addInitScript(() => {
+    if (localStorage.getItem('seeded-by-test')) return;
+    localStorage.setItem('seeded-by-test', '1');
+    const ex = (k, i, w, h) => ({ k, bpm: 60, due: 32, within: w, heard: h, avg: h ? -2.7 : null, sd: h ? 3 : null, miss: 0, i });
+    localStorage.setItem('stick-timing-trainer.records.v2', JSON.stringify({ v: 1, names: { pabc: 'Mine' }, nu: 1, lib: [], runs: [{
+      id: 'r1', t: Date.now(), mode: 'routine', rk: 'pabc', lv: 'beat', dy: '', ne: 3, bpm: 60, tol: 20, sec: 120,
+      exercises: [ex('8 RLRL RLRL', 1, 30, 32), ex('8 RRLL RRLL', 2, 26, 32), ex('8 dLfR', 3, 0, 0)],
+      rp: { x: 'RLRL RLRL\nRRLL RRLL\ndLfR', st: 1, ev: 8, eu: 'pass', gp: 0, o: null } }] }));
+    localStorage.setItem('stick-timing-trainer.v1', JSON.stringify({ settings: { seeded: true, noise: -50, latCal: true }, cal: null }));
+  });
+  await p.goto(base);
+  await p.waitForTimeout(300);
+  await p.click('#tabProgress');
+  await p.locator('.lrow', { hasText: 'Mine' }).first().click();
+  const text = () => p.evaluate(() => [...document.querySelectorAll('#pg')].map(x => x.innerText).join('|'));
+  let t = await text();
+  assert.match(t, /1 not played/);            /* nothing was heard in the last exercise */
+  assert.doesNotMatch(t, /dLfR[\s\S]*ACC/);    /* it is not scored, so it cannot be the weakest */
+  await p.evaluate(() => { document.querySelector('details').open = true; document.querySelector('details .ib').click(); });
+  const del = () => p.evaluate(() => [...document.querySelectorAll('.rmenu button')].find(x => /^Delete/.test(x.textContent)).click());
+  await del(); await del();
+  await p.waitForTimeout(300);
+  t = await text();
+  assert.doesNotMatch(t, /\d not played/);
+  assert.match(t, /88%/);                      /* both exercises were played, so the run now has an overall score */
+  const saved = await p.evaluate(() => JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')).runs[0]);
+  assert.equal(saved.ne, 2);
+  assert.deepEqual(p.errors, []);
+  await ctx.close();
+});

@@ -1207,7 +1207,7 @@ RLRR LRLL RLRR LRLL</pre>
         <li><b>Practise weak exercises:</b> after a routine run, this plays only the exercises below target. Restart repeats the same ones. A partial run never counts as clearing the routine.</li>
         <li><b>Tempo guidance:</b> each exercise in the start list shows the tempo it has cleared, or "new". The summary shows where the whole routine has been cleared.</li>
         <li><b>Staff of a run:</b> each run keeps the result of every stroke. A run's page has a <b>Staff</b> group showing the notation with each stroke coloured and read out, and the Play page rebuilds its review from the same record.</li>
-        <li><b>History:</b> on the Progress page, switch to History for your last 300 runs, by exercise or routine, newest first. Tap a group for its runs and a run for its exercises. <b>Play</b> loads the same routine, tempo, click level and settings, ready to start. <b>Delete</b> deletes the run. An untitled routine is called "Untitled 1", "Untitled 2" and so on. The pencil renames it everywhere, and a title typed in the editor replaces it. Runs beyond 300 are folded into your totals, streaks, achievements and cleared tempos, which are kept for good, but they can no longer be replayed.</li>
+        <li><b>History:</b> on the Progress page, switch to History for your last 300 runs, by exercise or routine, newest first. Tap a group for its runs and a run for its exercises. <b>Play</b> loads the same routine, tempo, click level and settings, ready to start. <b>Delete</b> deletes the run. The ⋮ beside an exercise deletes just that exercise from the run, for one that was in the editor by mistake. An exercise nothing was heard in is listed as not played and is never scored. An untitled routine is called "Untitled 1", "Untitled 2" and so on. The pencil renames it everywhere, and a title typed in the editor replaces it. Runs beyond 300 are folded into your totals, streaks, achievements and cleared tempos, which are kept for good, but they can no longer be replayed.</li>
       </ul>
       <p class="totop"><button class="linkbtn" type="button">Back to top</button></p>
     </section>
@@ -1984,7 +1984,7 @@ const heardEnough=b=>b.due>0&&(b.heard||0)>=b.due*0.25;
 function patStats(runs,sum){
   const m=new Map();
   runs.forEach(run=>run.exercises.forEach(b=>{
-    if(!(b.due>0)||run.lv==='off')return;
+    if(!(b.due>0)||!(b.heard>0)||run.lv==='off')return;   /* an exercise nothing was heard in was not played */
     const mk=b.k+'|'+run.lv+(run.dy?'|'+run.dy:'');   /* the same sticking with a different accent rule is a different exercise */
     let e=m.get(mk);if(!e){e={k:b.k,lv:run.lv,dy:run.dy||'',recs:[]};m.set(mk,e);}
     const hd=heardEnough(b);
@@ -2059,7 +2059,7 @@ function foldRun(sum,run){
   const dk=dayKey(run.t);sum.days[dk]=(sum.days[dk]||0)+(run.sec||0);
   if(run.lv==='off')return;
   run.exercises.forEach(b=>{
-    if(!(b.due>0))return;
+    if(!(b.due>0)||!(b.heard>0))return;
     const key=b.k+'|'+run.lv+(run.dy?'|'+run.dy:''),bpm=b.bpm||run.bpm,pct=b.within/b.due;
     let e=sum.pat[key];if(!e){e={k:b.k,lv:run.lv,dy:run.dy||'',runs:0,t:0,bpm:bpm,tr:[],cleared:0,clearedT:0,avg:null};sum.pat[key]=e;}
     e.runs++;e.t=run.t;
@@ -2465,7 +2465,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.82.0';                           /* shown beside the title */
+const VERSION='0.83.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2577,6 +2577,12 @@ function cleanRun(x){
   const q=x.rp;
   if(q&&typeof q.x==='string'&&q.x.length<=MAX_SNAP)o.rp={x:q.x,st:Math.max(1,Math.round(+q.st)||1),ev:isFinite(+q.ev)&&+q.ev>0?+q.ev:1,eu:q.eu==='pass'?'pass':'min',gp:+q.gp===4?4:0,
     o:Array.isArray(q.o)?q.o.map(n=>Math.round(+n)).filter(n=>n>=1&&n<=200):null};
+  /* Exercises nothing was heard in were not played: they leave the scores and show as not played. A run with nothing heard at all goes. */
+  if(o.lv!=='off'){
+    const un=o.exercises.filter(b=>!(b.heard>0));
+    if(un.length===o.exercises.length)return null;
+    if(un.length&&un.every(b=>b.i>=1)){o.exercises=o.exercises.filter(b=>!un.includes(b));o.sk=(o.sk||[]).concat(un.map(b=>({i:b.i,k:b.k})));}
+  }
   return o;
 }
 const MAX_LIB=500;
@@ -4211,7 +4217,7 @@ function dynSaved(r,si){   /* accents and ghost notes judged in this exercise: h
 }
 function recordRun(r){
   lastRun=null;
-  const rows=exerciseRows(r).filter(x=>x.passes>=1);
+  const rows=exerciseRows(r).filter(x=>x.passes>=1&&(x.heard>0||S.click==='off'));   /* nothing heard counts as not played */
   const skipped=exerciseRows(r).length-rows.length;
   if(!rows.length)return;
   const all=S.mode==='routine'?allExercises().map(b=>patKey(b.notes,b.groupStart,b.subs,b.defSub,b.sig)):null;
@@ -4905,9 +4911,24 @@ function renderRunPage(r){
       const hd=heardEnough(b);
       stat(hd&&typeof b.avg==='number'?fmtMs(b.avg,1):'—','ms',hd&&typeof b.avg==='number'?biasCls(b.avg):'muted');
       stat(hd&&typeof b.ls==='number'?'±'+b.ls.toFixed(1):'—','dB');
-      eb.appendChild(sn);eb.style.flex='1';eb.style.minWidth='0';row.appendChild(en);row.appendChild(eb);row.appendChild(practiseBtn(b.k,x.i,r));page.appendChild(row);});
+      eb.appendChild(sn);eb.style.flex='1';eb.style.minWidth='0';row.appendChild(en);row.appendChild(eb);row.appendChild(practiseBtn(b.k,x.i,r));
+      if(played.length>1)row.appendChild(kebab('More actions',[{t:'Delete',fn:()=>dropExercise(r,b),arm:true,danger:true}]));
+      page.appendChild(row);});
     const sk=items.length-played.length;
-    if(sk){const e=document.createElement('div');e.className='sb';e.style.padding='8px 0';e.textContent=sk+(sk===1?' exercise was':' exercises were')+' not played and '+(sk===1?'is':'are')+' not listed.';page.appendChild(e);}
+    if(sk){   /* not played: kept out of the scores, listed here so a stray one can be deleted */
+      const d=document.createElement('details'),sm=document.createElement('summary');sm.textContent=sk+' not played';d.appendChild(sm);
+      d.style.cssText='border:0;border-top:1px solid var(--line);border-radius:0;background:none';
+      sm.style.cssText='font:600 13px var(--font-data);text-transform:none;letter-spacing:0;padding:10px 0;color:var(--muted)';
+      const inner=document.createElement('div');
+      items.filter(x=>!x.b).forEach(x=>{
+        const row=document.createElement('div');row.className='exr';
+        const en=document.createElement('div');en.className='en';en.textContent=String(x.i||'');
+        const n=document.createElement('div');n.className='seq';n.textContent=showKey(x.k);n.style.flex='1';n.style.minWidth='0';
+        row.append(en,n,kebab('More actions',[{t:'Delete',fn:()=>dropExercise(r,(r.sk||[]).find(q=>q.i===x.i&&q.k===x.k)||{i:0}),arm:true,danger:true}]));
+        inner.appendChild(row);
+      });
+      d.appendChild(inner);page.appendChild(d);
+    }
   }
   const acts=document.createElement('div');acts.className='actions';
   acts.appendChild(actBtn('Play',()=>replayRun(r),true));
@@ -4968,6 +4989,31 @@ function deleteRun(id){
   const i=recs.runs.findIndex(x=>x.id===id);if(i<0)return;
   recs.runs.splice(i,1);saveRecs();
   if(lastRun&&lastRun.run.id===id){lastRun=null;renderAdvice();}
+  renderProgress();
+}
+/* Takes one exercise out of a recorded routine run, for a stray exercise that was in the editor. The run becomes a run of the routine without it, so it counts toward that routine. */
+function dropExercise(r,b){
+  const gone=b.i||0,inSk=!!(r.sk&&r.sk.includes(b)),left=inSk?r.exercises:r.exercises.filter(x=>x!==b);
+  if(!left.length||!gone){deleteRun(r.id);return;}
+  if(inSk){r.sk=r.sk.filter(x=>x!==b);if(!r.sk.length)delete r.sk;}
+  const shift=n=>n>gone?n-1:n;
+  left.forEach(x=>{x.i=shift(x.i);});
+  if(r.sk)r.sk.forEach(x=>{x.i=shift(x.i);});
+  r.exercises=left;
+  const keys=left.map(x=>({i:x.i,k:x.k})).concat((r.sk||[]).map(x=>({i:x.i,k:x.k}))).sort((a,c)=>a.i-c.i).map(x=>x.k);
+  const was=r.rk;
+  r.ne=keys.length;r.rk=routineKeyOf(keys);
+  if(was&&was!==r.rk&&recs.names[was]&&!recs.names[r.rk])recs.names[r.rk]=recs.names[was];
+  if(r.rp){   /* the replay text loses the same line, so Play does not bring the exercise back */
+    const t=String(r.rp.x||'').replace(/^\uFEFF/,'').trim(),ex=/^[\[{]/.test(t)?null:parseRoutine(t).exercises.find(e=>e.idx===gone);
+    if(ex&&ex.line!=null){
+      const L=t.split(/\r?\n/);L.splice(ex.line,1);
+      r.rp.x=L.join('\n');r.rp.st=Math.max(1,shift(r.rp.st));
+      if(r.rp.o){r.rp.o=r.rp.o.filter(n=>n!==gone).map(shift);if(!r.rp.o.length)r.rp.o=null;}
+    }else delete r.rp;
+  }
+  saveRecs();
+  if(lastRun&&lastRun.run.id===r.id)renderAdvice();
   renderProgress();
 }
 /* Loads a past run's pattern or routine, tempo, click level and settings, then opens Play. It does not start. */
