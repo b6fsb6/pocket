@@ -2158,7 +2158,7 @@ const LADDER=[1,5,10,25,50,100,250,500,750,1000];
 LEVELS.forEach(l=>BADGES.push({id:'l'+l.v,lv:l.v,name:l.n,unit:'exercises cleared on '+l.n,at:LADDER}));
 BADGES.push({id:'all',name:'On every level',unit:'exercises cleared on every level',at:LADDER});
 BADGES.push({id:'dyn',name:'Accents and ghosts',unit:'accent or ghost exercises cleared',one:'accent or ghost exercise cleared',at:LADDER});
-BADGES.push({id:'rtc',name:'Exercises in routines',unit:'exercises cleared in routines',one:'exercise cleared in a routine',at:LADDER});
+BADGES.push({id:'rtc',name:'Exercises in routines',unit:'exercises in cleared routines',one:'exercise in a cleared routine',at:LADDER});
 BADGES.push({id:'cln',name:'Longest clean run',lead:'Longest clean run',suf:' min',unit:'min, longest routine run with every exercise cleared',at:[5,10,15,20,30,45,60]});
 BADGES.push({id:'prf',name:'Perfect exercises',unit:'perfect exercises',one:'perfect exercise',at:LADDER});
 BADGES.push({id:'tmp',name:'Fastest clear',lead:'Fastest clear',suf:' BPM',unit:'BPM, fastest exercise cleared',at:[40,60,80,100,120,140,160]});
@@ -2192,7 +2192,8 @@ const BGROUPS=[{name:'Runs',d:'Runs where at least one exercise was played throu
   {name:'Days in a row',d:'Your longest run of practice days. A day counts at 5 minutes or more. One rest day a week does not break it.',ids:['str']},
   {name:'Exercises cleared',d:'An exercise is cleared on a level when you play it at 90% or more of strokes on time at that click level. Each exercise counts once on each level, whatever the accent rule. Each level is cleared on its own. The table counts exercises by the fastest tempo they were cleared at.',grid:true,ids:['lstrokes','lbeat','lhalf','lbar','lnone','all']},
   {name:'Accents and ghosts',d:'Exercises cleared with an accent or ghost rule: 90% or more of strokes on time and played as written. The same exercise with another rule counts again.',ids:['dyn']},
-  {name:'Routines',d:'A routine is cleared when one run plays it right through with every exercise at 90% or more. Each routine counts once, by the number of exercises in it. Longest clean run is the most minutes of one routine run with every exercise at 90% or more.',ids:['rtc','cln']},
+  {name:'Routines cleared',d:'Play a saved routine from start to finish with every exercise at 90% or more, and it is cleared. A cleared routine adds its number of exercises, once: a 24-exercise routine adds 24.',ids:['rtc']},
+  {name:'Longest clean run',d:'The most minutes of one routine, played start to finish, with every exercise at 90% or more.',ids:['cln']},
   {name:'Perfect exercises',d:'An exercise of at least 16 strokes with every stroke on time.',ids:['prf']},
   {name:'Tempo',d:'The fastest tempo at which you have cleared any exercise.',ids:['tmp']}];
 /* Cleared exercises per level: each sticking once, at the fastest tempo it was cleared at, whatever the accent rule. */
@@ -2548,7 +2549,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.93.0';                           /* shown beside the title */
+const VERSION='0.93.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
