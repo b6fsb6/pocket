@@ -286,7 +286,7 @@ body[data-tab=pattern] header,body[data-tab=pattern] .tabs{display:none}   /* th
 .etitle{flex:1;min-width:0;display:grid;line-height:1.2}
 .etitle b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .etitle .hint{margin:0;font-size:12px}
-.rtname{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.rtname{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .rtname+.patrow{margin-top:-10px}   /* the name and its line read as one block */
 .rtname b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}.rtname .linkbtn{flex:none}
 :root:not([data-layout=desktop]) body[data-review="1"] header,:root:not([data-layout=desktop]) body[data-review="1"] .tabs,:root:not([data-layout=desktop]) body[data-review="1"] .cfg,:root:not([data-layout=desktop]) body[data-review="1"] .transport,:root:not([data-layout=desktop]) body[data-review="1"] .notice{display:none}
@@ -1258,8 +1258,8 @@ RLRR LRLL RLRR LRLL</pre>
     </section>
     <div class="pcol pctl">
     <section class="panel cfg" aria-label="Exercises">
-      <div class="rtname"><b id="playName"></b><button class="linkbtn" id="playChange" type="button">Change</button></div>
-      <div class="patrow"><p class="patline single-only" id="playPat"></p><p class="hint routine-only" id="routineInfo"></p><button class="btn small" id="editPlay" type="button">Edit</button></div>
+      <div class="rtname"><b id="playName"></b><button class="ib" id="editPlay" type="button" aria-label="Edit routine" title="Edit routine"></button><button class="linkbtn" id="playChange" type="button">Change</button></div>
+      <div class="patrow"><p class="patline single-only" id="playPat"></p><p class="hint routine-only" id="routineInfo"></p></div>
       <div class="exercises routine-only" id="exerciseList" role="listbox" aria-label="Exercises in this routine. Choose the exercise to start at."></div>
     </section>
 
@@ -2477,7 +2477,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='0.85.5';                           /* shown beside the title */
+const VERSION='0.86.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -6054,7 +6054,7 @@ function syncInfo(){
     $('routineErr').textContent=n===0&&!S.routineText.trim()?'':(errs.length?errs.slice(0,3).join(' ')+(errs.length>3?' (+'+(errs.length-3)+' more)':''):(n===0?'No exercises found. Type one exercise per line using L and R.':''));
     const total=playTime(all);
     $('routineInfo').textContent=ok
-      ?n+(n===1?' exercise':' exercises')+' · about '+fmtTime(total)+' in all · '+S.bpm+' BPM'
+      ?n+(n===1?' exercise':' exercises')+' · about '+fmtTime(total)+' in all'
       :'';
     const en=$('eachNote');
     en.hidden=!routineParsed.each;
@@ -6657,6 +6657,7 @@ function wire(){
     }
     startPlay();
   });
+  $('editPlay').innerHTML=ICON.edit;
   $('editPlay').addEventListener('click',editFromPlayPage);
   $('advWeak').addEventListener('click',()=>{if(lastRun)startPlay(lastRun.weakIdx);});
   TABS.forEach(n=>{
