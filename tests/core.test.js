@@ -1,7 +1,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const { loadCore, plain } = require('./helpers');
 const c = loadCore(['parseStrokes', 'parseExerciseLine', 'parseRoutine', 'resolveExercises', 'buildPlan', 'builderApply',
-  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck']);
+  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT']);
 
 const plan = (text, opt) => {
   const p = c.parseRoutine(text);
@@ -103,4 +103,20 @@ test('detector: a soft grace does not hide the loud main stroke when flams are o
 test('detector: a single hit is heard once', () => {
   const h = detect(0.07, 0.03, 0, 0.6);
   assert.equal(h.length, 1);
+});
+
+test('mastery is measured in strokes a minute, so sixteenths count for more than eighths', () => {
+  const key = x => c.textKey(x, 4);
+  const sixteenths = key('RLRL RLRL');       /* four strokes to the beat */
+  const eighths = key('8 RLRL RLRL');     /* two strokes to the beat */
+  assert.equal(c.strokeRate(sixteenths, 60), 240);
+  assert.equal(c.strokeRate(eighths, 60), 120);
+  assert.equal(c.masteryTier(sixteenths, 60), 3);   /* Gold */
+  assert.equal(c.masteryTier(eighths, 60), 1);      /* Bronze */
+  assert.equal(c.masteryTier(eighths, 40), 0);      /* Hickory: cleared, but slow */
+  assert.equal(c.masteryTier(sixteenths, 150), 7);  /* Diamond */
+  assert.equal(c.MTIER.length, c.RATE_AT.length + 1);
+  /* rests are not strokes, and a half-note beat counts its own strokes */
+  assert.equal(c.strokeRate(key('R_L_ R_L_'), 60), 120);
+  assert.equal(c.strokeRate(key('2/2: RLRL RLRL'), 70), 280);
 });
