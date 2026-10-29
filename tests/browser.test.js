@@ -328,9 +328,9 @@ test('every badge has one medal, with a written step name, on the Achievements p
   await p.evaluate(() => document.getElementById('pvBtnAch').click());
   await p.waitForTimeout(200);
   const r = await p.evaluate(() => ({ n: document.querySelectorAll('#badges .medal').length, bad: [...document.querySelectorAll('#badges .medal')].filter(m => /undefined|NaN/.test(m.title) || !m.title).length, off: document.querySelectorAll('#badges .medal.off').length }));
-  assert.equal(r.n, 13);
+  assert.equal(r.n, 17);
   assert.equal(r.bad, 0);
-  assert.equal(r.off, 13);
+  assert.equal(r.off, 17);
   const txt = await p.evaluate(() => document.getElementById('badges').innerText);
   assert.doesNotMatch(txt, /undefined|NaN/);
 });
@@ -352,4 +352,28 @@ test('Import asks what to bring in, offers only what the file holds, and imports
   const after = await p.evaluate(() => ({ bpm: JSON.parse(localStorage.getItem('stick-timing-trainer.v1')).settings.bpm, lib: JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')).lib.length }));
   assert.notEqual(after.bpm, 77, 'settings were unticked');
   assert.equal(after.lib, 1);
+});
+
+test('a scored run is scored, announces a new high score once, and keeps the per-stroke codes', async () => {
+  const o = await runOnce({ click: 'half' }, false);
+  assert.match(o.win, /New high score! [\d,]+ on Hard/);
+  assert.match(o.text, /Score [\d,]+/);
+  const p0 = await runOnce({ click: 'half' }, true);
+  assert.doesNotMatch(p0.win, /high score/i, 'a practice run is not scored');
+});
+
+test('rests are scored: on time unless hit, and a hit on a rest is a miss', async () => {
+  const p = await open({ input: 'kb', bpm: 120, routineText: 'R_L_ R_L_', eachUnit: 'pass', eachVal: 2, seeded: true });
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
+  await p.evaluate(() => {
+    const T = window.__T, r = T.run(), pl = r.plan, rest = pl.cells.filter(c => c.rest)[1];
+    pl.slots.forEach(s => { const hand = pl.segs[s.seg].notes[s.pos].slice(-1); T.hit({ t: r.t0 + s.t + 0.005, kb: true, f: null, det: { hand, conf: 1 } }); });
+    T.hit({ t: r.t0 + rest.t, kb: true, f: null, det: { hand: 'R', conf: 1 } });
+  });
+  await p.waitForFunction(() => window.__T.run().ended, null, { timeout: 40000 });
+  await p.waitForTimeout(300);
+  const q = await p.evaluate(() => JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')).runs[0].exercises[0].q);
+  assert.ok(q && q.length > 8, 'rests are in the sequence: ' + q);
+  assert.equal((q.match(/m/g) || []).length, 1, 'one rest was hit: ' + q);
 });
