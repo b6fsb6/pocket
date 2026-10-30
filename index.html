@@ -587,7 +587,7 @@ body[data-edit=type] .buildonly{display:none}
 .live[hidden]{display:none}
 .live b{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums}
 .live small{font:700 10px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:4px}
-.live em{margin-left:auto;font:800 13px var(--font-body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:0}
+.live em{margin-left:auto;min-width:4ch;text-align:right;font:800 18px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums;font-style:normal;color:var(--muted);opacity:0}
 .live em.ok{color:var(--ok)}.live em.late{color:var(--late,#c0305a)}
 .live em.on{opacity:1}
 .live .meter{flex-basis:100%;display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
@@ -2662,7 +2662,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.1.0';                           /* shown beside the title */
+const VERSION='1.1.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3252,7 +3252,7 @@ function paintLive(r){
   [...$('lvMeter').children].forEach((e,i)=>{e.className=i<r.sk?(r.sk>=STREAK_CAP?'max':'on'):'';});
   const f=r.flash,el=$('lvFlash');
   if(f){
-    el.textContent=(f.c==='o'?'On time':f.c==='b'?'Off time':'Miss')+(f.d?' '+(f.d>0?'+':'\u2212')+Math.abs(f.d):'');
+    el.textContent=(f.d<0?'\u2212':'+')+Math.abs(f.d);
     el.className=f.c==='o'?'ok':'late';void el.offsetWidth;el.className+=' on';r.flash=null;
   }
 }
