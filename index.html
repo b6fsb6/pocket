@@ -583,6 +583,19 @@ body[data-edit=type] .buildonly{display:none}
 .erow.cur{background:color-mix(in srgb,var(--fill) 20%,transparent)}
 .erow.done{color:var(--muted)}
 .erow.skip{opacity:.4}
+.live{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px 12px;margin:0 0 10px}
+.live[hidden]{display:none}
+.live b{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums}
+.live small{font:700 10px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:4px}
+.live em{margin-left:auto;font:800 13px var(--font-body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:0}
+.live em.ok{color:var(--ok)}.live em.late{color:var(--late,#c0305a)}
+.live em.on{opacity:1}
+.live .meter{flex-basis:100%;display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
+.live .meter i{height:8px;border-radius:3px;background:var(--line)}
+.live .meter i.on{background:var(--fill)}
+.live .meter i.max{background:var(--accent)}
+@media (prefers-reduced-motion:no-preference){.live em.on{animation:lvfade .7s ease-out forwards}.live .meter i.on{transition:background .15s}}
+@keyframes lvfade{from{opacity:1;transform:translateY(2px)}to{opacity:.15;transform:none}}
 .runinfo{display:grid;gap:6px}
 .progress{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .progress>div{height:100%;width:0;background:var(--fill)}
@@ -1407,6 +1420,14 @@ RLRR LRLL RLRR LRLL</pre>
       <div class="runline"><span id="timeLeft"></span></div>
     </div>
 
+
+    <div class="live" id="live" hidden>
+      <span><b id="lvScore">0</b><small>score</small></span>
+      <span><b id="lvStreak">0</b><small>streak</small></span>
+      <span><b id="lvMult">×1.0</b></span>
+      <em id="lvFlash"></em>
+      <div class="meter" id="lvMeter"></div>
+    </div>
 
     <section aria-label="Strokes">
       <div class="rowswrap">
@@ -2641,7 +2662,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.0.2';                           /* shown beside the title */
+const VERSION='1.1.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3168,7 +3189,7 @@ function beginRun(mode,only){
   const r={
     mode:mode,plan:plan,w0:Date.now(),t0:ctx.currentTime+0.25,kb:S.input==='kb',
     nextClick:0,pulseIdx:-1,nextFin:0,pending:new Map(),cur:-1,showSeg:0,gridSeg:-1,
-    errs:[],lv:[],seq:[],hand:{L:[],R:[]},within:0,slots:0,miss:0,extras:0,streak:0,best:0,checked:0,bad:0,trace:[],res:new Map(),showG:0,missRun:0,trail:[],live:'',
+    errs:[],lv:[],seq:[],hand:{L:[],R:[]},within:0,slots:0,miss:0,extras:0,streak:0,best:0,checked:0,bad:0,trace:[],res:new Map(),showG:0,missRun:0,trail:[],live:'',pts:0,sk:0,hud:scoreOn&&mode==='play'&&!!LV_PTS[S.click],tm:[],
     fin:new Set(),paused:false,ci:null,dyc:lat?'':dynCode(),dyl:[],
     seg:plan.segs.map(sg=>({errs:[],lv:[],hand:{L:[],R:[]},within:0,slots:0,miss:0,extras:0,checked:0,bad:0,sc:[],sm:[],sb:[],sy:[],sw:[],ev:[],da:0,dg:0,
       posSum:new Array(sg.N).fill(0),posCnt:new Array(sg.N).fill(0)})),
@@ -3176,7 +3197,7 @@ function beginRun(mode,only){
     startExercise:only?Math.min.apply(null,only):(S.mode==='routine'?S.startExercise:1)
   };
   if(audioFresh){r.t0+=0.4;audioFresh=false;}
-  run=r;pushDet();
+  run=r;pushDet();initLive(r);
   if(!lat){rvModel=null;view=r;r.gridSeg=0;document.body.dataset.state='run';if(S.mode==='routine')markExercises(r);applyLayout(layoutPlan(plan));rowsShown=ROWS;labelsOn=true;labelMode='routine';setRows(plan,0,false);paintRows(r,null);}
   else{
     /* Calibration shows one row with a cursor on the Play page, so there is something to watch as well as hear. */
@@ -3208,6 +3229,33 @@ function tick(){
   if(r.mode==='lat'&&r.missRun>=(r.errs.length?LAT.quiet:LAT.noHit)){endRun();return;}
   if(r.nextFin>=plan.slots.length)endRun();
 }
+/* The score as the run goes. Strokes judged too soft or too loud only count against it when the run ends, so the final score can come out a little lower. */
+function liveScore(r,sg,c){
+  if(!r.hud)return;
+  const p=LV_PTS[S.click],si=r.plan.segs.indexOf(sg);
+  if(r.tm[si]===undefined)r.tm[si]=tempoMult(patKey(sg.notes,sg.groupStart,sg.subs,sg.defSub,sg.sig),sg.bpm);
+  const m=r.tm[si];let d;
+  if(c==='o'){d=m*p[1]*(1+STREAK_MOD*Math.min(r.sk,STREAK_CAP));r.sk++;}
+  else{r.sk=0;d=m*(c==='m'?p[2]:p[0]);}
+  r.pts=Math.max(0,r.pts+d);r.flash={c:c,d:Math.round(d)};r.hudDirty=true;
+}
+function initLive(r){
+  const box=$('live');box.hidden=!r.hud;
+  if(!r.hud)return;
+  const mt=$('lvMeter');if(!mt.children.length)for(let i=0;i<STREAK_CAP;i++)mt.appendChild(document.createElement('i'));
+  paintLive(r);$('lvFlash').className='';$('lvFlash').textContent='';
+}
+function paintLive(r){
+  $('lvScore').textContent=Math.round(r.pts).toLocaleString('en-US');
+  $('lvStreak').textContent=r.sk;
+  $('lvMult').textContent='\u00d7'+(1+STREAK_MOD*Math.min(r.sk,STREAK_CAP)).toFixed(1);
+  [...$('lvMeter').children].forEach((e,i)=>{e.className=i<r.sk?(r.sk>=STREAK_CAP?'max':'on'):'';});
+  const f=r.flash,el=$('lvFlash');
+  if(f){
+    el.textContent=(f.c==='o'?'On time':f.c==='b'?'Off time':'Miss')+(f.d?' '+(f.d>0?'+':'\u2212')+Math.abs(f.d):'');
+    el.className=f.c==='o'?'ok':'late';void el.offsetWidth;el.className+=' on';r.flash=null;
+  }
+}
 /* The rest that time tc falls inside, if any. */
 function restAt(r,tc){
   if(!r.rests){r.rests=r.plan.cells.filter(c=>c.rest);r.restHit=new Set();}
@@ -3228,7 +3276,7 @@ function finalizeSlot(i){
   const redo=r.fin.has(i);r.fin.add(i);
   if(!redo){r.slots++;Q.slots++;}
   r.dirty=true;
-  if(!hits.length){if(!redo){r.miss++;Q.miss++;Q.ev.push({t:sl.t,ci:Q.sc.length});Q.sc.push('m');Q.sy.push(sl.dy||'n');Q.sw.push(0);Q.sm.push(null);Q.sb.push(null);r.streak=0;r.missRun++;r.seq.push({db:null});if(r.seq.length>STRIP_MAX)r.seq.shift();}r.res.set(i,{miss:true});return;}
+  if(!hits.length){if(!redo){r.miss++;Q.miss++;Q.ev.push({t:sl.t,ci:Q.sc.length});Q.sc.push('m');Q.sy.push(sl.dy||'n');Q.sw.push(0);Q.sm.push(null);Q.sb.push(null);r.streak=0;liveScore(r,sg,'m');r.missRun++;r.seq.push({db:null});if(r.seq.length>STRIP_MAX)r.seq.shift();}r.res.set(i,{miss:true});return;}
   const h=pickBest(hits);
   /* Hits just before the main stroke of a flam or drag are its grace notes, not extras. */
   const ex=hits.length-1-(sl.gr?hits.filter(x=>x!==h&&x.e<h.e&&h.e-x.e<=graceSpan(sl.gr)).length:0);
@@ -3245,7 +3293,7 @@ function finalizeSlot(i){
     const on=Math.abs(ms)<=S.tol;
     if(db!==null&&sl.dy&&!sl.tight)r.dyl.push({db:db,dy:sl.dy,si:sl.seg,ci:Q.sc.length,on:on});
     Q.sy.push(sl.dy||'n');Q.sw.push(wrong?1:0);Q.sm.push(Math.round(ms));Q.sb.push(db===null?null:Math.round(db));
-    Q.ev.push({t:sl.t,ci:Q.sc.length});Q.sc.push(on?'o':'b');   /* o on time, b off time, m missed; s and l (accent too soft, ghost too loud) are set when the run ends */
+    Q.ev.push({t:sl.t,ci:Q.sc.length});Q.sc.push(on?'o':'b');liveScore(r,sg,on?'o':'b');   /* o on time, b off time, m missed; s and l (accent too soft, ghost too loud) are set when the run ends */
     r.seq.push({db:db,hand:hand,dy:sl.dy||''});if(r.seq.length>STRIP_MAX)r.seq.shift();   /* one entry per stroke due, so a miss leaves a gap in the level bars */
     r.missRun=0;if(r.mode==='lat')latLive(r);
     if(Math.abs(ms)<=S.tol){r.within++;Q.within++;r.streak++;if(r.streak>r.best)r.best=r.streak;}else r.streak=0;
@@ -3368,7 +3416,7 @@ function endRun(){
     else setStatus((finished?'Finished. ':'Stopped. ')+done+' strokes measured.',true);
   }
   setRunning(false);
-  $('runInfo').hidden=true;
+  $('runInfo').hidden=true;$('live').hidden=true;
   $('bigCount').hidden=true;
   if(r.mode==='lat'){rowsShown=ROWS;labelsOn=true;labelMode='routine';showSetup('dev');refreshPreview();}
   if(view&&r.mode==='play'){
@@ -3410,7 +3458,7 @@ function handleHit(h){
     const outside=tc<plan.slots[0].t-sl.w||tc>plan.slots[plan.slots.length-1].t+sl.w;
     if(outside||inLead(plan,tc))return;
     r.extras++;r.seg[sl.seg].extras++;r.dirty=true;
-    const rc=restAt(r,tc);if(rc&&!r.restHit.has(rc)){r.restHit.add(rc);r.seg[rc.seg].ev.push({t:rc.t,c:'m'});}   /* a hit on a rest is a miss */
+    const rc=restAt(r,tc);if(rc&&!r.restHit.has(rc)){r.restHit.add(rc);r.seg[rc.seg].ev.push({t:rc.t,c:'m'});liveScore(r,r.plan.segs[rc.seg],'m');}   /* a hit on a rest is a miss */
     return;
   }
   const arr=r.pending.get(i)||[];
@@ -5646,6 +5694,7 @@ function frame(){
     if(tl!==lastTimeLeft){lastTimeLeft=tl;$('timeLeft').textContent=tl;}
   }
   if(r.dirty){updateGauge(r);r.dirty=false;}
+  if(r.hudDirty){paintLive(r);r.hudDirty=false;}
 }
 
 /* ---------- routine loading ---------- */

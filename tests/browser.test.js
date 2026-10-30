@@ -413,6 +413,27 @@ test('a routine shows the most a flawless run could score, and a flawless run re
   assert.equal(mx, '/ ' + sc);
 });
 
+test('the live score counts up as strokes are judged, drops the streak on a slip, matches the final score, and is hidden for practice', async () => {
+  const p = await open({ input: 'kb', bpm: 120, routineText: 'RLRL RLRL\nLRLR LRLR', eachUnit: 'pass', eachVal: 1, click: 'half', seeded: true });
+  assert.equal(await p.evaluate(() => document.getElementById('live').hidden), true, 'hidden before a run');
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
+  await p.evaluate(() => { const T = window.__T, r = T.run(), pl = r.plan; pl.slots.forEach((s, i) => { if (i === 11) return; const hand = pl.segs[s.seg].notes[s.pos].slice(-1); T.hit({ t: r.t0 + s.t + 0.005, kb: true, f: null, det: { hand, conf: 1 } }); }); });
+  await p.waitForFunction(() => window.__T.run().sk >= 4, null, { timeout: 20000 });
+  const mid = await p.evaluate(() => ({ shown: !document.getElementById('live').hidden, streak: document.getElementById('lvStreak').textContent, mult: document.getElementById('lvMult').textContent, lit: document.querySelectorAll('#lvMeter i.on').length, n: document.querySelectorAll('#lvMeter i').length }));
+  assert.ok(mid.shown); assert.equal(mid.n, 16); assert.ok(+mid.streak >= 4 && mid.lit === +mid.streak, 'one segment per stroke in a row'); assert.match(mid.mult, /^\u00d7[\d.]+$/);
+  await p.waitForFunction(() => window.__T.run().ended, null, { timeout: 40000 });
+  await p.waitForTimeout(400);
+  const end = await p.evaluate(() => ({ live: window.__T.run().pts, hidden: document.getElementById('live').hidden, score: document.getElementById('advScore').textContent }));
+  assert.ok(end.hidden, 'the live score gives way to the result');
+  assert.equal(Math.round(end.live).toLocaleString('en-US'), end.score, 'the live score matches the final score');
+  const q = await open({ input: 'kb', bpm: 120, routineText: '8 RLRL', eachUnit: 'pass', eachVal: 1, click: 'half', seeded: true });
+  await q.evaluate(() => { const s = document.getElementById('score'); s.value = '0'; s.dispatchEvent(new Event('change')); });
+  await q.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await q.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
+  assert.equal(await q.evaluate(() => document.getElementById('live').hidden), true, 'no live score in practice');
+});
+
 test('History shows each run\'s score in the list and on the run page', async () => {
   const p = await open({ input: 'kb', bpm: 120, routineText: 'RLRL RLRL', eachUnit: 'pass', eachVal: 1, click: 'half', seeded: true });
   await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
