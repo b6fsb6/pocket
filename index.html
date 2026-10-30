@@ -593,10 +593,10 @@ body[data-edit=type] .buildonly{display:none}
 .live em{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums;font-style:normal;color:var(--muted);opacity:0}
 .live em.ok{color:var(--ok)}.live em.late{color:var(--late,#c0305a)}
 .live em.on{opacity:1}
-.live .meter{grid-column:1/-1;display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
-.live .meter i{height:8px;border-radius:3px;background:var(--line)}
-.live .meter i.on{background:color-mix(in srgb,#E5322B calc(var(--t)*100%),#fff);box-shadow:0 0 0 1px var(--line)}   /* white at the first stroke, red at the best streak */
-@media (prefers-reduced-motion:no-preference){.live .fire.on{animation:lvflame 1.2s ease-in-out infinite alternate;transform-origin:50% 90%}.live em.on{animation:lvfade .7s ease-out forwards}.live .meter i.on{transition:background .15s}}
+.live .lvm{grid-column:1/-1;display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
+.live .lvm i{height:12px;border-radius:3px;background:var(--line)}
+.live .lvm i.on{background:color-mix(in srgb,#E5322B calc(var(--t)*100%),#fff);box-shadow:0 0 0 1px var(--line)}   /* white at the first stroke, red at the best streak */
+@media (prefers-reduced-motion:no-preference){.live .fire.on{animation:lvflame 1.2s ease-in-out infinite alternate;transform-origin:50% 90%}.live em.on{animation:lvfade .7s ease-out forwards}.live .lvm i.on{transition:background .15s}}
 @keyframes lvflame{from{transform:scale(1)}to{transform:scale(1.12) rotate(-3deg)}}
 @keyframes lvfade{from{opacity:1;transform:translateY(2px)}to{opacity:.15;transform:none}}
 .runinfo{display:grid;gap:6px}
@@ -1428,7 +1428,7 @@ RLRR LRLL RLRR LRLL</pre>
       <em id="lvFlash"></em>
       <svg class="fire" id="lvFire" viewBox="0 0 24 24" aria-label="Streak at its best" role="img"><path d="M12 2c1 3.5 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.2 1.6 1 2.5 2 2.5C10.5 8 10.5 5 12 2z" fill="#F5841F"/><path d="M12 21a3 3 0 0 1-3-3c0-1.6 1.4-2.6 2-4 .5 1 1 1.4 1.6 1.8.9.6 1.4 1.3 1.4 2.2a3 3 0 0 1-2 3z" fill="#FFC53D"/></svg>
       <span class="tot"><b id="lvScore">0</b><small>score</small></span>
-      <div class="meter" id="lvMeter"></div>
+      <div class="lvm" id="lvMeter"></div>
     </div>
 
     <section aria-label="Strokes">
@@ -2664,7 +2664,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.2.0';                           /* shown beside the title */
+const VERSION='1.2.1';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
