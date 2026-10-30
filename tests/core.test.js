@@ -1,7 +1,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const { loadCore, plain } = require('./helpers');
 const c = loadCore(['parseStrokes', 'parseExerciseLine', 'parseRoutine', 'resolveExercises', 'buildPlan', 'builderApply',
-  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runScore', 'highScores', 'unpackStrokes', 'BADGES', 'maxPoints', 'tempoMult', 'scoreParts', 'runShare', 'bestShares', 'scoreBreakdown']);
+  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runScore', 'highScores', 'unpackStrokes', 'BADGES', 'maxPoints', 'tempoMult', 'scoreParts', 'runShare', 'bestShares', 'scoreBreakdown', 'streakAfter']);
 
 const runPoints = (codes, lv) => c.scoreParts([[codes, 1]], lv);
 const plan = (text, opt) => {
@@ -123,9 +123,9 @@ test('mastery is measured in strokes a minute, so sixteenths count for more than
 });
 
 test('scoring: the worked examples, the streak cap, the floor at zero and a streak carried across exercises', () => {
-  assert.equal(runPoints('oooboomo', 'strokes'), 22);
-  assert.equal(runPoints('oooboomo', 'half'), 73);
-  assert.equal(runPoints('oooboomo', 'none'), 140);
+  assert.equal(runPoints('oooboomo', 'strokes'), 24);
+  assert.equal(runPoints('oooboomo', 'half'), 78);
+  assert.equal(runPoints('oooboomo', 'none'), 150);
   assert.equal(runPoints('ooroo', 'strokes'), runPoints('oooo', 'strokes'), 'a rest scores nothing and keeps the streak');
   assert.equal(runPoints('o'.repeat(20), 'strokes'), 198);   // 3 x (51 for the first 17 strokes + 5 for each of the next 3): the bonus stops growing at x5
   assert.equal(runPoints('mmm', 'none'), 0, 'never below zero');
@@ -188,4 +188,16 @@ test('score breakdown separates unplayed strokes from hits on a rest', () => {
   const run = { id: 1, t: 1, lv: 'half', bpm: 60, exercises: [{ k: 'RLRL', bpm: 60, due: 4, miss: 1, within: 0, q: 'ooomrm' }] };
   const d = c.scoreBreakdown(run);
   assert.deepEqual([d.due, d.on, d.miss, d.rest], [4, 3, 1, 1]);
+});
+
+test('an off-time stroke takes the streak back two steps, and a miss resets it', () => {
+  assert.equal(c.streakAfter(5, 'o'), 6);
+  assert.equal(c.streakAfter(16, 'b'), 14);
+  assert.equal(c.streakAfter(1, 'b'), 0, 'never below zero');
+  assert.equal(c.streakAfter(9, 'm'), 0);
+  // 'half': ten on time, one off time, then on time again: the bonus carries on from step 8
+  const t = (q, l) => runPoints(q, l);
+  assert.ok(t('ooooooooooboo', 'half') > t('oooooooooomoo', 'half'), 'a late stroke costs less than a missed one');
+  assert.equal(t('oob', 'half') + 10, t('oobo', 'half'), 'after an off-time stroke at streak 2 the next stroke starts again');
+  assert.equal(t('ooobo', 'half'), 53, 'at streak 3 it keeps one step: 10 + 12.5 + 15 + 3 + 12.5');
 });

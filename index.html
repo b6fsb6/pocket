@@ -1282,7 +1282,7 @@ RLRR LRLL RLRR LRLL</pre>
       <h3>Scores, tempo and progress</h3>
       <ul>
         <li><b>On time</b> is the share of due strokes inside your on-time window. With an accent or ghost rule a stroke must also be played as written: an accent clearly louder and a ghost clearly softer than its neighbours. An exercise needs at least one full pass to be scored.</li>
-        <li><b>Score:</b> every run is scored when Scored is on. Each stroke earns points by its timing and the click level: on time scores most, off time a little, and a miss scores nothing (it costs 2 on Extreme and 5 on Master). A rest keeps the streak going and scores nothing, and a hit on it is a miss. Strokes on time in a row add a quarter to a multiplier, up to five times, and anything else resets it. Faster strokes score more: 240 strokes a minute (sixteenths at 60 BPM) counts once, and the range is half to double. The streak carries from one exercise to the next. The total never goes below zero. Your best score at each click level is an achievement, and a new one is announced when the run ends.</li>
+        <li><b>Score:</b> every run is scored when Scored is on. Each stroke earns points by its timing and the click level: on time scores most, off time a little, and a miss scores nothing (it costs 2 on Extreme and 5 on Master). A rest keeps the streak going and scores nothing, and a hit on it is a miss. Strokes on time in a row add a quarter to a multiplier, up to five times. An off-time stroke takes the streak back two steps, and a miss resets it. Faster strokes score more: 240 strokes a minute (sixteenths at 60 BPM) counts once, and the range is half to double. The streak carries from one exercise to the next. The total never goes below zero. Your best score at each click level is an achievement, and a new one is announced when the run ends.</li>
         <li><b>Medals:</b> each exercise gets a medal for each click level, from the fastest tempo you have cleared it at. It is measured in strokes a minute, so sixteenths count for more than eighths at the same BPM. Hickory is cleared at any speed, then Bronze at 120 strokes a minute, Silver 180, Gold 240, Platinum 320, Sapphire 400, Ruby 480 and Diamond 600. Sixteenths at 60 BPM is 240, so Gold.</li>
         <li><b>Exercise table:</b> after a routine run, each exercise gets its accuracy, average error and spread, plus your earlier best at that tempo.</li>
         <li><b>The target is 90%.</b> An exercise is "cleared" at a tempo when it reaches 90% there. After a run the app names the weak exercises and suggests staying at that tempo until they settle. Any tempo is always allowed.</li>
@@ -2164,18 +2164,19 @@ const sweepRun=run=>run.lv!=='off'&&run.ne>=2&&run.exercises.length>=run.ne&&run
 const perfectN=run=>run.lv==='off'?0:run.exercises.filter(b=>b.due>=16&&b.within>=b.due).length;
 /* Score. Every stroke scores by its timing at the run's click level, and strokes on time in a row build a bonus. The codes are o on time, b off time, m missed, r a rest left alone, in the order played. */
 const LV_PTS={strokes:[1,3,0],beat:[2,5,0],half:[3,10,0],bar:[4,15,-2],none:[5,20,-5]};   /* off time, on time, miss */
-const STREAK_MOD=0.25,STREAK_CAP=16;   /* each stroke on time in a row adds a quarter to the multiplier, up to 16 in a row (x5) */
+const STREAK_MOD=0.25,STREAK_CAP=16,STREAK_SLIP=2;   /* each stroke on time adds a quarter to the multiplier, up to 16 (x5). An off-time stroke takes 2 steps back, and a miss all of them. */
+const streakAfter=(streak,c)=>c==='o'?streak+1:(c==='m'?0:Math.max(0,streak-STREAK_SLIP));
 /* Faster strokes score more: 240 strokes a minute (Gold pace, sixteenths at 60 BPM) is x1, between half and double. */
 const tempoMult=(k,bpm)=>{const r=strokeRate(k,bpm);return r>0?Math.min(2,Math.max(0.5,r/240)):1;};
 /* parts: [codes, tempo multiplier] for each exercise in order, so the streak carries from one to the next. */
 function scoreParts(parts,lv){
   const p=LV_PTS[lv];if(!p)return 0;
-  let tally=0,streak=0;   /* the first stroke of a run, and the first on time after a slip, have no bonus. A rest (r) scores nothing and leaves the streak alone. */
+  let tally=0,streak=0;   /* the first stroke of a run has no bonus. A rest (r) scores nothing and leaves the streak alone. */
   for(const [codes,m] of parts){
     for(const c of codes){
       if(c==='r')continue;
-      if(c==='o'){tally+=m*p[1]*(1+STREAK_MOD*Math.min(streak,STREAK_CAP));streak++;}
-      else{streak=0;tally+=m*(c==='m'?p[2]:p[0]);}
+      tally+=m*(c==='o'?p[1]*(1+STREAK_MOD*Math.min(streak,STREAK_CAP)):(c==='m'?p[2]:p[0]));
+      streak=streakAfter(streak,c);
       if(tally<0)tally=0;
     }
   }
@@ -2665,7 +2666,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.3.0';                           /* shown beside the title */
+const VERSION='1.4.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3240,8 +3241,8 @@ function liveScore(r,sg,c){
   const p=LV_PTS[S.click],si=r.plan.segs.indexOf(sg);
   if(r.tm[si]===undefined)r.tm[si]=tempoMult(patKey(sg.notes,sg.groupStart,sg.subs,sg.defSub,sg.sig),sg.bpm);
   const m=r.tm[si];let d;
-  if(c==='o'){d=m*p[1]*(1+STREAK_MOD*Math.min(r.sk,STREAK_CAP));r.sk++;}
-  else{r.sk=0;d=m*(c==='m'?p[2]:p[0]);}
+  d=m*(c==='o'?p[1]*(1+STREAK_MOD*Math.min(r.sk,STREAK_CAP)):(c==='m'?p[2]:p[0]));
+  r.sk=streakAfter(r.sk,c);
   r.pts=Math.max(0,r.pts+d);r.flash={c:c,d:Math.round(d)};r.hudDirty=true;
 }
 /* The flame that takes the place of the last section of the streak bar at the best streak. */
@@ -4541,7 +4542,7 @@ function renderAdvice(){
       if(on){
         const d=scoreBreakdown(L.run),p=LV_PTS[L.run.lv],f=n=>n.toLocaleString('en-US');
         $('bDue').textContent=f(d.due);$('bRestBox').hidden=!d.rest;$('bRest').textContent=f(d.rest);$('bOn').textContent=f(d.on);$('bOff').textContent=f(d.off);$('bMiss').textContent=f(d.miss);$('bBest').textContent=f(d.best);
-        $('scoreNote').textContent=levelName(L.run.lv)+': '+p[1]+' points on time, '+p[0]+' off time, '+(p[2]<0?'minus '+(-p[2]):p[2])+' for a miss or a hit on a rest. Strokes on time in a row add a bonus of up to five times, reached after 16. Tempo ×'+(Math.round(d.tempo*100)/100)+'.';
+        $('scoreNote').textContent=levelName(L.run.lv)+': '+p[1]+' points on time, '+p[0]+' off time, '+(p[2]<0?'minus '+(-p[2]):p[2])+' for a miss or a hit on a rest. Strokes on time in a row add a bonus of up to five times, reached after 16. An off-time stroke takes it back two steps, and a miss resets it. Tempo ×'+(Math.round(d.tempo*100)/100)+'.';
       }
     }
     {   /* the score, against a flawless run of what was played and against the best before */
