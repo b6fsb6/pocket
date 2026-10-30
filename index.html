@@ -583,18 +583,20 @@ body[data-edit=type] .buildonly{display:none}
 .erow.cur{background:color-mix(in srgb,var(--fill) 20%,transparent)}
 .erow.done{color:var(--muted)}
 .erow.skip{opacity:.4}
-.live{display:grid;grid-template-columns:4rem 1fr auto;align-items:baseline;gap:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px 12px;margin:0 0 10px}
+.live{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px 12px;margin:0 0 10px}
 .live[hidden]{display:none}
 .live b{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums}
 .live small{font:700 10px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:4px}
-.live .fire{width:28px;height:28px;justify-self:center;align-self:center;visibility:hidden}
+.live .lvm i{position:relative}
+.live .lvm i.fl{background:none;box-shadow:none}
+.live .fire{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;visibility:hidden}
 .live .fire.on{visibility:visible}
 .live .tot{text-align:right}
 .live em{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums;font-style:normal;color:var(--muted);opacity:0}
 .live em.ok{color:var(--ok)}.live em.late{color:var(--late,#c0305a)}
 .live em.on{opacity:1}
 .live .lvm{grid-column:1/-1;display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
-.live .lvm i{height:12px;border-radius:3px;background:var(--line)}
+.live .lvm i{height:14px;border-radius:3px;background:var(--line)}
 .live .lvm i.on{background:color-mix(in srgb,#E5322B calc(var(--t)*100%),#fff);box-shadow:0 0 0 1px var(--line)}   /* white at the first stroke, red at the best streak */
 @media (prefers-reduced-motion:no-preference){.live .fire.on{animation:lvflame 1.2s ease-in-out infinite alternate;transform-origin:50% 90%}.live em.on{animation:lvfade .7s ease-out forwards}.live .lvm i.on{transition:background .15s}}
 @keyframes lvflame{from{transform:scale(1)}to{transform:scale(1.12) rotate(-3deg)}}
@@ -1426,7 +1428,6 @@ RLRR LRLL RLRR LRLL</pre>
 
     <div class="live" id="live" hidden>
       <em id="lvFlash"></em>
-      <svg class="fire" id="lvFire" viewBox="0 0 24 24" aria-label="Streak at its best" role="img"><path d="M12 2c1 3.5 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.2 1.6 1 2.5 2 2.5C10.5 8 10.5 5 12 2z" fill="#F5841F"/><path d="M12 21a3 3 0 0 1-3-3c0-1.6 1.4-2.6 2-4 .5 1 1 1.4 1.6 1.8.9.6 1.4 1.3 1.4 2.2a3 3 0 0 1-2 3z" fill="#FFC53D"/></svg>
       <span class="tot"><b id="lvScore">0</b><small>score</small></span>
       <div class="lvm" id="lvMeter"></div>
     </div>
@@ -2664,7 +2665,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.2.1';                           /* shown beside the title */
+const VERSION='1.2.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3243,16 +3244,19 @@ function liveScore(r,sg,c){
   else{r.sk=0;d=m*(c==='m'?p[2]:p[0]);}
   r.pts=Math.max(0,r.pts+d);r.flash={c:c,d:Math.round(d)};r.hudDirty=true;
 }
+/* The flame that takes the place of the last section of the streak bar at the best streak. */
+const LV_FLAME='<svg class="fire" id="lvFire" viewBox="0 0 24 24" aria-label="Streak at its best" role="img"><path d="M12 2c1 3.5 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.2 1.6 1 2.5 2 2.5C10.5 8 10.5 5 12 2z" fill="#F5841F"/><path d="M12 21a3 3 0 0 1-3-3c0-1.6 1.4-2.6 2-4 .5 1 1 1.4 1.6 1.8.9.6 1.4 1.3 1.4 2.2a3 3 0 0 1-2 3z" fill="#FFC53D"/></svg>';
 function initLive(r){
   const box=$('live');box.hidden=!r.hud;
   if(!r.hud)return;
   const mt=$('lvMeter');if(!mt.children.length)for(let i=0;i<STREAK_CAP;i++){const e=document.createElement('i');e.style.setProperty('--t',(i/(STREAK_CAP-1)).toFixed(3));mt.appendChild(e);}
+  mt.lastChild.insertAdjacentHTML('beforeend',LV_FLAME);   /* the last section is where the flame shows */
   paintLive(r);$('lvFlash').className='';$('lvFlash').textContent='';
 }
 function paintLive(r){
   $('lvScore').textContent=Math.round(r.pts).toLocaleString('en-US');
   $('lvFire').classList.toggle('on',r.sk>=STREAK_CAP);
-  [...$('lvMeter').children].forEach((e,i)=>{e.className=i<r.sk?'on':'';});
+  [...$('lvMeter').children].forEach((e,i)=>{e.className=i<r.sk?(i===STREAK_CAP-1?'fl':'on'):'';});
   const f=r.flash,el=$('lvFlash');
   if(f){
     el.textContent=(f.d<0?'\u2212':'+')+Math.abs(f.d);
