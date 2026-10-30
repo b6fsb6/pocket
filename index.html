@@ -2666,7 +2666,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.4.1';                           /* shown beside the title */
+const VERSION='1.4.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2931,13 +2931,22 @@ function showMicError(err){
 let audioFresh=false;   /* the output was just started or the microphone just opened, so the first click needs a little more time */
 let ctxOp=null;   /* the output is being put to sleep. Waking it has to wait for that to finish, or it goes back to sleep. */
 let opening=0;   /* a microphone is being opened, so it must not be put away yet */
+/* After the output wakes, the audio clock can run before the device is really playing, and the first clicks of a count-in go into nothing.
+   Wait until the device has rendered past the moment of waking, or the clock has clearly moved if the browser cannot say. */
+async function outputRunning(){
+  const t0=ctx.currentTime,end=performance.now()+2000;
+  const flowing=()=>{const o=ctx.getOutputTimestamp?ctx.getOutputTimestamp():null;return o&&o.performanceTime>0?o.contextTime>t0+0.02:ctx.currentTime>t0+0.1;};
+  while(!flowing()&&performance.now()<end)await new Promise(r=>setTimeout(r,25));
+}
 async function ensureAudio(needMic){
   opening++;
   try{
     if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});
     if(ctxOp)await ctxOp;
-    if(ctx.state!=='running'){await ctx.resume();audioFresh=true;if(ctx.state!=='running')await ctx.resume();}   /* a phone can need a second try after a call or a switch of output */
+    let woke=false;
+    if(ctx.state!=='running'){await ctx.resume();audioFresh=true;woke=true;if(ctx.state!=='running')await ctx.resume();}   /* a phone can need a second try after a call or a switch of output */
     try{const z=ctx.createBufferSource();z.buffer=ctx.createBuffer(1,1,ctx.sampleRate);z.connect(ctx.destination);z.start(0);}catch(e){}   /* wakes the output */
+    if(woke)await outputRunning();
     /* iPhone lets people mute the microphone from Safari's page menu. The stream stays open but silent, so start again from scratch. */
     if(needMic&&node&&!micLive())micOff(true);
     if(needMic&&!node){audioFresh=true;
