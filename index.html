@@ -261,8 +261,8 @@ details[open]>summary::after{transform:rotate(-135deg);margin-top:10px}
 .libitem span{color:var(--muted);font:12px var(--font-data);white-space:nowrap}
 .chkmsg{margin:0;padding:10px 12px;border-left:4px solid var(--accent);background:var(--surface);border-radius:6px;font:600 17px/1.35 var(--font-body);color:var(--ink)} .chkmsg:empty{display:none}
 .rchev{width:40px;height:40px;border:0;background:none;position:relative;flex:none;cursor:pointer} .rchev::after{content:"";position:absolute;left:15px;top:13px;width:9px;height:9px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform .15s} .rchev.up::after{transform:rotate(-135deg);top:18px}
-.rtruns{margin:10px 0 0}
-.rrun{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:12px 0;font:inherit;color:inherit;cursor:pointer} .rrun .l{flex:1;min-width:0} .rrun .nm{font:600 14px var(--font-body)} .rrun .ar{color:var(--muted);font-size:22px;line-height:1}
+.rtruns{margin:12px -16px -14px;padding:2px 16px 4px 13px;background:color-mix(in srgb,var(--ink) 7%,transparent);border-left:3px solid var(--accent)}   /* the runs of an open routine sit on a tinted band with an accent rail, so they read as part of it */
+.rrun{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:12px 0;font:inherit;color:inherit;cursor:pointer} .rrun:first-child{border-top:0} .rtruns .rrun{border-top-color:color-mix(in srgb,var(--ink) 12%,transparent)} .rrun .l{flex:1;min-width:0} .rrun .nm{font:600 14px var(--font-body)} .rrun .ar{color:var(--muted);font-size:22px;line-height:1}
 .rmore{border-top:1px solid var(--line);width:100%;text-align:left;border-radius:0}
 .calst{display:grid;gap:2px;margin:4px 0 8px} .calst .cs{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:14px} .calst .cs:first-child{border-top:0} .calst .good{color:var(--ok)} .calst .warn{color:var(--accent)} .calst .bad{color:var(--late)} .calst .muted{color:var(--muted)}
 .chkout{margin:0;padding-left:18px;font-size:13px;display:grid;gap:4px} .chkout:empty{display:none} .chkout .bad{color:var(--late)} .chkout .warn{color:var(--accent)} .chkout .good{color:var(--ok)}
@@ -2666,7 +2666,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.3';                           /* shown beside the title */
+const VERSION='1.5.4';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
