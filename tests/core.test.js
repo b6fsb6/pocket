@@ -193,6 +193,8 @@ test('score breakdown separates unplayed strokes from hits on a rest', () => {
 test('an off-time stroke takes the streak back two steps, and a miss resets it', () => {
   assert.equal(c.streakAfter(5, 'o'), 6);
   assert.equal(c.streakAfter(16, 'b'), 14);
+  assert.equal(c.streakAfter(16, 'o'), 16, 'the streak stops at the best');
+  assert.equal(runPoints('o'.repeat(30) + 'bo', 'half') - runPoints('o'.repeat(30), 'half'), 3 + 10 * 4.5, 'at the best, one off-time stroke really does cost two steps');
   assert.equal(c.streakAfter(1, 'b'), 0, 'never below zero');
   assert.equal(c.streakAfter(9, 'm'), 0);
   // 'half': ten on time, one off time, then on time again: the bonus carries on from step 8
