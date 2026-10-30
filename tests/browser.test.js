@@ -5,7 +5,7 @@ const http = require('http'), fs = require('fs'), path = require('path'), os = r
 const { chromium } = require('playwright');
 const { ROOT, html } = require('./helpers');
 
-const page = html.replace('let heardTimer=0;', 'window.__T={hit:handleHit,run:()=>run,S:()=>S};let heardTimer=0;');
+const page = html.replace('let heardTimer=0;', 'window.__T={hit:handleHit,run:()=>run,S:()=>S,ctx:()=>ctx};let heardTimer=0;');
 assert.ok(page !== html, 'the test hook did not attach: has handleHit moved?');
 
 let server, base, browser;
@@ -432,6 +432,17 @@ test('the live score counts up as strokes are judged, drops the streak on a slip
   await q.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
   await q.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
   assert.equal(await q.evaluate(() => document.getElementById('live').hidden), true, 'no live score in practice');
+});
+
+test('the audio output wakes when Start resumes a paused run, even if it was put to sleep meanwhile', async () => {
+  const p = await open({ input: 'kb', bpm: 120, routineText: '8 RLRL', eachUnit: 'pass', eachVal: 3, click: 'half', seeded: true });
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.run() && window.__T.run().plan && window.__T.ctx() && window.__T.ctx().state === 'running', null, { timeout: 8000 });
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Pause/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.evaluate(() => window.__T.ctx().suspend());
+  assert.equal(await p.evaluate(() => window.__T.ctx().state), 'suspended');
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^(Resume|Start|Continue)/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.ctx().state === 'running' && !window.__T.run().paused, null, { timeout: 5000 });
 });
 
 test('History shows each run\'s score in the list and on the run page', async () => {

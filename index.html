@@ -2662,7 +2662,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.1.1';                           /* shown beside the title */
+const VERSION='1.1.2';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2925,12 +2925,14 @@ function showMicError(err){
   $('micMsg').textContent=m;
 }
 let audioFresh=false;   /* the output was just started or the microphone just opened, so the first click needs a little more time */
+let ctxOp=null;   /* the output is being put to sleep. Waking it has to wait for that to finish, or it goes back to sleep. */
 let opening=0;   /* a microphone is being opened, so it must not be put away yet */
 async function ensureAudio(needMic){
   opening++;
   try{
     if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});
-    if(ctx.state!=='running'){await ctx.resume();audioFresh=true;}
+    if(ctxOp)await ctxOp;
+    if(ctx.state!=='running'){await ctx.resume();audioFresh=true;if(ctx.state!=='running')await ctx.resume();}   /* a phone can need a second try after a call or a switch of output */
     try{const z=ctx.createBufferSource();z.buffer=ctx.createBuffer(1,1,ctx.sampleRate);z.connect(ctx.destination);z.start(0);}catch(e){}   /* wakes the output */
     /* iPhone lets people mute the microphone from Safari's page menu. The stream stays open but silent, so start again from scratch. */
     if(needMic&&node&&!micLive())micOff(true);
@@ -3007,7 +3009,7 @@ const micBusy=()=>!!((run&&!run.ended)||chk||calMode||calTest||loop||listen||mic
 function idleMic(){
   if(opening||micBusy())return;
   if(node||stream)micOff(true);
-  if(ctx&&ctx.state==='running')ctx.suspend().catch(()=>{});
+  if(ctx&&ctx.state==='running'){const op=ctxOp=ctx.suspend().catch(()=>{}).then(()=>{if(ctxOp===op)ctxOp=null;});}
 }
 async function toggleMic(){
   if(run&&!run.ended)return;
@@ -7043,7 +7045,7 @@ function wire(){
     if(run&&!run.ended){
       if(run.mode!=='play'){stopRun();return;}
       if(!run.paused)pauseRun();
-      else(S.input==='mic'&&!micLive()?ensureAudio(true):Promise.resolve(true)).then(ok=>{if(ok&&run&&!run.ended&&run.paused)resumeRun();});   /* the mic may have been lost while away */
+      else ensureAudio(S.input==='mic').then(ok=>{if(ok&&run&&!run.ended&&run.paused)resumeRun();});   /* the output may have been put to sleep, and the mic lost, while away */
       return;
     }
     startPlay();
