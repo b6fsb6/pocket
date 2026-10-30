@@ -5,8 +5,10 @@ const http = require('http'), fs = require('fs'), path = require('path'), os = r
 const { chromium } = require('playwright');
 const { ROOT, html } = require('./helpers');
 
-const page = html.replace('let heardTimer=0;', 'window.__T={hit:handleHit,run:()=>run,S:()=>S};let heardTimer=0;');
-assert.ok(page !== html, 'the test hook did not attach: has handleHit moved?');
+/* POCKET_MIN=1 runs the same checks against the minified build that gets deployed. */
+const src = process.env.POCKET_MIN ? require('../build').minify(html) : html;
+const page = src.replace('let heardTimer=0;', 'window.__T={hit:handleHit,run:()=>run,S:()=>S};let heardTimer=0;');
+assert.ok(page !== src, 'the test hook did not attach: has handleHit moved?');
 
 let server, base, browser;
 test.before(async () => {

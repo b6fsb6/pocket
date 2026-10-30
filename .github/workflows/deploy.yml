@@ -24,6 +24,8 @@ jobs:
       - run: npm install
       - run: npx playwright install --with-deps chromium
       - run: npm test
+      - name: The minified build passes the browser checks too
+        run: POCKET_MIN=1 npm run test:browser
 
   # Only tested code goes live, and only from main. The site is the app and its hosted libraries.
   deploy:
@@ -38,10 +40,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
       - name: Assemble the site
         run: |
-          mkdir site
-          cp index.html site/
+          node build.js site/index.html
           cp -r routines site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
