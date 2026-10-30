@@ -2279,11 +2279,11 @@ BADGES.push({id:'cln',name:'Longest clean run',lead:'Longest clean run',suf:' mi
 BADGES.push({id:'prf',name:'Perfect exercises',unit:'perfect exercises',one:'perfect exercise',at:LADDER});
 BADGES.push({id:'tmp',name:'Fastest clear',lead:'Fastest clear',suf:' BPM',unit:'BPM, fastest exercise cleared',at:[40,60,80,100,120,140,160]});
 /* Each step has a written name and each badge a glyph. The look of a step (its tier) follows how far up its ladder it sits, so every ladder runs from plain wood to diamond. */
-const STEPNAMES={ses:['Warmed up','Regular','Locked in','Dedicated','Road-tested','Veteran','Lifer'],
+const STEPNAMES={ses:['Showing up','Regular','Steady hands','Dedicated','Road-tested','Veteran','Lifer'],
   str:['On a roll','Habit forming','Dialled in','A month of grooves','Two months deep','Hundred days','Half a year','A full year'],
-  ladder:['First clear','A handful','Ten down','Quarter hundred','Fifty up','Centurion','Deep cut','Encyclopedia','Almost there','The whole book'],
+  ladder:['First clear','High five','Ten down','Quarter century','Half century','Century','Deep cut','Half a grand','Nearly a grand','A grand'],
   prf:['Spotless','Crisp','Tight','Surgical','Metronome','Machine','Clockwork','Pinpoint','Untouchable','Perfect pocket'],
-  hs:['On the board','Getting going','Four figures','Climbing','Big numbers','Five figures','High roller','Fifty grand','Hundred grand','Quarter million'],
+  hs:['On the board','Warming up','Feeling the groove','Locked in','In the pocket','Deep groove','Beat master','Time keeper','Groove legend','Hall of fame'],
   cln:['Warmed through','Ten straight','Quarter hour','Twenty flat','Half hour','Three quarters','Full hour'],
   tmp:['Slow burn','Easy groove','Cruising','Hundred club','Picking up','Fast hands','Speed demon']};
 const GLYPHS={lstrokes:'lv1',lbeat:'lv2',lhalf:'lv3',lbar:'lv4',lnone:'lvM',hstrokes:'lv1',hbeat:'lv2',hhalf:'lv3',hbar:'lv4',hnone:'lvM',ses:'drum',str:'cal',all:'lvA',dyn:'acc',cln:'sweep',prf:'target',tmp:'metro'};
@@ -2666,7 +2666,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.4.6';                           /* shown beside the title */
+const VERSION='1.5.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
