@@ -601,6 +601,7 @@ body[data-edit=type] .buildonly{display:none}
 @media (prefers-reduced-motion:no-preference){.live .fire.on .fo{animation:lvflick .45s ease-in-out infinite alternate}.live .fire.on .fn{animation:lvflick .3s ease-in-out infinite alternate-reverse}.live .fire path{transform-box:fill-box;transform-origin:50% 100%}.live em.on{animation:lvfade .7s ease-out forwards}.live .lvm i.on{transition:background .15s}}
 @keyframes lvflick{from{transform:scale(1,.9) skewX(-4deg)}to{transform:scale(.94,1.08) skewX(4deg)}}
 @keyframes lvfade{from{opacity:1;transform:translateY(2px)}to{opacity:.15;transform:none}}
+.discrow{border-top:1px solid var(--line);padding:12px 0 4px}
 .runinfo{display:grid;gap:6px}
 .progress{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .progress>div{height:100%;width:0;background:var(--fill)}
@@ -705,7 +706,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
 .res .sbar i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--fill);min-width:10px}
 .res .sbar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);opacity:.7}
 .res .scap{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
-.res .sacc{display:flex;gap:14px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px}
+.res .sacc{display:flex;gap:14px;align-items:center;border-top:1px solid var(--line);padding-top:10px}
 .res .sacc b{font:800 28px var(--font-display);white-space:nowrap}
 .res[data-ok="1"] .sacc b{color:var(--ok)}
 .res .sacc>span{font-size:13px;color:var(--muted)}
@@ -1459,7 +1460,6 @@ RLRR LRLL RLRR LRLL</pre>
       </div>
       <p class="insight" id="advHead"></p>
       <p class="hint" id="advBody"></p>
-      <p class="hint" id="advNext"></p>
       <div class="btns advmain" id="advBtns1">
         <button class="btn primary" id="advAgain" type="button">Again</button>
         <button class="btn" id="advDone" type="button" hidden>Done</button>
@@ -1546,10 +1546,10 @@ RLRR LRLL RLRR LRLL</pre>
         <p class="insight" id="resInsight"></p>
         <div class="btns"><button class="btn small" id="csvBtn" type="button">Download CSV</button></div>
       </section>
-      <div class="btns"><button class="btn small" id="advDiscard" type="button">Discard this run</button></div>
     </div>
       </div>
     </details>
+    <div class="discrow" id="advDiscRow" hidden><button class="btn small" id="advDiscard" type="button">Discard this run</button></div>
     </div>
   </div>
 </main>
@@ -2666,7 +2666,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.4.2';                           /* shown beside the title */
+const VERSION='1.4.6';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4502,29 +4502,17 @@ function showResult(){
   const go=()=>{const b=$('advice');if(b.hidden||curTab!=='play')return;const r=b.getBoundingClientRect();if(r.bottom>innerHeight||r.top<0)scrollBy(0,r.top-12);};
   go();requestAnimationFrame(()=>{go();});setTimeout(go,150);setTimeout(go,450);
 }
-/* The badge step you are closest to, as one line. */
-function nextBadge(){
-  const v=badgeValues(recs.runs,recs.sum);let best=null;
-  BADGES.forEach(b=>{
-    const next=b.at.find(n=>v[b.id]<n);if(!next)return;
-    const prev=b.at.filter(n=>v[b.id]>=n).pop()||0,r=(v[b.id]-prev)/(next-prev);
-    if(!best||r>best.r)best={r:r,b:b,next:next};
-  });
-  if(!best)return '';
-  const b=best.b,what=b.lead?b.lead+' '+best.next+(b.suf||''):best.next+' '+(b.one&&best.next===1?b.one:b.unit);
-  return 'Next badge: '+what+' ('+(b.lead?v[b.id]+(b.suf||''):v[b.id]+' of '+best.next)+')';
-}
 function renderAdvice(){
   const box=$('advice');
-  if(!lastRun){box.hidden=true;return;}
+  if(!lastRun){box.hidden=true;$('advDiscRow').hidden=true;return;}
   box.hidden=false;
   const L=lastRun,adv=adviceFor(L.rows.map(x=>({idx:x.idx,pct:x.pct,passes:x.passes})));
-  const disc=$('advDiscard');
+  const disc=$('advDiscRow');
   const tgt=Math.round(TARGET*100)+'%';
   if(L.discarded){
     $('advRes').hidden=true;$('advHead').textContent='Run discarded.';
     $('advBody').textContent='It is not in your records.';
-    $('advWin').hidden=true;$('advBadge').hidden=true;$('advNext').hidden=true;
+    $('advWin').hidden=true;$('advBadge').hidden=true;
     disc.hidden=true;$('advWeak').hidden=true;return;
   }
   disc.hidden=!!L.practice;
@@ -4581,7 +4569,6 @@ function renderAdvice(){
     const shown=renderUnlocked(L);
     if(shown&&!L.celebrated){const bx=$('advBadge');bx.classList.remove('pop');void bx.offsetWidth;bx.classList.add('pop');}
     if(shown||wins.length)L.celebrated=true;
-    const nb=shown?'':nextBadge();$('advNext').hidden=!nb;$('advNext').textContent=nb;
   }
   if(L.skipped)body+=' '+L.skipped+(L.skipped===1?' exercise was':' exercises were')+' stopped before one full pass and not scored.';
   if(!L.saved)body+=' Your browser would not save the records.';
@@ -7003,7 +6990,7 @@ function wire(){
     guard(()=>{setRoutineText(b.dataset.text);showTab('play');window.scrollTo(0,0);});
   }));
   $('advAgain').addEventListener('click',()=>startPlay(lastRun&&lastRun.only||undefined));
-  $('advDone').addEventListener('click',()=>{setReview(false);window.scrollTo(0,0);});
+  $('advDone').addEventListener('click',()=>{lastRun=null;refreshPreview();renderAdvice();setReview(false);window.scrollTo(0,0);});   /* done with these results: back to the start screen, the run stays in History */
   arm($('advDiscard'),discardRun);
   $('svBtnPref').addEventListener('click',()=>setSview('pref'));
   $('svBtnDev').addEventListener('click',()=>setSview('dev'));

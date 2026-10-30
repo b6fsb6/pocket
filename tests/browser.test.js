@@ -206,10 +206,9 @@ async function runOnce(settings, practice, init) {
   const out = await p.evaluate(() => ({
     saved: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).runs || []).map(r => r.lv),
     text: document.getElementById('advice').innerText,
-    discard: !document.getElementById('advDiscard').hidden,
+    discard: !document.getElementById('advDiscRow').hidden,
     win: document.getElementById('advWin').hidden ? '' : document.getElementById('advWin').textContent,
     badge: document.getElementById('advBadge').hidden ? '' : document.getElementById('advBadge').innerText,
-    next: document.getElementById('advNext').textContent,
     days: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).sum || {}).days || {},
   }));
   assert.deepEqual(p.errors, []);
@@ -234,7 +233,7 @@ test('a practice run still counts its time toward the day', async () => {
   assert.equal(Object.keys(o.days).length, 1);
 });
 
-test('a new badge is announced on the result, with the next one in sight', async () => {
+test('a new badge is announced on the result', async () => {
   const seed = () => {
     if (localStorage.getItem('seeded-runs')) return;
     localStorage.setItem('seeded-runs', '1');
@@ -368,8 +367,8 @@ test('a scored run shows its score against the maximum, flags a new high score, 
   assert.ok(!o.solo);
   assert.match(o.prev, /^First score on Hard$/);
   assert.equal(await p.evaluate(() => document.querySelector('#advRes .slab').textContent), 'Score');
-  const bd = await p.evaluate(() => ({ shown: !document.getElementById('scoreBox').hidden, on: document.getElementById('bOn').textContent, note: document.getElementById('scoreNote').textContent, discardInDetails: !!document.querySelector('#detBox #advDiscard') }));
-  assert.ok(bd.shown); assert.match(bd.on, /^\d+$/); assert.match(bd.note, /Hard: 10 points on time/); assert.ok(bd.discardInDetails, 'Discard lives in Details');
+  const bd = await p.evaluate(() => ({ shown: !document.getElementById('scoreBox').hidden, on: document.getElementById('bOn').textContent, note: document.getElementById('scoreNote').textContent, discardOutside: !document.querySelector('#detBox #advDiscard') && !!(document.getElementById('detBox').compareDocumentPosition(document.getElementById('advDiscard')) & Node.DOCUMENT_POSITION_FOLLOWING) }));
+  assert.ok(bd.shown); assert.match(bd.on, /^\d+$/); assert.match(bd.note, /Hard: 10 points on time/); assert.ok(bd.discardOutside, 'Discard sits under the Details section, not inside it');
   const p0 = await runOnce({ click: 'half' }, true);
   assert.doesNotMatch(p0.text, /high score/i, 'a practice run is not scored');
 });
@@ -453,6 +452,22 @@ test('a flame shows in the live header once the streak reaches its best', async 
   await p.waitForFunction(() => getComputedStyle(document.getElementById('lvFire')).visibility === 'visible', null, { timeout: 30000 });
   assert.ok(await p.evaluate(() => window.__T.run().sk >= 16));
   assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('#lvFire .fo')).animationName), 'lvflick', 'the flame flickers');
+});
+
+test('Done clears the result and the details, and the run stays in History', async () => {
+  const p = await open({ input: 'kb', bpm: 120, routineText: 'RLRL RLRL', eachUnit: 'pass', eachVal: 1, click: 'half', seeded: true });
+  await p.evaluate(() => [...document.querySelectorAll('button')].find(b => /^Start/.test(b.textContent.trim()) && b.offsetParent).click());
+  await p.waitForFunction(() => window.__T.run() && window.__T.run().plan, null, { timeout: 8000 });
+  await p.evaluate(() => { const T = window.__T, r = T.run(), pl = r.plan; pl.slots.forEach(s => { const hand = pl.segs[s.seg].notes[s.pos].slice(-1); T.hit({ t: r.t0 + s.t + 0.005, kb: true, f: null, det: { hand, conf: 1 } }); }); });
+  await p.waitForFunction(() => window.__T.run().ended, null, { timeout: 40000 });
+  await p.waitForTimeout(400);
+  assert.equal(await p.evaluate(() => !document.getElementById('advice').hidden), true, 'the result shows after a run');
+  await p.evaluate(() => document.getElementById('advDone').click());
+  await p.waitForTimeout(200);
+  const o = await p.evaluate(() => ({ advice: document.getElementById('advice').hidden, within: document.getElementById('sWithin').textContent, runs: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).runs || []).length }));
+  assert.equal(o.advice, true, 'the result card goes');
+  assert.equal(o.within, '\u2014', 'the details go back to empty');
+  assert.equal(o.runs, 1, 'the run is still saved');
 });
 
 test('History shows each run\'s score in the list and on the run page', async () => {
