@@ -376,6 +376,10 @@ svg.spark{display:block;overflow:visible}
 .pghd::after,.pgft::before{content:"";position:absolute;left:var(--pgx);right:var(--pgx);height:1px;background:var(--line)}
 .pghd::after{bottom:0}
 .pgft::before{top:0}
+.pgov:not([data-owner=help]) .pghd{display:none}
+.pgov:not([data-owner=help]) .pgbd{padding-top:calc(14px + env(safe-area-inset-top))}
+.pgh{display:flex;align-items:baseline;gap:12px} .pgh .linkbtn{flex:none;padding:0;min-height:0;white-space:nowrap} .pgh h2{flex:1;min-width:0}
+.pgh h2:not(.seq){margin:0;font-size:20px;line-height:1.25;font-weight:600;overflow-wrap:anywhere}
 .pghd .linkbtn{padding-left:0;white-space:nowrap}
 .pghd .ttl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 14px var(--font-body)}
 .pghd .ttl.seq{font:700 13px var(--font-data);letter-spacing:.04em}
@@ -2668,7 +2672,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.5';                           /* shown beside the title */
+const VERSION='1.5.6';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -5065,7 +5069,15 @@ function showPage(o){
   if(hm){t.classList.add('hmenu');t.setAttribute('role','button');t.tabIndex=0;t.setAttribute('aria-haspopup','menu');}
   else{t.removeAttribute('role');t.removeAttribute('tabindex');t.removeAttribute('aria-haspopup');}
   const bd=$('pgBody'),keep=o.key===pgKey&&!$('pg').hidden,y=bd.scrollTop;
-  bd.textContent='';bd.appendChild(o.body);
+  bd.textContent='';
+  if(!hm){   /* the page's own title carries the way back, so there is no bar above it */
+    let h=o.body.querySelector('h2');
+    if(!h){h=document.createElement('h2');h.textContent=o.title;if(o.mono)h.className='seq';o.body.prepend(h);}
+    const row=document.createElement('div'),bk=document.createElement('button');
+    row.className='pgh';bk.type='button';bk.className='linkbtn';bk.textContent=o.back;bk.onclick=pageBack;
+    h.before(row);row.append(bk,h);
+  }
+  bd.appendChild(o.body);
   const ft=$('pgFoot');ft.textContent='';
   if(o.foot){[...o.foot.children].forEach(c=>ft.appendChild(c));}
   ft.hidden=!o.foot;
