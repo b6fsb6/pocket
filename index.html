@@ -589,7 +589,7 @@ body[data-edit=type] .buildonly{display:none}
 .live small{font:700 10px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:4px}
 .live .lvm i{position:relative}
 .live .lvm i.fl{background:none;box-shadow:none}
-.live .fire{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;visibility:hidden}
+.live .fire{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;visibility:hidden}
 .live .fire.on{visibility:visible}
 .live .tot{text-align:right}
 .live em{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums;font-style:normal;color:var(--muted);opacity:0}
@@ -598,8 +598,8 @@ body[data-edit=type] .buildonly{display:none}
 .live .lvm{grid-column:1/-1;display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
 .live .lvm i{height:14px;border-radius:3px;background:var(--line)}
 .live .lvm i.on{background:color-mix(in srgb,#E5322B calc(var(--t)*100%),#fff);box-shadow:0 0 0 1px var(--line)}   /* white at the first stroke, red at the best streak */
-@media (prefers-reduced-motion:no-preference){.live .fire.on{animation:lvflame 1.2s ease-in-out infinite alternate;transform-origin:50% 90%}.live em.on{animation:lvfade .7s ease-out forwards}.live .lvm i.on{transition:background .15s}}
-@keyframes lvflame{from{transform:scale(1)}to{transform:scale(1.12) rotate(-3deg)}}
+@media (prefers-reduced-motion:no-preference){.live .fire.on .fo{animation:lvflick .45s ease-in-out infinite alternate}.live .fire.on .fn{animation:lvflick .3s ease-in-out infinite alternate-reverse}.live .fire path{transform-box:fill-box;transform-origin:50% 100%}.live em.on{animation:lvfade .7s ease-out forwards}.live .lvm i.on{transition:background .15s}}
+@keyframes lvflick{from{transform:scale(1,.9) skewX(-4deg)}to{transform:scale(.94,1.08) skewX(4deg)}}
 @keyframes lvfade{from{opacity:1;transform:translateY(2px)}to{opacity:.15;transform:none}}
 .runinfo{display:grid;gap:6px}
 .progress{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
@@ -2665,7 +2665,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.2.2';                           /* shown beside the title */
+const VERSION='1.3.0';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3245,7 +3245,7 @@ function liveScore(r,sg,c){
   r.pts=Math.max(0,r.pts+d);r.flash={c:c,d:Math.round(d)};r.hudDirty=true;
 }
 /* The flame that takes the place of the last section of the streak bar at the best streak. */
-const LV_FLAME='<svg class="fire" id="lvFire" viewBox="0 0 24 24" aria-label="Streak at its best" role="img"><path d="M12 2c1 3.5 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.2 1.6 1 2.5 2 2.5C10.5 8 10.5 5 12 2z" fill="#F5841F"/><path d="M12 21a3 3 0 0 1-3-3c0-1.6 1.4-2.6 2-4 .5 1 1 1.4 1.6 1.8.9.6 1.4 1.3 1.4 2.2a3 3 0 0 1-2 3z" fill="#FFC53D"/></svg>';
+const LV_FLAME='<svg class="fire" id="lvFire" viewBox="0 0 24 24" aria-label="Streak at its best" role="img"><path class="fo" d="M12 2c1 3.5 5 5.5 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.2 1.6 1 2.5 2 2.5C10.5 8 10.5 5 12 2z" fill="#F5841F"/><path class="fn" d="M12 21a3 3 0 0 1-3-3c0-1.6 1.4-2.6 2-4 .5 1 1 1.4 1.6 1.8.9.6 1.4 1.3 1.4 2.2a3 3 0 0 1-2 3z" fill="#FFC53D"/></svg>';
 function initLive(r){
   const box=$('live');box.hidden=!r.hud;
   if(!r.hud)return;

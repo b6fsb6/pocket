@@ -452,6 +452,7 @@ test('a flame shows in the live header once the streak reaches its best', async 
   await p.evaluate(() => { const T = window.__T, r = T.run(), pl = r.plan; pl.slots.forEach(s => { const hand = pl.segs[s.seg].notes[s.pos].slice(-1); T.hit({ t: r.t0 + s.t + 0.005, kb: true, f: null, det: { hand, conf: 1 } }); }); });
   await p.waitForFunction(() => getComputedStyle(document.getElementById('lvFire')).visibility === 'visible', null, { timeout: 30000 });
   assert.ok(await p.evaluate(() => window.__T.run().sk >= 16));
+  assert.equal(await p.evaluate(() => getComputedStyle(document.querySelector('#lvFire .fo')).animationName), 'lvflick', 'the flame flickers');
 });
 
 test('History shows each run\'s score in the list and on the run page', async () => {
