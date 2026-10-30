@@ -388,6 +388,8 @@ html.pgopen{overflow:hidden}
 .rp .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 8px;text-align:center}
 .rp .stats .v{font:700 20px var(--font-data)} .rp .stats .k{font:600 11px var(--font-body);letter-spacing:.08em;color:var(--muted);margin-top:2px}
 .rp .stats .v.ok{color:var(--ok)} .rp .stats .v.late{color:var(--late)} .rp .stats .v.muted{color:var(--muted)}
+.rp .res{margin:12px 0 4px} .rp .res .sacc b.ok{color:var(--ok)} .rp .res .sacc b.late{color:var(--late)} .rp .res .sacc b.muted{color:var(--muted)}
+.rp .bk{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:13px;color:var(--muted)} .rp .bk b{color:var(--ink);font-weight:700}
 .rp .lbl{font:600 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
 .rp .cell.sel{outline:2px solid var(--ink);outline-offset:1px} .rp .cell{cursor:pointer} .rp .lvbars{display:flex;align-items:flex-end;gap:1px;height:56px;border-bottom:1px solid var(--line)} .rp .lvbars i{flex:1;min-width:1px;background:var(--early);cursor:pointer} .rp .lvbars i.acc{background:var(--fill)} .rp .lvbars i.sel{background:var(--ink);box-shadow:0 0 0 2px var(--ink);position:relative} .rp .tapinfo{padding:8px 0}
 .rp .strip{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
@@ -2666,7 +2668,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.4';                           /* shown beside the title */
+const VERSION='1.5.5';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -5229,11 +5231,8 @@ function runStrokes(page,r){
 function runLevelText(r){   /* the level card of the play results, from what a run keeps */
   if(r.lv==='off')return '';
   const ex=r.exercises.filter(heardEnough),t=[];
-  const lsv=ex.filter(b=>typeof b.ls==='number'),ldv=ex.filter(b=>typeof b.ld==='number');
-  if(lsv.length){
-    const v=lsv.reduce((a,b)=>a+b.ls,0)/lsv.length,d=ldv.length?ldv.reduce((a,b)=>a+b.ld,0)/ldv.length:null;
-    t.push((/^[gbm2-7RL]$/.test(r.dy||'')?'Normal strokes: '+spreadWord(v):spreadWord(v).replace(/^./,c=>c.toUpperCase()))+(d!==null&&Math.abs(d)>=3?', '+(d<0?'left':'right')+' hand '+Math.abs(d).toFixed(0)+' dB quieter':'')+'.');
-  }
+  const ldv=ex.filter(b=>typeof b.ld==='number');   /* the spread is on the score card */
+  if(ldv.length){const d=ldv.reduce((a,b)=>a+b.ld,0)/ldv.length;if(Math.abs(d)>=3)t.push((d<0?'Left':'Right')+' hand '+Math.abs(d).toFixed(0)+' dB quieter.');}
   [['a','Accents'],['g','Ghost notes']].forEach(([c,w])=>{
     let n=0,k=0,sp=[];r.exercises.forEach(b=>{n+=b[c+'n']||0;k+=b[c+'c']||0;if(typeof b[c+'s']==='number')sp.push(b[c+'s']);});
     if(n)t.push(w+': '+k+' of '+n+' clear'+(sp.length?', '+spreadWord(sp.reduce((a,x)=>a+x,0)/sp.length):'')+'.');
@@ -5249,19 +5248,24 @@ function renderRunPage(r){
   const sb=document.createElement('div');sb.className='sb';sb.textContent=dayWord(r.t).replace(/^./,c=>c.toUpperCase())+' · '+runMeta(r,true,true);page.appendChild(sb);
   const dl=dyLine(r);if(dl){const d=document.createElement('div');d.className='sb dy';d.textContent=dl;page.appendChild(d);}
   const f=runFigures(r),a=accHtml(f.acc);
-  const stats=document.createElement('div');stats.className='stats';
-  stats.appendChild(statBox(String(r.bpm),'BPM'));
-  stats.appendChild(statBox(a[0],'ACC',a[1]));
-  stats.appendChild(statBox(isNaN(f.ms)?'—':fmtMs(f.ms,1),'ms',isNaN(f.ms)?'muted':biasCls(f.ms)));
-  stats.appendChild(statBox(isNaN(f.db)?'—':'±'+f.db.toFixed(1),'dB'));
-  page.appendChild(stats);
-  if(!off){   /* the score, against a flawless run of what was played */
-    const sc=runScore(r),mx=maxPoints(r.exercises.map(b=>[b.due,tempoMult(b.k,b.bpm||r.bpm)]),r.lv);
-    if(mx){const d=document.createElement('div');d.className='sb';d.textContent='Score: '+sc.toLocaleString('en-US')+' of '+mx.toLocaleString('en-US');page.appendChild(d);}
+  if(!off){   /* the score first, against a flawless run of what was played and the best at this level; the same card as after a run */
+    const sc=runScore(r),mx=runMax(r),f0=n=>n.toLocaleString('en-US'),d=scoreBreakdown(r);
+    const card=document.createElement('div');card.className='res';
+    const mk=(tag,cls,txt,par)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;(par||card).appendChild(e);return e;};
+    mk('span','slab','Score');
+    const hd=mk('div','shd');mk('b',null,f0(sc),hd);mk('span',null,'of '+f0(mx),hd);
+    const bar=mk('div','sbar');mk('i',null,null,bar).style.width=Math.min(100,100*sc/mx)+'%';
+    const cp=mk('div','scap');mk('span',null,Math.round(100*sc/mx)+'% of max',cp);mk('span',null,'Best on '+levelName(r.lv)+': '+Math.round(100*(bestShares(recs.runs,recs.sum)[r.lv]||0))+'%',cp);
+    const ac=mk('div','sacc'),pb=mk('b',null,a[0],ac);pb.className=a[1];
+    const sp=mk('span',null,'on time',ac);
+    const sm=document.createElement('small');sm.textContent=[isNaN(f.ms)?'':fmtMs(f.ms,1)+' ms',isNaN(f.db)?'':'±'+f.db.toFixed(1)+' dB'].filter(Boolean).join(' \u00b7 ');if(sm.textContent)sp.appendChild(sm);
+    const bk=mk('div','bk');
+    [[d.on,'on time'],[d.off,'off time'],[d.miss,'missed'],[d.rest,'on a rest']].forEach(([n,w])=>{if(n||w==='on time'){const e=mk('span',null,null,bk);mk('b',null,f0(n),e);e.append(' '+w);}});
+    page.appendChild(card);
   }
   const lc=runLevelText(r);if(lc){const d=document.createElement('div');d.className='sb lvl';d.textContent=lc;page.appendChild(d);}
   if(r.exercises.length===1&&r.exercises[0].sp&&!off)runStrokes(page,r);
-  if(!off&&r.rp&&r.exercises.some(b=>b.sp))staffSection(page,r);
+  const hasStaff=!off&&r.rp&&r.exercises.some(b=>b.sp);let staffDone=false;
   if(!plainRun(r)&&r.ne>1){
     const items=r.exercises.map(b=>({i:b.i||0,b:b})).concat((r.sk||[]).map(b=>({i:b.i,k:b.k})));
     items.sort((x,y)=>x.i-y.i);
@@ -5272,6 +5276,7 @@ function renderRunPage(r){
     items.forEach(x=>{const c=document.createElement('span');c.className='cell '+(!x.b?'skip':off?'':(pctOf(x)>=TARGET?'ok':'late'));strip.appendChild(c);});
     page.appendChild(strip);
     const key2=document.createElement('div');key2.className='key';key2.textContent=off?'Count-in only: nothing is scored.':'Green: 90% or more. Pink: below 90%. Dashed: not played.';page.appendChild(key2);
+    if(hasStaff){staffSection(page,r);staffDone=true;}   /* the grid says where to look; the staff is for looking */
     if(!off&&played.length>1){
       page.appendChild(lbl('Weakest'));
       played.slice().sort((x,y)=>pctOf(x)-pctOf(y)).slice(0,3).forEach(x=>{
@@ -5312,6 +5317,7 @@ function renderRunPage(r){
       d.appendChild(inner);page.appendChild(d);
     }
   }
+  if(hasStaff&&!staffDone)staffSection(page,r);
   const acts=document.createElement('div');acts.className='actions';
   acts.appendChild(actBtn('Play',()=>replayRun(r),true));
   if(!r.rp)acts.lastChild.disabled=true;

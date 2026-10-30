@@ -482,6 +482,6 @@ test('History shows each run\'s score in the list and on the run page', async ()
   assert.match(row, /Score: [\d,]+/);
   await p.evaluate(() => { const b = [...document.querySelectorAll('#pvHist summary, #pvHist .sm, #pvHist button')].find(x => /Score: /.test(x.innerText)); b.click(); });
   await p.waitForTimeout(300);
-  const page = await p.evaluate(() => document.getElementById('pgBody').innerText + ' ' + document.getElementById('pvHist').innerText);
-  assert.match(page, /Score: [\d,]+ of [\d,]+/);
+  const page = await p.evaluate(() => document.getElementById('pgBody').textContent);
+  assert.match(page, /[\d,]+\s*of [\d,]+/);
 });
