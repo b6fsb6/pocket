@@ -350,7 +350,7 @@ svg.spark{display:block;overflow:visible}
 .row .rt{font:600 var(--t-body) var(--font-body);overflow-wrap:anywhere}
 .row .rt.seq{font:600 var(--t-data) var(--font-data);letter-spacing:.08em}   /* a title that is a sticking */
 .row .rm{font:var(--t-caption) var(--font-body);color:var(--muted)}
-.row.cur{background:color-mix(in srgb,var(--fill) 15%,transparent);box-shadow:inset 3px 0 0 var(--fill)}
+.row.cur{background:color-mix(in srgb,var(--fill) 15%,transparent);box-shadow:inset 3px 0 0 var(--fill);padding-inline:var(--s-3)}   /* the band's content clears the bar and the band's edge */
 @media (hover:hover){:is(button,summary,[role=button]).row:hover{background:color-mix(in srgb,var(--fill) 8%,transparent)}}
 .hrow{border-bottom:1px solid var(--line)}   /* a Library entry: its summary is the row, its body opens beneath */
 .hrow>.row{border:0}
@@ -2626,7 +2626,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.25';                           /* shown beside the title */
+const VERSION='1.5.26';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
