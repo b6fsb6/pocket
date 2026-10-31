@@ -367,6 +367,8 @@ svg.spark{display:block;overflow:visible}
 .lrow .ac{font:700 16px/24px var(--font-data);white-space:nowrap} .lrow .ac small{font:600 11px var(--font-body);letter-spacing:.06em;color:var(--muted);margin-left:3px}
 .ac.ok{color:var(--ok)} .ac.late{color:var(--late)} .ac.muted{color:var(--muted)}
 .lrow .ar{color:var(--muted);font-size:22px;line-height:24px}
+.lrow.pl{grid-template-columns:minmax(0,1fr) auto auto auto} .lrow.pl .ib{grid-column:3;grid-row:1;margin:-8px 0} .lrow.pl .ar{grid-column:4}
+.lrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .lrow .ar.chv{position:relative;width:24px} .lrow .ar.chv::after{content:"";position:absolute;left:7px;top:6px;width:9px;height:9px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform .15s} .lrow .ar.chv.up::after{transform:rotate(-135deg);top:11px}
 .dayp{overflow:hidden} .dayp .rtruns{margin:0 -14px;padding:2px 14px 4px 11px} .page .dayp .rtruns{margin:0;padding:2px 0 4px 11px}
 .rp{display:grid;gap:4px}
@@ -550,7 +552,6 @@ body[data-mode="routine"] .single-only{display:none}
 .nh code{font:700 13px var(--font-data);color:var(--accent);white-space:nowrap}
 .nh .full{grid-column:1/-1;margin:0}
 .nh .more{text-align:right}
-.hname{font:inherit;min-width:0;width:100%;padding:4px 8px;border:1px solid var(--accent);border-radius:6px;background:var(--surface);color:var(--ink)}
 body[data-edit=type] .buildonly{display:none}
 .osec{display:grid;gap:8px;padding-top:14px;border-top:1px solid var(--line)}
 .mbox .mhead+.osec{border-top:0;padding-top:0}
@@ -2668,7 +2669,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.9';                           /* shown beside the title */
+const VERSION='1.5.10';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4979,19 +4980,6 @@ function iconBtn(kind,label,fn){
   b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fn(b);});return b;
 }
 const replayBtn=r=>{const b=iconBtn('play','Play',()=>replayRun(r));if(!r.rp){b.disabled=true;b.title='This run was saved without its text.';}return b;};
-/* Renames a routine in place. One name is kept for the routine, so every run and score row shows it. */
-function renameBtn(n,rk){
-  return iconBtn('edit','Rename',()=>{
-    const inp=document.createElement('input');inp.type='text';inp.className='hname';inp.maxLength=80;inp.value=routineName(rk);
-    inp.setAttribute('aria-label','Routine name');inp.autocomplete='off';inp.setAttribute('data-lpignore','true');inp.setAttribute('data-1p-ignore','');
-    let done=false;
-    const end=ok=>{if(done)return;done=true;const v=inp.value.trim();if(ok&&v&&v!==recs.names[rk]){recs.names[rk]=v.slice(0,80);saveRecs();const e=libFor(rk);if(e&&e.id===S.libId){S.routineText=setHeader(S.routineText,'title',recs.names[rk]);$('routineText').value=S.routineText;save();onRoutineChanged();}}renderProgress();renderLibraryPage();};
-    inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();end(true);}else if(e.key==='Escape'){end(false);}});
-    inp.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();});
-    inp.addEventListener('blur',()=>end(true));
-    n.replaceWith(inp);inp.focus();inp.select();
-  });
-}
 /* One run: Replay and Delete sit on the row. A routine run also expands to show each exercise's result. */
 /* Today and yesterday by name, otherwise the date. */
 const dayWord=t=>{const n=Date.now(),k=dayKey(t);return k===dayKey(n)?'today':k===dayKey(n-864e5)?'yesterday':new Date(t).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});};
@@ -5134,8 +5122,8 @@ function runFigures(r){
   return {acc:off||partialRun(r)?null:runPct(r),ms:hs&&!off?sw/hs:NaN,db:ls.length?ls.reduce((a,v)=>a+v,0)/ls.length:NaN};
 }
 const accHtml=(pc)=>pc===null?['—','muted']:accCell(pc);
-function listRow(title,mono,sub,dy,pc,onOpen,chev){   /* chev: {open} swaps the arrow for a chevron that opens the row in place */
-  const row=document.createElement('button');row.type='button';row.className='lrow';
+function listRow(title,mono,sub,dy,pc,onOpen,chev,run){   /* chev: {open} swaps the arrow for a chevron that opens the row in place; run adds Play for it */
+  const row=document.createElement('div');row.className='lrow'+(run?' pl':'');row.setAttribute('role','button');row.tabIndex=0;
   const l=document.createElement('div');l.className='l';
   const n=document.createElement('div');n.className='nm'+(mono?' seq':'');n.textContent=title;
   const b=document.createElement('div');b.className='sb';b.textContent=sub;
@@ -5145,15 +5133,16 @@ function listRow(title,mono,sub,dy,pc,onOpen,chev){   /* chev: {open} swaps the 
   const u=document.createElement('small');u.textContent='ACC';ac.appendChild(u);
   const ar=document.createElement('span');ar.className='ar'+(chev?' chv'+(chev.open?' up':''):'');ar.textContent=chev?'':'›';ar.setAttribute('aria-hidden','true');
   if(chev)row.setAttribute('aria-expanded',String(chev.open));
-  row.appendChild(l);row.appendChild(ac);row.appendChild(ar);
+  row.appendChild(l);row.appendChild(ac);if(run)row.appendChild(replayBtn(run));row.appendChild(ar);
   row.addEventListener('click',onOpen);
+  row.addEventListener('keydown',e=>{if(e.target===row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onOpen();}});
   return row;
 }
 let histOpen='',histAll=false;   /* the History row that is open, and whether it lists every run */
 /* A row for several runs: the chevron opens its runs in place, each one a way into the run. */
-function groupRow(panel,title,mono,sub,dy,pc,runs){
+function groupRow(panel,title,mono,sub,dy,pc,runs){   /* runs: newest first; Play replays the newest */
   const key=runs.map(x=>x.id).join(),open=histOpen===key;
-  panel.appendChild(listRow(title,mono,sub,dy,pc,()=>{histOpen=open?'':key;histAll=false;renderHistory();},{open:open}));
+  panel.appendChild(listRow(title,mono,sub,dy,pc,()=>{histOpen=open?'':key;histAll=false;renderHistory();},{open:open},runs[0]));
   if(!open)return;
   const list=document.createElement('div');list.className='rtruns';
   (histAll?runs:runs.slice(0,4)).forEach(r=>list.appendChild(runBtn(r,'History')));
@@ -5185,7 +5174,7 @@ function renderHistoryDays(){
     d.runs.forEach(r=>{const f=folds[folds.length-1];if(f&&sig(f[0])===sig(r))f.push(r);else folds.push([r]);});
     folds.forEach(f=>{
       const r=f[0],t=runTitle(r),fig=runFigures(r);
-      if(f.length===1){panel.appendChild(listRow(t.text,t.mono,runMeta(r,true),dyLine(r),fig.acc,()=>openHist({run:r.id})));return;}
+      if(f.length===1){panel.appendChild(listRow(t.text,t.mono,runMeta(r,true),dyLine(r),fig.acc,()=>openHist({run:r.id}),null,r));return;}
       const tm=x=>new Date(x.t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
       const bpms=f.map(x=>x.bpm),lo=Math.min.apply(null,bpms),hi=Math.max.apply(null,bpms);
       const best=bestPct(f);
@@ -5285,7 +5274,7 @@ function renderRunPage(r){
     const key2=document.createElement('div');key2.className='key';key2.textContent=off?'Count-in only: nothing is scored.':'Green: 90% or more. Pink: below 90%. Dashed: not played.';page.appendChild(key2);
     if(hasStaff){staffSection(page,r);staffDone=true;}   /* the grid says where to look; the staff is for looking */
     if(!off&&played.length>1){
-      page.appendChild(lbl('Weakest'));
+      page.appendChild(lbl('Suggested practice'));
       played.slice().sort((x,y)=>pctOf(x)-pctOf(y)).slice(0,3).forEach(x=>{
         const w=document.createElement('div');w.className='wr';
         const n=document.createElement('div');n.className='seq';n.textContent=showKey(x.b.k);
@@ -5325,9 +5314,7 @@ function renderRunPage(r){
     }
   }
   if(hasStaff&&!staffDone)staffSection(page,r);
-  const acts=[];   /* edit, play, menu: the order of every row of icons; Delete waits in the menu */
-  if(r.mode==='routine'&&!plainRun(r))acts.push(renameBtn(h,r.rk));
-  acts.push(replayBtn(r));
+  const acts=[replayBtn(r)];   /* play, menu: the order of every row of icons; Delete waits in the menu, and a routine is renamed in the Library */
   acts.push(kebab('More actions',[{t:'Delete',fn:()=>{closePages();deleteRun(r.id);},arm:true,danger:true}]));
   showPage({owner:'hist',key:'run'+r.id,back:'\u2039 '+runBack,title:t.text,mono:t.mono,body:page,acts:acts});
 }
@@ -5343,7 +5330,7 @@ function renderHistoryGroups(){
     const f=g[0],t=runTitle(f),fig=runFigures(f);
     const best=bestPct(g);
     const sub=(f.lv==='off'?'Count-in only':levelName(f.lv))+' · '+g.length+(g.length===1?' run':' runs')+' · latest '+dayWord(f.t)+(best!==null&&g.length>1?' · best '+Math.round(best*100)+'%':'');
-    if(g.length===1)panel.appendChild(listRow(t.text,t.mono,sub,dyLine(f),fig.acc,()=>openHist({run:f.id})));else groupRow(panel,t.text,t.mono,sub,dyLine(f),fig.acc,g);
+    if(g.length===1)panel.appendChild(listRow(t.text,t.mono,sub,dyLine(f),fig.acc,()=>openHist({run:f.id}),null,f));else groupRow(panel,t.text,t.mono,sub,dyLine(f),fig.acc,g);
   });
   if(panel.children.length)box.appendChild(panel);
   $('histMore').textContent='Show more';
