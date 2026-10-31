@@ -367,6 +367,8 @@ svg.spark{display:block;overflow:visible}
 .lrow .ac{font:700 16px/24px var(--font-data);white-space:nowrap} .lrow .ac small{font:600 11px var(--font-body);letter-spacing:.06em;color:var(--muted);margin-left:3px}
 .ac.ok{color:var(--ok)} .ac.late{color:var(--late)} .ac.muted{color:var(--muted)}
 .lrow .ar{color:var(--muted);font-size:22px;line-height:24px}
+.lrow .ar.chv{position:relative;width:24px} .lrow .ar.chv::after{content:"";position:absolute;left:7px;top:6px;width:9px;height:9px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform .15s} .lrow .ar.chv.up::after{transform:rotate(-135deg);top:11px}
+.dayp{overflow:hidden} .dayp .rtruns{margin:0 -14px;padding:2px 14px 4px 11px} .page .dayp .rtruns{margin:0;padding:2px 0 4px 11px}
 .rp{display:grid;gap:4px}
 
 .rp .back{justify-self:start;padding-left:0}
@@ -409,9 +411,9 @@ html.pgopen{overflow:hidden}
 .srow:first-child{border-top:0}
 .srow .sq{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .srow .seq{font:700 14px var(--font-data);letter-spacing:.06em}
-.srow .sn{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums}
-.srow .sn small{color:var(--muted);font:11px var(--font-body);letter-spacing:.04em;margin-left:3px}
-.srow .sn .muted{color:var(--muted)} .srow .sn .ok{color:var(--ok)} .srow .sn .late{color:var(--late)} .srow .sn .early{color:var(--early)}
+.srow .sn,.rrun .sn{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums}
+.srow .sn small,.rrun .sn small{color:var(--muted);font:11px var(--font-body);letter-spacing:.04em;margin-left:3px}
+.srow .sn .muted,.rrun .sn .muted{color:var(--muted)} .srow .sn .ok,.rrun .sn .ok{color:var(--ok)} .srow .sn .late,.rrun .sn .late{color:var(--late)} .srow .sn .early,.rrun .sn .early{color:var(--early)}
 .srow .ib{flex:none;margin:-6px 0}
 .srow .sq .seq{flex:1;min-width:0;overflow-wrap:anywhere} #rtList .srow{cursor:pointer} .lexs{cursor:default} .lexs .erow{cursor:default;grid-template-columns:30px minmax(0,1fr) 40px;align-items:center} .lexs .muted{color:var(--muted)} #rtList .srow .rtruns{cursor:default}
 .hgrp .tablewrap td,.hgrp .tablewrap th{padding-left:6px;padding-right:6px}
@@ -2666,7 +2668,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.8';                           /* shown beside the title */
+const VERSION='1.5.9';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4829,6 +4831,21 @@ function renderScoreGroups(stats,practise,usual){
 }
 /* Routine rows: same figures as exercises, one row per routine and level. */
 let rtOpen='',rtAll=false;   /* the routine row that is open in Scores, and whether it lists every run */
+/* One run of an open routine or group: its day and time, the figures, and a way into the run. */
+function runBtn(r,back){
+  const b=document.createElement('button');b.type='button';b.className='rrun';
+  const l=document.createElement('div');l.className='l';
+  const nm=document.createElement('div');nm.className='nm';nm.textContent=dayWord(r.t).replace(/^./,c=>c.toUpperCase())+' \u00B7 '+new Date(r.t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});l.appendChild(nm);
+  const f=runFigures(r),a=accHtml(f.acc),sn=document.createElement('div');sn.className='sn';
+  const st=(txt,unit,cls)=>{const e=document.createElement('span');if(cls)e.className=cls;e.textContent=txt;const u=document.createElement('small');u.textContent=unit;e.appendChild(u);sn.appendChild(e);};
+  st(String(r.bpm),'BPM');st(a[0],'ACC',a[1]);st(isNaN(f.ms)?'\u2014':fmtMs(f.ms,1),'ms',isNaN(f.ms)?'muted':biasCls(f.ms));st(isNaN(f.db)?'\u2014':'\u00B1'+f.db.toFixed(1),'dB');
+  l.appendChild(sn);
+  if(r.exercises.length<r.ne){const pn=document.createElement('div');pn.className='nt';pn.textContent=r.exercises.length+' of '+r.ne+' exercises played';l.appendChild(pn);}
+  const ar=document.createElement('span');ar.className='ar';ar.textContent='\u203A';ar.setAttribute('aria-hidden','true');
+  b.appendChild(l);b.appendChild(ar);
+  b.addEventListener('click',()=>openRunFrom(r.id,back));
+  return b;
+}
 function renderRoutineRows(routines,replay){
   const box=$('rtList');box.textContent='';
   if(!routines.length){const p=document.createElement('p');p.className='hint';p.textContent='No routines scored yet.';box.appendChild(p);return;}
@@ -4864,20 +4881,7 @@ function renderRoutineRows(routines,replay){
       const mine=recs.runs.filter(r=>r.rk===x.rk&&r.lv===x.lv&&(r.dy||'')===(x.dy||'')).sort((a,b)=>b.t-a.t);
       const shown=rtAll?mine:mine.slice(0,4);
       const list=document.createElement('div');list.className='rtruns';
-      shown.forEach(r=>{
-        const b=document.createElement('button');b.type='button';b.className='rrun';
-        const l=document.createElement('div');l.className='l';
-        const nm=document.createElement('div');nm.className='nm';nm.textContent=dayWord(r.t).replace(/^./,c=>c.toUpperCase())+' \u00B7 '+new Date(r.t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});l.appendChild(nm);
-        const f=runFigures(r),a=accHtml(f.acc),sn=document.createElement('div');sn.className='sn';
-        const st=(txt,unit,cls)=>{const e=document.createElement('span');if(cls)e.className=cls;e.textContent=txt;const u=document.createElement('small');u.textContent=unit;e.appendChild(u);sn.appendChild(e);};
-        st(String(r.bpm),'BPM');st(a[0],'ACC',a[1]);st(isNaN(f.ms)?'\u2014':fmtMs(f.ms,1),'ms',isNaN(f.ms)?'muted':biasCls(f.ms));st(isNaN(f.db)?'\u2014':'\u00B1'+f.db.toFixed(1),'dB');
-        l.appendChild(sn);
-        if(r.exercises.length<r.ne){const pn=document.createElement('div');pn.className='nt';pn.textContent=r.exercises.length+' of '+r.ne+' exercises played';l.appendChild(pn);}
-        const ar=document.createElement('span');ar.className='ar';ar.textContent='\u203A';ar.setAttribute('aria-hidden','true');
-        b.appendChild(l);b.appendChild(ar);
-        b.addEventListener('click',()=>openRunFrom(r.id,'Scores'));
-        list.appendChild(b);
-      });
+      shown.forEach(r=>list.appendChild(runBtn(r,'Scores')));
       if(mine.length>4){const m=document.createElement('button');m.type='button';m.className='linkbtn rmore';m.textContent=rtAll?'Show fewer':'Show all '+mine.length+' runs';m.addEventListener('click',()=>{rtAll=!rtAll;renderProgress();});list.appendChild(m);}
       if(x.runs>mine.length){const o=document.createElement('div');o.className='nt';o.style.padding='6px 0';o.textContent='Older runs are summarised and not listed.';list.appendChild(o);}
       row.appendChild(list);
@@ -5099,7 +5103,6 @@ function renderHistory(){
   document.querySelectorAll('#pvHist .hfilter').forEach(e=>{e.hidden=false;});
   if(pg){
     if(pg.run){const r=recs.runs.find(x=>x.id===pg.run);if(r){renderRunPage(r);return;}histStack.pop();return renderHistory();}
-    if(pg.group){renderGroupPage(pg.group);return;}
   }
   hidePage('hist');
   $('histMore').hidden=true;
@@ -5131,7 +5134,7 @@ function runFigures(r){
   return {acc:off||partialRun(r)?null:runPct(r),ms:hs&&!off?sw/hs:NaN,db:ls.length?ls.reduce((a,v)=>a+v,0)/ls.length:NaN};
 }
 const accHtml=(pc)=>pc===null?['—','muted']:accCell(pc);
-function listRow(title,mono,sub,dy,pc,onOpen){
+function listRow(title,mono,sub,dy,pc,onOpen,chev){   /* chev: {open} swaps the arrow for a chevron that opens the row in place */
   const row=document.createElement('button');row.type='button';row.className='lrow';
   const l=document.createElement('div');l.className='l';
   const n=document.createElement('div');n.className='nm'+(mono?' seq':'');n.textContent=title;
@@ -5140,10 +5143,22 @@ function listRow(title,mono,sub,dy,pc,onOpen){
   if(dy){const d=document.createElement('div');d.className='sb dy';d.textContent=dy;l.appendChild(d);}
   const a=accHtml(pc),ac=document.createElement('div');ac.className='ac '+a[1];ac.textContent=a[0];
   const u=document.createElement('small');u.textContent='ACC';ac.appendChild(u);
-  const ar=document.createElement('span');ar.className='ar';ar.textContent='›';ar.setAttribute('aria-hidden','true');
+  const ar=document.createElement('span');ar.className='ar'+(chev?' chv'+(chev.open?' up':''):'');ar.textContent=chev?'':'›';ar.setAttribute('aria-hidden','true');
+  if(chev)row.setAttribute('aria-expanded',String(chev.open));
   row.appendChild(l);row.appendChild(ac);row.appendChild(ar);
   row.addEventListener('click',onOpen);
   return row;
+}
+let histOpen='',histAll=false;   /* the History row that is open, and whether it lists every run */
+/* A row for several runs: the chevron opens its runs in place, each one a way into the run. */
+function groupRow(panel,title,mono,sub,dy,pc,runs){
+  const key=runs.map(x=>x.id).join(),open=histOpen===key;
+  panel.appendChild(listRow(title,mono,sub,dy,pc,()=>{histOpen=open?'':key;histAll=false;renderHistory();},{open:open}));
+  if(!open)return;
+  const list=document.createElement('div');list.className='rtruns';
+  (histAll?runs:runs.slice(0,4)).forEach(r=>list.appendChild(runBtn(r,'History')));
+  if(runs.length>4){const m=document.createElement('button');m.type='button';m.className='linkbtn rmore';m.textContent=histAll?'Show fewer':'Show all '+runs.length+' runs';m.addEventListener('click',()=>{histAll=!histAll;renderHistory();});list.appendChild(m);}
+  panel.appendChild(list);
 }
 let runBack='History';   /* what the run page's Back says: the list it was opened from */
 function openHist(page){runBack='History';histStack.push(page);pgPush();renderHistory();}
@@ -5175,7 +5190,7 @@ function renderHistoryDays(){
       const bpms=f.map(x=>x.bpm),lo=Math.min.apply(null,bpms),hi=Math.max.apply(null,bpms);
       const best=bestPct(f);
       const sub=f.length+' runs · '+tm(f[f.length-1])+' – '+tm(r)+' · '+(r.lv==='off'?'Count-in only':levelName(r.lv))+' · '+(lo===hi?lo:lo+'–'+hi)+' BPM'+(best!==null?' · best '+Math.round(best*100)+'%':'');
-      panel.appendChild(listRow(t.text,t.mono,sub,dyLine(r),fig.acc,()=>openHist({group:f.map(x=>x.id)})));
+      groupRow(panel,t.text,t.mono,sub,dyLine(r),fig.acc,f);
     });
     box.appendChild(panel);
   });
@@ -5314,21 +5329,7 @@ function renderRunPage(r){
   if(r.mode==='routine'&&!plainRun(r))acts.push(renameBtn(h,r.rk));
   acts.push(replayBtn(r));
   acts.push(kebab('More actions',[{t:'Delete',fn:()=>{closePages();deleteRun(r.id);},arm:true,danger:true}]));
-  showPage({owner:'hist',key:'run'+r.id,back:'\u2039 '+(histStack.length>1?'Back':runBack),title:t.text,mono:t.mono,body:page,acts:acts});
-}
-/* A fold of repeats opens to its runs. */
-function renderGroupPage(ids){
-  const runs=ids.map(id=>recs.runs.find(x=>x.id===id)).filter(Boolean);
-  if(!runs.length){closePages();renderHistory();return;}
-  const page=document.createElement('div');page.className='rp';
-  const t=runTitle(runs[0]);
-  const h=document.createElement('h2');h.className=t.mono?'seq':'';h.textContent=t.text;page.appendChild(h);
-  const sb=document.createElement('div');sb.className='sb';sb.textContent=runs.length+' runs · '+dayWord(runs[0].t).replace(/^./,c=>c.toUpperCase());page.appendChild(sb);
-  const dl=dyLine(runs[0]);if(dl){const d=document.createElement('div');d.className='sb dy';d.textContent=dl;page.appendChild(d);}
-  const panel=document.createElement('div');panel.className='dayp';panel.style.marginTop='12px';
-  runs.forEach(r=>panel.appendChild(listRow(dayWord(r.t).replace(/^./,c=>c.toUpperCase())+' \u00B7 '+new Date(r.t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}),false,runMeta(r,false),'',runFigures(r).acc,()=>openHist({run:r.id}))));
-  page.appendChild(panel);
-  showPage({owner:'hist',key:'grp'+ids.join(),back:'\u2039 History',title:t.text,mono:t.mono,body:page});
+  showPage({owner:'hist',key:'run'+r.id,back:'\u2039 '+runBack,title:t.text,mono:t.mono,body:page,acts:acts});
 }
 /* Runs grouped by exercise or routine, newest group first. A group of one run looks the same as a larger one. */
 function renderHistoryGroups(){
@@ -5336,13 +5337,13 @@ function renderHistoryGroups(){
   const groups=new Map();
   recs.runs.slice().sort((x,y)=>y.t-x.t).forEach(r=>{const k=runKey(r)+'|'+r.lv+'|'+(r.dy||'');if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);});
   let list=[...groups.values()];
-  $('histHint').textContent=list.length?'Your runs grouped by exercise or routine, most recent first. Tap one to see its runs.':'No runs yet. Each run you finish is listed here.';
+  $('histHint').textContent=list.length?'Your runs grouped by exercise or routine, most recent first. Tap a row to see its runs.':'No runs yet. Each run you finish is listed here.';
   const panel=document.createElement('div');panel.className='dayp';
   list.slice(0,histShown).forEach(g=>{
     const f=g[0],t=runTitle(f),fig=runFigures(f);
     const best=bestPct(g);
     const sub=(f.lv==='off'?'Count-in only':levelName(f.lv))+' · '+g.length+(g.length===1?' run':' runs')+' · latest '+dayWord(f.t)+(best!==null&&g.length>1?' · best '+Math.round(best*100)+'%':'');
-    panel.appendChild(listRow(t.text,t.mono,sub,dyLine(f),fig.acc,()=>openHist(g.length===1?{run:f.id}:{group:g.map(x=>x.id)})));
+    if(g.length===1)panel.appendChild(listRow(t.text,t.mono,sub,dyLine(f),fig.acc,()=>openHist({run:f.id})));else groupRow(panel,t.text,t.mono,sub,dyLine(f),fig.acc,g);
   });
   if(panel.children.length)box.appendChild(panel);
   $('histMore').textContent='Show more';
