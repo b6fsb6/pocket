@@ -163,7 +163,7 @@ body[data-run="1"] .notice{display:none}
 .rowswrap{position:relative}
 #exBox .hint{margin:8px 0 0}
 .rows:focus-visible{outline:2px solid var(--accent);outline-offset:3px}   /* the staff only shows: the start exercise is chosen in the exercise list */
-.bigcount{position:absolute;inset:0 0 auto 0;height:100%;max-height:260px;z-index:5;display:grid;place-items:center;font:800 var(--t-hero) var(--font-display);font-variant-numeric:tabular-nums;color:var(--accent);background:color-mix(in srgb,var(--bg) 80%,transparent);border-radius:10px;pointer-events:none}   /* the count-in: the hero while it runs */
+.bigcount{position:absolute;inset:0;z-index:5;display:grid;place-items:center;font:800 var(--t-hero) var(--font-display);font-variant-numeric:tabular-nums;color:var(--accent);background:color-mix(in srgb,var(--bg) 80%,transparent);border-radius:10px;pointer-events:none}   /* the count-in: the hero while it runs */
 .rows{border-radius:10px;--rowh:124px;--nrows:3}
 .staffs{display:grid;gap:2px}
 .rows.sliding{overflow:hidden;transition:height var(--dur-2) var(--ease)}
@@ -2642,7 +2642,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.41';                           /* shown beside the title */
+const VERSION='1.5.42';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
