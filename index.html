@@ -276,6 +276,7 @@ button.row:disabled{opacity:.4;cursor:not-allowed}
 .row.num>.rn{grid-column:1;grid-row:1/span 2;align-self:start;font:var(--t-caption) var(--font-data);color:var(--muted)}
 .row.num>.ra{grid-column:3}
 .exercises>.row{padding:var(--s-2) var(--s-3)}   /* inside the bordered list box */
+#pickList .row{padding-inline:var(--s-3)}   /* every row as wide as the selected one, so the titles line up */
 .chkmsg{margin:0;padding:10px 12px;border-left:4px solid var(--accent);background:var(--surface);border-radius:6px;font:600 17px/1.35 var(--font-body);color:var(--ink)} .chkmsg:empty{display:none}
 .rtruns{padding:0 var(--s-3);background:var(--surface);border-left:3px solid var(--accent)}   /* the runs of an open row sit on a band with an accent rail, so they read as part of it */
 .row>.rtruns{grid-column:1/-1;margin:var(--s-2) 0 calc(-1*var(--s-3))}
@@ -2626,7 +2627,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.26';                           /* shown beside the title */
+const VERSION='1.5.27';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
