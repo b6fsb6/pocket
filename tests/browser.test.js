@@ -175,7 +175,7 @@ test('a stray exercise is deleted from a run, and an unheard one is not scored',
   let t = await text();
   assert.match(t, /1 not played/);            /* nothing was heard in the last exercise */
   assert.doesNotMatch(t, /dLfR[\s\S]*ACC/);    /* it is not scored, so it cannot be the weakest */
-  await p.evaluate(() => { document.querySelector('details').open = true; document.querySelector('details .ib').click(); });
+  await p.evaluate(() => { document.querySelector('details').open = true; document.querySelector('details .btn.icon').click(); });
   const del = () => p.evaluate(() => [...document.querySelectorAll('.rmenu button')].find(x => /^(Delete|Tap again to delete)$/.test(x.textContent)).click());
   await del(); await del();
   await p.waitForTimeout(300);

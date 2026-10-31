@@ -350,9 +350,8 @@ svg.spark{display:block;overflow:visible}
 .hgrp>summary{padding-right:116px}
 .hrow .ha{position:absolute;right:38px;top:50%;transform:translateY(-50%);display:flex;gap:2px}
 .hrow.flat .ha{right:8px}
-.ib{border:0;background:transparent;color:var(--muted);min-width:40px;height:40px;border-radius:8px;display:grid;place-items:center;cursor:pointer;font:700 12px var(--font-body);padding:0 6px}
-.ib.replay,.ib.play{color:var(--accent)}
-.ib:disabled{opacity:.35;cursor:not-allowed}
+.btn.icon{min-width:var(--hit);padding:0;border-color:transparent;background:transparent;color:var(--muted);display:grid;place-items:center}   /* a 20px SVG, an aria-label and a title */
+.btn.icon.replay,.btn.icon.play{color:var(--accent)}
 .hrow .hb{padding:0 12px 12px;display:grid;gap:8px}
 .slist{display:grid}
 .sum{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -377,7 +376,7 @@ svg.spark{display:block;overflow:visible}
 .lrow .ac{font:600 16px/24px var(--font-data);white-space:nowrap} .lrow .ac small{font:600 11px var(--font-body);letter-spacing:.06em;color:var(--muted);margin-left:3px}
 .ac.ok{color:var(--ok)} .ac.late{color:var(--late)} .ac.muted{color:var(--muted)}
 .lrow .ar{color:var(--muted);font-size:22px;line-height:24px}
-.lrow.pl{grid-template-columns:minmax(0,1fr) auto auto auto} .lrow.pl .ib{grid-column:3;grid-row:1;margin:-8px 0} .lrow.pl .ar{grid-column:4}
+.lrow.pl{grid-template-columns:minmax(0,1fr) auto auto auto} .lrow.pl .btn.icon{grid-column:3;grid-row:1;margin:-8px 0} .lrow.pl .ar{grid-column:4}
 .lrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .lrow .ar.chv{position:relative;width:24px} .lrow .ar.chv::after{content:"";position:absolute;left:7px;top:6px;width:9px;height:9px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform .15s} .lrow .ar.chv.up::after{transform:rotate(-135deg);top:11px}
 .dayp{overflow:hidden} .dayp .rtruns{margin:0 -14px;padding:2px 14px 4px 11px} .page .dayp .rtruns{margin:0;padding:2px 0 4px 11px}
@@ -391,7 +390,7 @@ svg.spark{display:block;overflow:visible}
 .pghd::after{bottom:0}
 .pgov:not([data-owner=help]) .pghd{display:none}
 .pgov:not([data-owner=help]) .pgbd{padding-top:calc(14px + env(safe-area-inset-top))}
-.pgh{display:flex;align-items:baseline;gap:12px} .pgm{display:flex;align-items:center;gap:4px} .pgm .sb{flex:1;min-width:0} .pgm .ib{flex:none;margin:-6px 0} .pgm .ib:first-of-type{margin-left:auto} .pgh .btn.link{flex:none;padding:0;white-space:nowrap} .pgh h2{flex:1;min-width:0}
+.pgh{display:flex;align-items:baseline;gap:12px} .pgm{display:flex;align-items:center;gap:4px} .pgm .sb{flex:1;min-width:0} .pgm .btn.icon{flex:none;margin:-6px 0} .pgm .btn.icon:first-of-type{margin-left:auto} .pgh .btn.link{flex:none;padding:0;white-space:nowrap} .pgh h2{flex:1;min-width:0}
 .pgh h2:not(.seq){margin:0;font-size:20px;line-height:1.25;font-weight:600;overflow-wrap:anywhere}
 .pghd .btn.link{padding-left:0;white-space:nowrap}
 .pghd .ttl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 14px var(--font-body)}
@@ -425,14 +424,14 @@ html.pgopen{overflow:hidden}
 .srow .sn,.rrun .sn{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums}
 .srow .sn small,.rrun .sn small{color:var(--muted);font:11px var(--font-body);letter-spacing:.04em;margin-left:3px}
 .srow .sn .muted,.rrun .sn .muted{color:var(--muted)} .srow .sn .ok,.rrun .sn .ok{color:var(--ok)} .srow .sn .late,.rrun .sn .late{color:var(--late)} .srow .sn .early,.rrun .sn .early{color:var(--early)}
-.srow .ib{flex:none;margin:-6px 0}
+.srow .btn.icon{flex:none;margin:-6px 0}
 .srow .sq .seq{flex:1;min-width:0;overflow-wrap:anywhere} #rtList .srow{cursor:pointer} .lexs{cursor:default} .lexs .erow{cursor:default;grid-template-columns:30px minmax(0,1fr) 40px;align-items:center} .lexs .muted{color:var(--muted)} #rtList .srow .rtruns{cursor:default}
 .hgrp .tablewrap td,.hgrp .tablewrap th{padding-left:6px;padding-right:6px}
-.hgrp .tablewrap .ib{min-width:40px;height:40px;padding:0;margin:-8px -6px}
-.hgrp .tablewrap .ib svg{width:17px;height:17px}
+.hgrp .tablewrap .btn.icon{margin:-8px -6px}
+.hgrp .tablewrap .btn.icon svg{width:17px;height:17px}
 .hgrp tbody tr:has(.cv){cursor:pointer}
-.ib.cv span{width:8px;height:8px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
-.ib.cv.open span{transform:rotate(-135deg) translate(-2px,-2px)}
+.btn.icon.cv span{width:8px;height:8px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
+.btn.icon.cv.open span{transform:rotate(-135deg) translate(-2px,-2px)}
 .hgrp .hrow{background:var(--bg)}
 .hrow ul{margin:0;padding:0;list-style:none;font-size:13px;display:grid;gap:2px}
 .hrow li{display:flex;gap:8px;justify-content:space-between}
@@ -531,8 +530,6 @@ body[data-mode="routine"] .single-only{display:none}
 .bmenu .btn.del{color:var(--danger)}
 #editList .erow{grid-template-columns:30px minmax(0,1fr) 40px;align-items:center}
 #editList .meta{display:none}
-.dots{border:0;background:transparent;color:var(--muted);font:600 22px/1 var(--font-data);min-height:36px;cursor:pointer;border-radius:8px}
-@media (hover:hover){.dots:hover{color:var(--accent)}}
 .bnote{display:flex;align-items:flex-start;gap:10px}
 .bnote .btn{flex:none}
 .bfields{flex:1;min-width:0}
@@ -567,7 +564,6 @@ body[data-edit=type] .buildonly{display:none}
 .mhead h3{margin:0}
 .lsstaff{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 4px;max-height:58vh;overflow-y:auto;overflow-x:hidden}
 .lsstaff>*{margin:0}
-.iconbtn{min-width:48px;padding:6px 12px;display:grid;place-items:center}
 .bcodes{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
 .bcode{font:600 14px var(--font-data);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;min-height:44px;padding:0;cursor:pointer}
 .bcode[aria-pressed=true]{background:var(--fill);color:var(--accent-ink);border-color:transparent}
@@ -631,15 +627,10 @@ tr:last-child td{border-bottom:0}
 td.seq{letter-spacing:.08em;font-weight:600}
 td.early{color:var(--early)} td.late{color:var(--late)} td.ok{color:var(--ok)} td.muted{color:var(--muted)}
 .headbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto;justify-content:flex-end}
-#themeBtn{font-size:15px;line-height:1;padding:3px 9px}
-button.pill{cursor:pointer;color:var(--ink);font-weight:600;min-height:32px;padding:6px 12px}
-button.pill:disabled{opacity:.5;cursor:not-allowed}
-button.pill.on{color:var(--ok)}
 #micPill{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:6px 12px;font-weight:600}
 #micPill[hidden]{display:inline-flex;visibility:hidden}   /* keeps its place so Help and the theme button do not jump */
 body[data-input="kb"] #micPill{display:none}
 #micDot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.35;transition:opacity .08s}
-button.pill.warn{color:var(--warn);border-color:var(--warn)}
 .help p,.help li{font-size:14.5px;line-height:1.55;margin:6px 0}
 .help ul,.help ol{padding-left:20px;margin:6px 0}
 .help h4{font:700 14px var(--font-body);margin:14px 0 4px}
@@ -665,13 +656,11 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 .page .hist>.hrow:last-child,.page .slist>.hrow:last-child{border-bottom:0}
 .page .dayp{background:none;border:0;border-radius:0;padding:0}
 .page .dayp .lrow:first-child{border-top:1px solid var(--line)}
-.glib .hrow>summary{padding-right:152px}
+.glib .hrow>summary{padding-right:calc(4*var(--hit) + var(--s-3))}   /* room for the four actions; step 7 moves them into the row's flow */
 .glib .hrow>summary::after{display:none}
 .glib .hrow .ha{right:6px}
-.glib .hrow .ib{min-width:36px}
-.lnkrow{position:relative;display:grid;gap:4px;padding:10px 84px 10px 0;border-bottom:1px solid var(--line)}
+.lnkrow{position:relative;display:grid;gap:4px;padding:10px calc(2*var(--hit) + var(--s-1)) 10px 0;border-bottom:1px solid var(--line)}
 .lnkrow .ha{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex}
-.lnkrow .ib{min-width:36px}
 #advBar{display:none;grid-column:1/-1;gap:8px}
 #advBar .advmain{margin-top:0}
 :root[data-layout=desktop] body[data-review="1"] #advBar{display:grid}
@@ -734,15 +723,14 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 .maxline:empty{display:none}
 .pickrow.on{background:var(--bg);box-shadow:inset 3px 0 0 var(--fill)}
 #pickList{display:grid;gap:10px}
-.ib.down svg{transition:transform .18s}
-.hrow[open] .ib.down svg{transform:rotate(180deg)}
-.ib.gap{visibility:hidden;pointer-events:none}
+.btn.icon.down svg{transition:transform .18s}
+.hrow[open] .btn.icon.down svg{transform:rotate(180deg)}
+.btn.icon.gap{visibility:hidden;pointer-events:none}
 .rmenu{position:fixed;z-index:60;min-width:150px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:var(--shadow-pop);display:grid}
 .rmenu button{border:0;background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;padding:12px 14px;border-radius:7px;cursor:pointer;min-height:44px}
 .rmenu button:hover,.rmenu button:focus-visible{background:var(--bg)}
 .rmenu button.danger,.btn.danger{color:var(--danger)}
 button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--danger);color:var(--on-danger);border:1px solid var(--danger);padding-inline:var(--s-3)}   /* the one armed look, on every kind of button */
-@media (max-width:359px){.glib .hrow>summary{padding-right:128px}.glib .hrow .ib{min-width:30px}}
 </style>
 </head>
 <body data-input="mic" data-mode="single" data-tab="pattern" data-state="idle" data-run="0" data-review="0">
@@ -750,7 +738,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
   <header>
     <div class="head">
       <h1>Pocket</h1>
-      <span class="headbtns"><button class="pill" id="helpBtn" type="button" data-help="help-how">Help</button><button class="pill" id="themeBtn" type="button"></button><span class="pill on" id="micPill" role="status" hidden><i id="micDot"></i><span id="micTxt">Mic on</span></span></span>
+      <span class="headbtns"><button class="btn" id="helpBtn" type="button" data-help="help-how">Help</button><button class="btn icon" id="themeBtn" type="button"></button><span class="pill on" id="micPill" role="status" hidden><i id="micDot"></i><span id="micTxt">Mic on</span></span></span>
     </div>
     <p class="sub"><span>Go from trailing to nailing the beat</span><small class="ver" id="ver"></small></p>
   </header>
@@ -908,7 +896,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
         <button class="btn" id="edBack" type="button">&larr; Back</button>
         <div class="etitle"><b id="edName"></b><span class="hint estate"><span id="edState"></span><button class="btn link" id="edDiscard" type="button" hidden>Discard</button></span></div>
         <button class="btn" id="saveBtn" type="button">Save</button>
-        <button class="dots" id="saveMore" type="button" aria-label="More ways to save" aria-haspopup="menu">&#8942;</button>
+        <button class="btn icon dots" id="saveMore" type="button" aria-label="More ways to save" title="More ways to save" aria-haspopup="menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
       </div>
       <div class="bmenu" id="saveMenu" role="menu" hidden><button class="btn" id="saveNew" type="button">Save as new</button><button class="btn" id="saveFile" type="button">Download file</button></div>
       <div class="bmain" id="bMain">
@@ -980,7 +968,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
           </div>
           <div class="bmeta">
     <div class="bmsg"><p class="err" id="patErr" role="alert"></p><p class="err" id="routineErr" role="alert"></p><p class="hint" id="bStatus" aria-live="polite"></p><button class="btn link" id="exLink" type="button" data-help="help-format">Examples &rarr;</button></div>
-            <div class="bbtns"><button class="btn iconbtn" id="bListen" type="button" aria-label="Listen to this exercise" title="Listen"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg></button></div>
+            <div class="bbtns"><button class="btn icon" id="bListen" type="button" aria-label="Listen to this exercise" title="Listen"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg></button></div>
           </div>
 
         <div class="bpane" id="buildPane">
@@ -1337,7 +1325,7 @@ RLRR LRLL RLRR LRLL</pre>
     </section>
     <div class="pcol pctl">
     <section class="panel cfg" aria-label="Exercises">
-      <div class="rtname"><b id="playName"></b><button class="ib" id="editPlay" type="button" aria-label="Edit routine" title="Edit routine"></button><button class="btn link" id="playChange" type="button">Change</button></div>
+      <div class="rtname"><b id="playName"></b><button class="btn icon" id="editPlay" type="button" aria-label="Edit routine" title="Edit routine"></button><button class="btn link" id="playChange" type="button">Change</button></div>
       <div class="patrow single-only"><p class="patline" id="playPat"></p></div>
       <details id="exBox" class="setbox routine-only">
         <summary id="routineInfo"></summary>
@@ -1566,7 +1554,7 @@ RLRR LRLL RLRR LRLL</pre>
     <div class="lsstaff" id="lsStaff" aria-hidden="true"></div>
     <div class="bnote">
       <p class="hint" id="lsInfo" style="flex:1"></p>
-      <button class="btn iconbtn" id="lsPlay" type="button" aria-label="Play again" title="Play again"></button>
+      <button class="btn icon" id="lsPlay" type="button" aria-label="Play again" title="Play again"></button>
     </div>
   </div>
 </div>
@@ -2672,7 +2660,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.20';                           /* shown beside the title */
+const VERSION='1.5.21';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4981,6 +4969,8 @@ const bestPct=l=>{const v=l.filter(r=>r.lv!=='off'&&!partialRun(r)).map(runPct);
 const runPct=r=>{let w=0,d=0;r.exercises.forEach(b=>{w+=b.within;d+=b.due;});return d?w/d:0;};
 const runKey=r=>r.mode==='routine'?'r:'+(r.rk||r.id):'p:'+r.exercises[0].k;
 const ICON={replay:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>',
   kebab:'<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>',
   down:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
   more:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>',
@@ -4988,7 +4978,7 @@ const ICON={replay:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" 
   edit:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
   del:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>'};
 function iconBtn(kind,label,fn){
-  const b=document.createElement('button');b.type='button';b.className='ib '+kind;b.innerHTML=ICON[kind];b.setAttribute('aria-label',label);b.title=label;
+  const b=document.createElement('button');b.type='button';b.className='btn icon '+kind;b.innerHTML=ICON[kind];b.setAttribute('aria-label',label);b.title=label;
   b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fn(b);});return b;
 }
 const replayBtn=r=>{const b=iconBtn('play','Play',()=>replayRun(r));if(!r.rp){b.disabled=true;b.title='This run was saved without its text.';}return b;};
@@ -5718,7 +5708,7 @@ function onRoutineChanged(){
   syncPlayName();syncEditorBar();
 }
 function dotsBtn(fn){
-  const d=document.createElement('button');d.type='button';d.className='dots';d.textContent='\u22EE';d.setAttribute('aria-label','Exercise actions');d.setAttribute('aria-haspopup','menu');
+  const d=document.createElement('button');d.type='button';d.className='btn icon dots';d.innerHTML=ICON.kebab;d.setAttribute('aria-label','Exercise actions');d.title='Exercise actions';d.setAttribute('aria-haspopup','menu');
   d.addEventListener('click',e=>{e.stopPropagation();fn();});
   return d;
 }
@@ -6121,7 +6111,7 @@ function renderLibraryPage(){
     /* The chevron shows when opening the row reveals something the row does not already say: more than one exercise, or an exercise behind a title. */
     const more=exerciseCount(e.x)>1||!!recs.names[libKey(e)];
     const ex=more?iconBtn('down','Show exercises',()=>{det.open=!det.open;}):document.createElement('span');
-    if(more){ex.setAttribute('aria-expanded','false');det.addEventListener('toggle',()=>ex.setAttribute('aria-expanded',String(det.open)));}else ex.className='ib gap';
+    if(more){ex.setAttribute('aria-expanded','false');det.addEventListener('toggle',()=>ex.setAttribute('aria-expanded',String(det.open)));}else ex.className='btn icon gap';
     ac.append(ed,pl,km,ex);
     sm.append(n,hs,ac);det.appendChild(sm);
     const body=document.createElement('div');body.className='hb';
@@ -6901,7 +6891,7 @@ function applyTheme(){
   const d=S.theme==='dark',b=$('themeBtn');
   document.documentElement.dataset.theme=S.theme;
   if(S.palette==='cb')document.documentElement.dataset.palette='cb';else delete document.documentElement.dataset.palette;
-  b.textContent=d?'\u2600':'\u263E';b.title=b.ariaLabel=d?'Switch to light':'Switch to dark';
+  b.innerHTML=d?ICON.sun:ICON.moon;b.title=d?'Switch to light':'Switch to dark';b.setAttribute('aria-label',b.title);
   drawTrace();
 }
 function wire(){
