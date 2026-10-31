@@ -653,6 +653,7 @@ output.bigbpm{display:block;font:800 var(--t-hero) var(--font-display);font-vari
 .bigrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .bigrow .hint{margin:0;text-align:right}
 .setbox{border:0;border-radius:0;background:none}
+body:not([data-review="1"]) #leadBox{display:none}   /* a result: while playing the drummer watches the staff, so it waits for the end of the run */
 .sbody{display:grid;gap:22px}
 #setBox>summary,#detBox>summary,#exBox>summary{font:700 15px var(--font-body);text-transform:none;letter-spacing:0;padding:12px 0;border-top:1px solid var(--line)}
 #setBox>summary,#detBox>summary,#exBox>summary{display:flex;align-items:center;justify-content:space-between;gap:10px}   /* the chevron stays beside the text, not under it */
@@ -1444,7 +1445,7 @@ RLRR LRLL RLRR LRLL</pre>
     <details id="detBox" class="setbox" open>
       <summary>Details</summary>
       <div class="sbody">
-    <section class="panel" aria-label="Lead or drag">
+    <section class="panel" id="leadBox" aria-label="Lead or drag">
       <h3>Lead or drag, last 32 strokes</h3>
       <div class="readout">
         <div class="big"><span id="gVal">—</span><small>ms</small></div>
@@ -2642,7 +2643,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.43';                           /* shown beside the title */
+const VERSION='1.5.44';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
