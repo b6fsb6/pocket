@@ -2642,7 +2642,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.42';                           /* shown beside the title */
+const VERSION='1.5.43';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3370,12 +3370,14 @@ function restartRun(){
   beginRun('play',r.only);
 }
 /* Starts a practice run. With a list of exercise numbers it plays only those exercises. */
-/* Starting from further down the page goes back to the top, where the staff sits in the run layout. It returns whether the page was scrolled.
-   The run layout hides most of the page, and phone browsers then pull the scroll position back on their own and cancel a smooth scroll, so this jumps and jumps again once the page has settled. */
+/* At Start on a phone the page scrolls so the score box is at the top of the window, with the staff and the run controls under it. On desktop, where there is room, or without a score box, it goes to the top of the page. It returns whether the page was scrolled.
+   The run layout hides most of the page, and phone browsers then pull the scroll position back on their own and cancel a smooth scroll, so this jumps and jumps again once the page has settled, measuring each time. */
 function revealStaff(){
-  if(!(scrollY>0))return false;
-  const top=()=>{document.documentElement.scrollTop=0;document.body.scrollTop=0;scrollTo(0,0);};
-  top();requestAnimationFrame(()=>{top();requestAnimationFrame(top);});setTimeout(top,120);setTimeout(top,400);
+  const live=$('live');
+  const target=()=>live.hidden||document.documentElement.dataset.layout==='desktop'?0:Math.max(0,Math.round(live.getBoundingClientRect().top+scrollY));
+  if(Math.abs(scrollY-target())<2)return false;
+  const go=()=>{const y=target();document.documentElement.scrollTop=y;document.body.scrollTop=y;scrollTo(0,y);};
+  go();requestAnimationFrame(()=>{go();requestAnimationFrame(go);});setTimeout(go,120);setTimeout(go,400);
   return true;
 }
 async function startPlay(only){
