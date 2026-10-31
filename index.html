@@ -70,7 +70,13 @@ h1{font:800 clamp(26px,7.5vw,40px)/1 var(--font-display);text-transform:uppercas
 .eyebrow,h3,.field>label,.lbl,th,#helpNav b,.stat .k,.sortrow,.dayh,.rp .lbl,#advBadge .lbl,.clk .clt,.olbl,.live small,.res .slab{font:600 var(--t-eyebrow) var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 h3{color:var(--ink);margin:0 0 var(--s-2)}
 .sub{color:var(--muted);font-size:13px;margin:2px 0 0;line-height:1.2}
-.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 12px}
+/* Header: the title and its buttons, the tagline, then the tab bar. On desktop the tabs join the title's row. */
+header{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"title btns" "sub sub" "tabs tabs";column-gap:var(--s-3);align-items:center}
+header h1{grid-area:title} header .headbtns{grid-area:btns} header .sub{grid-area:sub} header .tabs{grid-area:tabs;margin-top:var(--s-3)}
+:root[data-layout=desktop] header{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"title tabs btns" "sub tabs btns";column-gap:var(--s-6)}
+:root[data-layout=desktop] header .tabs{display:flex;gap:var(--s-5);margin:0;padding:0;background:none;border-radius:0;align-self:end}   /* no trough: natural width, left-aligned, a brass underline */
+:root[data-layout=desktop] .tabs button{min-width:var(--hit);padding:0;border-radius:0;border-bottom:3px solid transparent}
+:root[data-layout=desktop] .tabs button[aria-selected=true]{background:none;color:var(--ink);border-bottom-color:var(--fill)}
 .pill{font:600 12px var(--font-data);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);white-space:nowrap;background:var(--surface)}
 .pill.on{color:var(--ok);border-color:var(--ok)}
 
@@ -607,7 +613,7 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 tr:last-child td{border-bottom:0}
 td.seq{letter-spacing:.08em;font-weight:600}
 td.early{color:var(--early)} td.late{color:var(--late)} td.ok{color:var(--ok)} td.muted{color:var(--muted)}
-.headbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto;justify-content:flex-end}
+.headbtns{display:flex;gap:var(--s-2);align-items:center;flex-wrap:wrap;justify-content:flex-end}
 #micPill{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:6px 12px;font-weight:600}
 #micPill[hidden]{display:inline-flex;visibility:hidden}   /* keeps its place so Help and the theme button do not jump */
 body[data-input="kb"] #micPill{display:none}
@@ -703,20 +709,16 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
 <body data-input="mic" data-mode="single" data-tab="pattern" data-state="idle" data-run="0" data-review="0">
 <main class="app">
   <header>
-    <div class="head">
       <h1>Pocket</h1>
       <span class="headbtns"><button class="btn" id="helpBtn" type="button" data-help="help-how">Help</button><button class="btn icon" id="themeBtn" type="button"></button><span class="pill on" id="micPill" role="status" hidden><i id="micDot"></i><span id="micTxt">Mic on</span></span></span>
-    </div>
     <p class="sub"><span>Go from trailing to nailing the beat</span><small class="ver" id="ver"></small></p>
+    <nav class="tabs" role="tablist" aria-label="Pages">
+      <button type="button" role="tab" id="tabPlay" aria-controls="pagePlay" aria-selected="true">Play</button>
+      <button type="button" role="tab" id="tabLibrary" aria-controls="pageLibrary" aria-selected="false">Library</button>
+      <button type="button" role="tab" id="tabProgress" aria-controls="pageProgress" aria-selected="false">Progress</button>
+      <button type="button" role="tab" id="tabSetup" aria-controls="pageSetup" aria-selected="false">Settings</button>
+    </nav>
   </header>
-
-
-  <nav class="tabs" role="tablist" aria-label="Pages">
-    <button type="button" role="tab" id="tabPlay" aria-controls="pagePlay" aria-selected="true">Play</button>
-    <button type="button" role="tab" id="tabLibrary" aria-controls="pageLibrary" aria-selected="false">Library</button>
-    <button type="button" role="tab" id="tabProgress" aria-controls="pageProgress" aria-selected="false">Progress</button>
-    <button type="button" role="tab" id="tabSetup" aria-controls="pageSetup" aria-selected="false">Settings</button>
-  </nav>
   <p class="notice" id="updNote" hidden><span id="updText"></span> <button class="btn link" id="updGo" type="button">Update</button> <button class="btn link" id="updLater" type="button">Later</button></p>
 
   <div id="stTop"><p class="status" id="status" role="status" aria-live="polite"></p></div>
@@ -2627,7 +2629,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.27';                           /* shown beside the title */
+const VERSION='1.5.28';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
