@@ -213,12 +213,13 @@ test('the longest clean run counts strokes, so a short routine counts too', () =
   assert.equal(c.badgeValues([run([32, 32], [32, 32])], sum).cln, 3000, 'an older folded best still stands');
 });
 
-test('the on-time window scales points, and the share of max is measured at the standard window', () => {
+test('the on-time window scales points and the maximum alike, so a flawless run is 100% at any window', () => {
   const run = tol => ({ id: 'w' + tol, t: 1, lv: 'half', bpm: 60, tol, exercises: [{ k: 'e', due: 8, within: 8, q: 'oooooooo' }] });
   const std = c.runScore(run(20));
   assert.equal(c.runMax(run(20)), std, 'a flawless run at the standard window is 100%');
   assert.equal(c.runScore(run(50)), Math.round(std * 0.5));
   assert.equal(c.runScore(run(10)), Math.round(std * 1.5));
-  assert.equal(c.runMax(run(50)), c.runMax(run(20)), 'the maximum does not depend on the window');
+  assert.equal(c.runMax(run(50)), c.runScore(run(50)), 'a flawless run at ±50 is 100%');
+  assert.equal(c.runMax(run(10)), c.runScore(run(10)), 'a flawless run at ±10 is 100%, not 150%');
   assert.equal(c.winMult(undefined), 1, 'a run saved without a window counts once');
 });
