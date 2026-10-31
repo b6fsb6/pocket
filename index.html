@@ -266,13 +266,16 @@ summary{cursor:pointer;padding:14px;font:800 20px var(--font-display);letter-spa
 summary::-webkit-details-marker{display:none}
 summary::after{content:"";float:right;width:9px;height:9px;margin:6px 4px 0 0;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform .15s}
 details[open]>summary::after{transform:rotate(-135deg);margin-top:10px}
-.libitem{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;padding:9px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;font:600 14px var(--font-body);color:var(--ink);cursor:pointer}
-.libitem:last-child{border-bottom:0}
-@media (hover:hover){.libitem:hover{background:color-mix(in srgb,var(--fill) 10%,transparent)}}
-.libitem.cur{background:color-mix(in srgb,var(--fill) 20%,transparent)}
-.libitem:disabled{opacity:.5;cursor:default}
-.libitem.have b{font-weight:400;color:var(--muted)}
-.libitem span{color:var(--muted);font:12px var(--font-data);white-space:nowrap}
+button.row{cursor:pointer}
+button.row:disabled{opacity:.4;cursor:not-allowed}
+.row .rt.have{font-weight:400;color:var(--muted)}   /* a library item you already have */
+.row>.ra>.rm{text-align:right;white-space:nowrap}   /* a value in the trailing area */
+/* A numbered row: the index in its own column, ahead of the title. */
+.row.num{grid-template-columns:var(--s-5) minmax(0,1fr) auto}
+.row.num>*{grid-column:2}
+.row.num>.rn{grid-column:1;grid-row:1/span 2;align-self:start;font:var(--t-caption) var(--font-data);color:var(--muted)}
+.row.num>.ra{grid-column:3}
+.exercises>.row{padding:var(--s-2) var(--s-3)}   /* inside the bordered list box */
 .chkmsg{margin:0;padding:10px 12px;border-left:4px solid var(--accent);background:var(--surface);border-radius:6px;font:600 17px/1.35 var(--font-body);color:var(--ink)} .chkmsg:empty{display:none}
 .rtruns{padding:0 var(--s-3);background:var(--surface);border-left:3px solid var(--accent)}   /* the runs of an open row sit on a band with an accent rail, so they read as part of it */
 .row>.rtruns{grid-column:1/-1;margin:var(--s-2) 0 calc(-1*var(--s-3))}
@@ -396,10 +399,6 @@ html.pgopen{overflow:hidden}
 .rp .strip{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
 .rp .cell{aspect-ratio:1;border-radius:4px;background:var(--line)} .rp .cell.ok{background:var(--ok)} .rp .cell.late{background:var(--late)} .rp .cell.skip{background:transparent;border:1px dashed var(--line)} .rp .cell.lvl{background:var(--fill);color:var(--accent-ink);font:700 10px/1 var(--font-body);display:grid;place-items:center}
 .rp .key{font-size:12px;color:var(--muted);margin-top:8px}
-.rp .wr .ac{font:600 16px var(--font-data);white-space:nowrap} .rp .wr .ac small{font:600 11px var(--font-body);letter-spacing:.06em;color:var(--muted);margin-left:3px}
-.rp .wr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
-.rp .exr{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line)} .rp .exr .en{width:22px;flex:none;color:var(--muted);font:12px var(--font-data);padding-top:3px}
-.rp .exr .seq,.rp .wr .seq{font:600 13px/1.5 var(--font-data);letter-spacing:.05em}
 .rp .sn{display:flex;flex-wrap:wrap;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums} .rp .sn small{color:var(--muted);font:11px var(--font-body);margin-left:3px}
 .rp .sn .ok{color:var(--ok)} .rp .sn .late{color:var(--late)} .rp .sn .early{color:var(--early)} .rp .sn .muted{color:var(--muted)}
 .hint.hl{margin:2px 0 0}
@@ -415,7 +414,7 @@ html.pgopen{overflow:hidden}
 .row .sn{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums}
 .row .sn small{color:var(--muted);font:11px var(--font-body);letter-spacing:.06em;margin-left:3px}
 .row .sn .muted{color:var(--muted)} .row .sn .ok{color:var(--ok)} .row .sn .late{color:var(--late)} .row .sn .early{color:var(--early)}
-.lexs{cursor:default} .lexs .erow{cursor:default;grid-template-columns:30px minmax(0,1fr) 40px;align-items:center} .lexs .muted{color:var(--muted)}
+
 .btn.icon.cv span{width:8px;height:8px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
 .btn.icon.cv.open span{transform:rotate(-135deg) translate(-2px,-2px)}
 .hrow ul{margin:0;padding:0;list-style:none;font-size:13px;display:grid;gap:2px}
@@ -487,16 +486,13 @@ body[data-mode="routine"] .single-only{display:none}
 .lnk{display:grid;gap:8px;margin:0 0 14px}
 .lnk input{min-width:0}.lnkurl{word-break:break-all;color:var(--muted,inherit);font-size:.9em}.lnk .btns{margin:0}
 .exercises{max-height:288px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
-.erow{cursor:pointer;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);font:13px var(--font-data);align-items:baseline}
-.erow:last-child{border-bottom:0}
+.erow{cursor:pointer}   /* an editor or Play list row: a .row.num that picks an exercise */
 #editList{height:184px;max-height:none}
 .patrow{display:flex;gap:12px;align-items:center;justify-content:space-between}
 .patrow .btn{flex:none}
 .patrow .hint{margin:0;min-width:0}
 .patline{margin:0;font:600 18px var(--font-data);letter-spacing:.1em;overflow-wrap:anywhere}
 .patline:empty{display:none}
-.erow .seq{letter-spacing:.1em;font-weight:600;overflow-wrap:anywhere}
-.erow .meta{color:var(--muted);white-space:nowrap}
 .bpane{display:grid;gap:12px}
 .bmain,.editor{display:grid;gap:22px}
 .bpane .field{display:grid;gap:8px}
@@ -513,7 +509,6 @@ body[data-mode="routine"] .single-only{display:none}
 .bmenu .btn{border:0;background:transparent;color:var(--ink);text-align:left;justify-content:flex-start;padding:10px;font-size:14px;min-height:40px}
 .bmenu .btn:disabled{opacity:.35}
 .bmenu .btn.del{color:var(--danger)}
-#editList .erow{grid-template-columns:30px minmax(0,1fr) 40px;align-items:center}
 #editList .meta{display:none}
 .bnote{display:flex;align-items:flex-start;gap:10px}
 .bnote .btn{flex:none}
@@ -568,7 +563,7 @@ body[data-edit=type] .buildonly{display:none}
 .bcode[aria-pressed=true]{background:var(--fill);border-color:transparent}
 .bkey:active,.bcode:active{filter:brightness(.92)}
 .erow.editing{outline:2px solid var(--accent);outline-offset:-2px}
-@media (hover:hover){.erow:hover{background:color-mix(in srgb,var(--fill) 10%,transparent)}}
+@media (hover:hover){.erow:hover{background:color-mix(in srgb,var(--fill) 8%,transparent)}}
 .erow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .erow.start{background:color-mix(in srgb,var(--fill) 22%,transparent);box-shadow:inset 4px 0 0 var(--fill)}
 .erow.cur{background:color-mix(in srgb,var(--fill) 20%,transparent)}
@@ -691,11 +686,8 @@ body[data-input="kb"] #micPill{display:none}
 .key .k.miss{color:var(--muted);opacity:.4}
 @media (max-width:359px){.tabs button{font-size:13px;letter-spacing:0}}   /* four tab names fit the narrowest phones */
 .dur{display:grid;grid-template-columns:minmax(70px,1fr) minmax(110px,1.4fr);gap:8px}
-.pickrow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:48px;padding:8px 12px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;cursor:pointer}
-.pickrow small{color:var(--muted);font:500 13px var(--font-body);white-space:nowrap;text-align:right;line-height:1.4}
 .maxline{margin:-10px 0 0;font-size:13px;color:var(--muted);text-align:right}
 .maxline:empty{display:none}
-.pickrow.on{background:var(--bg);box-shadow:inset 3px 0 0 var(--fill)}
 #pickList{display:grid;gap:10px}
 .btn.icon.down svg{transition:transform .18s}
 :is(.hrow.open>.row,.row.open)>.ra .btn.icon.down svg{transform:rotate(180deg)}   /* an open row's chevron points up */
@@ -2634,7 +2626,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.24';                           /* shown beside the title */
+const VERSION='1.5.25';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -5199,7 +5191,7 @@ function runStrokes(page,r){
   const n=c=>st.split(c).length-1,rows=[[n('m'),'missed'],[n('b'),'off time'],[n('s'),n('s')===1?'accent too soft':'accents too soft'],[n('l'),n('l')===1?'ghost too loud':'ghosts too loud']].filter(x=>x[0]);
   if(!rows.length)return;
   const l2=document.createElement('div');l2.className='lbl';l2.textContent='What cost strokes';page.appendChild(l2);
-  rows.forEach(x=>{const w=document.createElement('div');w.className='wr';const t=document.createElement('div');t.textContent=x[0]+' '+x[1];w.appendChild(t);page.appendChild(w);});
+  rows.forEach(x=>{const w=document.createElement('div');w.className='row';const t=document.createElement('span');t.textContent=x[0]+' '+x[1];w.appendChild(t);page.appendChild(w);});
   const g=n('o'),d=st.length,e=document.createElement('div');e.className='sb';e.style.padding='8px 0';e.textContent=g+' of '+d+' strokes were on time and played as written.';page.appendChild(e);
 }
 function runLevelText(r){   /* the level card of the play results, from what a run keeps */
@@ -5254,27 +5246,27 @@ function renderRunPage(r){
     if(!off&&played.length>1){
       page.appendChild(lbl('Suggested practice'));
       played.slice().sort((x,y)=>pctOf(x)-pctOf(y)).slice(0,3).forEach(x=>{
-        const w=document.createElement('div');w.className='wr';
-        const n=document.createElement('div');n.className='seq';n.textContent=showKey(x.b.k);
-        const c=accCell(pctOf(x)),ac=document.createElement('div');ac.className='ac '+c[1];ac.textContent=c[0];const u=document.createElement('small');u.textContent='ACC';ac.appendChild(u);
-        w.appendChild(n);w.appendChild(ac);w.appendChild(practiseBtn(x.b.k,x.i,r));page.appendChild(w);});
+        const w=document.createElement('div');w.className='row';
+        const n=document.createElement('span');n.className='rt seq';n.textContent=showKey(x.b.k);
+        const c=accCell(pctOf(x)),ac=document.createElement('span');ac.className='ac '+c[1];ac.textContent=c[0];const u=document.createElement('small');u.textContent='ACC';ac.appendChild(u);
+        const ra=document.createElement('span');ra.className='ra';ra.append(ac,practiseBtn(x.b.k,x.i,r));
+        w.append(n,ra);page.appendChild(w);});
     }
     page.appendChild(lbl('All exercises'));
     played.forEach(x=>{
-      const b=x.b,row=document.createElement('div');row.className='exr';
-      const en=document.createElement('div');en.className='en';en.textContent=String(x.i||'');
-      const eb=document.createElement('div');
-      const n=document.createElement('div');n.className='seq';n.textContent=showKey(b.k);eb.appendChild(n);
-      const sn=document.createElement('div');sn.className='sn';
+      const b=x.b,row=document.createElement('div');row.className='row num';
+      const en=document.createElement('span');en.className='rn';en.textContent=String(x.i||'');
+      const n=document.createElement('span');n.className='rt seq';n.textContent=showKey(b.k);
+      const sn=document.createElement('span');sn.className='sn';
       const stat=(txt,unit,cls)=>{const m=document.createElement('span');if(cls)m.className=cls;m.textContent=txt;if(unit){const u=document.createElement('small');u.textContent=unit;m.appendChild(u);}sn.appendChild(m);};
       const c=off?['—','muted']:accCell(pctOf(x));
       stat(c[0],'ACC',c[1]);
       const hd=heardEnough(b);
       stat(hd&&typeof b.avg==='number'?fmtMs(b.avg,1):'—','ms',hd&&typeof b.avg==='number'?biasCls(b.avg):'muted');
       stat(hd&&typeof b.ls==='number'?'±'+b.ls.toFixed(1):'—','dB');
-      eb.appendChild(sn);eb.style.flex='1';eb.style.minWidth='0';row.appendChild(en);row.appendChild(eb);row.appendChild(practiseBtn(b.k,x.i,r));
-      if(played.length>1)row.appendChild(kebab('More actions',[{t:'Delete',fn:()=>dropExercise(r,b),arm:true,danger:true}]));
-      page.appendChild(row);});
+      const ra=document.createElement('span');ra.className='ra';ra.appendChild(practiseBtn(b.k,x.i,r));
+      if(played.length>1)ra.appendChild(kebab('More actions',[{t:'Delete',fn:()=>dropExercise(r,b),arm:true,danger:true}]));
+      row.append(en,n,sn,ra);page.appendChild(row);});
     const sk=items.length-played.length;
     if(sk){   /* not played: kept out of the scores, listed here so a stray one can be deleted */
       const d=document.createElement('details'),sm=document.createElement('summary');sm.textContent=sk+' not played';d.appendChild(sm);
@@ -5282,10 +5274,11 @@ function renderRunPage(r){
       sm.style.cssText='font:600 13px var(--font-data);text-transform:none;letter-spacing:0;padding:10px 0;color:var(--muted)';
       const inner=document.createElement('div');
       items.filter(x=>!x.b).forEach(x=>{
-        const row=document.createElement('div');row.className='exr';
-        const en=document.createElement('div');en.className='en';en.textContent=String(x.i||'');
-        const n=document.createElement('div');n.className='seq';n.textContent=showKey(x.k);n.style.flex='1';n.style.minWidth='0';
-        row.append(en,n,kebab('More actions',[{t:'Delete',fn:()=>dropExercise(r,(r.sk||[]).find(q=>q.i===x.i&&q.k===x.k)||{i:0}),arm:true,danger:true}]));
+        const row=document.createElement('div');row.className='row num';
+        const en=document.createElement('span');en.className='rn';en.textContent=String(x.i||'');
+        const n=document.createElement('span');n.className='rt seq';n.textContent=showKey(x.k);
+        const ra=document.createElement('span');ra.className='ra';ra.appendChild(kebab('More actions',[{t:'Delete',fn:()=>dropExercise(r,(r.sk||[]).find(q=>q.i===x.i&&q.k===x.k)||{i:0}),arm:true,danger:true}]));
+        row.append(en,n,ra);
         inner.appendChild(row);
       });
       d.appendChild(inner);page.appendChild(d);
@@ -5373,10 +5366,11 @@ function exerciseListEl(text,lv,dy){
   if(!ex.length)return null;
   const box=document.createElement('div');box.className='exercises lexs';
   ex.forEach(x=>{
-    const r=document.createElement('div');r.className='erow';
-    const n=document.createElement('span');n.className='muted';n.textContent=String(x.i);
-    const q=document.createElement('span');q.className='seq';q.textContent=showKey(x.k);
-    r.append(n,q,iconBtn('play','Play exercise '+x.i,()=>practisePattern(x.k,lv,dy)));
+    const r=document.createElement('div');r.className='row num';
+    const n=document.createElement('span');n.className='rn';n.textContent=String(x.i);
+    const q=document.createElement('span');q.className='rt seq';q.textContent=showKey(x.k);
+    const ra=document.createElement('span');ra.className='ra';ra.appendChild(iconBtn('play','Play exercise '+x.i,()=>practisePattern(x.k,lv,dy)));
+    r.append(n,q,ra);
     box.appendChild(r);
   });
   return box;
@@ -5692,15 +5686,16 @@ function fillExerciseList(box,onPick,menu){
   box.textContent='';
   const exercises=allExercises();
   exercises.forEach(b=>{
-    const row=document.createElement('div');row.className='erow';row.setAttribute('role','option');row.tabIndex=0;row.dataset.idx=b.idx;
+    const row=document.createElement('div');row.className='row num erow';row.setAttribute('role','option');row.tabIndex=0;row.dataset.idx=b.idx;
     row.addEventListener('click',()=>onPick(b.idx));
     row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onPick(b.idx);}});
-    const n=document.createElement('span');n.textContent=b.idx;
-    const q=document.createElement('span');q.className='seq';q.textContent=showPattern(b.notes,b.groupStart,b.subs,b.defSub,b.sig,b.src);
-    const m=document.createElement('span');m.className='meta';
+    const n=document.createElement('span');n.className='rn';n.textContent=b.idx;
+    const q=document.createElement('span');q.className='rt seq';q.textContent=showPattern(b.notes,b.groupStart,b.subs,b.defSub,b.sig,b.src);
+    const m=document.createElement('span');m.className='rm meta';
     m.textContent=b.passes+(b.passes===1?' pass':' passes')+' · '+fmtTime(b.secs)+(b.bpm!==S.bpm?' · @'+b.bpm:'');
-    row.append(n,q,m);
-    if(menu)row.appendChild(dotsBtn(()=>{onPick(b.idx);openRowMenu(b.idx);}));
+    const ra=document.createElement('span');ra.className='ra';ra.appendChild(m);
+    if(menu)ra.appendChild(dotsBtn(()=>{onPick(b.idx);openRowMenu(b.idx);}));
+    row.append(n,q,ra);
     box.appendChild(row);
   });
   box.hidden=!exercises.length;
@@ -5721,11 +5716,12 @@ function buildEditList(){
   fillExerciseList(box,editExercise,true);
   const lines=bLines();
   if(S.mode==='routine'&&bLine<lines.length&&bValid(lines,bLine)&&bExerciseLines().indexOf(bLine)<0){
-    const row=document.createElement('div');row.className='erow editing';row.setAttribute('role','option');row.tabIndex=0;row.dataset.idx='new';
-    const n=document.createElement('span');n.textContent='+';
-    const q=document.createElement('span');q.className='seq';q.textContent=lines[bLine].trim()||'(empty)';q.style.color='var(--muted)';
-    const m=document.createElement('span');m.className='meta';m.textContent='new';
-    row.append(n,q,m,dotsBtn(()=>openRowMenu('new')));
+    const row=document.createElement('div');row.className='row num erow editing';row.setAttribute('role','option');row.tabIndex=0;row.dataset.idx='new';
+    const n=document.createElement('span');n.className='rn';n.textContent='+';
+    const q=document.createElement('span');q.className='rt seq';q.textContent=lines[bLine].trim()||'(empty)';q.style.color='var(--muted)';
+    const m=document.createElement('span');m.className='rm meta';m.textContent='new';
+    const ra=document.createElement('span');ra.className='ra';ra.append(m,dotsBtn(()=>openRowMenu('new')));
+    row.append(n,q,ra);
     const after=[...box.querySelectorAll('.erow')].find(r=>{const e=routineParsed.exercises[(+r.dataset.idx)-1];return e&&e.line>bLine;});
     box.insertBefore(row,after||null);box.hidden=false;
   }
@@ -6035,10 +6031,11 @@ function openPick(){
     const sm=document.createElement('summary');sm.textContent=g+' ('+items.length+')';
     const body=document.createElement('div');body.className='gb';
     items.forEach(([e,label])=>{
-      const b=document.createElement('button');b.type='button';b.className='pickrow'+(e.id===S.libId?' on':'');
+      const b=document.createElement('button');b.type='button';b.className='row'+(e.id===S.libId?' cur':'');
       const n=exerciseCount(e.x);
-      b.innerHTML='<span></span><small></small>';b.firstChild.textContent=label;b.lastChild.textContent=n+(n===1?' exercise':' exercises');
-      if(n>1){const i=routineInfoOf(parseRoutine(e.x));if(i.max){b.lastChild.appendChild(document.createElement('br'));b.lastChild.appendChild(document.createTextNode(maxText(i.max)));}}
+      b.innerHTML='<span class="rt"></span><span class="ra"><span class="rm"></span></span>';b.firstChild.textContent=label;
+      const d=b.lastChild.firstChild;d.textContent=n+(n===1?' exercise':' exercises');
+      if(n>1){const i=routineInfoOf(parseRoutine(e.x));if(i.max){d.appendChild(document.createElement('br'));d.appendChild(document.createTextNode(maxText(i.max)));}}
       b.addEventListener('click',()=>{
         if(e.id===S.libId){closePick();return;}
         closePick();guard(()=>loadEntry(e));
@@ -6179,10 +6176,10 @@ function renderLibrary(){
   lib.items.forEach(it=>{
     const b=document.createElement('button');
     const have=inLib(it);
-    b.type='button';b.className='libitem'+(have?' have':'')+(it===lib.cur?' cur':'');b.setAttribute('role','listitem');
+    b.type='button';b.className='row'+(it===lib.cur?' cur':'');b.setAttribute('role','listitem');
     b.disabled=lib.busy||!!(run&&!run.ended);
-    const n=document.createElement('b');n.textContent=it.title;
-    const h=document.createElement('span');h.textContent=have?'In library':'New';
+    const n=document.createElement('span');n.className='rt'+(have?' have':'');n.textContent=it.title;
+    const h=document.createElement('span');h.className='ra';h.innerHTML='<span class="rm"></span>';h.firstChild.textContent=have?'In library':'New';
     b.append(n,h);
     b.addEventListener('click',()=>openLibraryItem(it));
     box.appendChild(b);

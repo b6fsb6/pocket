@@ -21,7 +21,6 @@
   ".hand.rest { font-size: 18px }",
   ".help p,.help li { font-size: 14.5px }",
   ".help pre { font-size: 12.5px }",
-  ".libitem span { font-size: 12px }",
   ".live b { font-size: 22px }",
   ".live em { font-size: 22px }",
   ".lnkurl { font-size: .9em }",
@@ -34,7 +33,6 @@
   ".res .shd b { font-size: 64px }",
   ".res.solo .sacc b { font-size: 56px }",
   ".rp .cell.lvl { font-size: 10px }",
-  ".rp .exr .en { font-size: 12px }",
   ".rp .key { font-size: 12px }",
   ".sum .big { font-size: 22px }",
   ".sum small { font-size: 12px }",
@@ -48,7 +46,6 @@
  "font-weight": [],
  "letter-spacing": [
   ".pghd .ttl.seq { letter-spacing: .04em }",
-  ".rp .exr .seq,.rp .wr .seq { letter-spacing: .05em }",
   "header .ver { letter-spacing: .04em }"
  ],
  "radius": [
