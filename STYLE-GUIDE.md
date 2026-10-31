@@ -21,7 +21,7 @@ Keep the existing palette and add the roles that are missing. **Component CSS ne
   /* Surfaces */
   --bg:#E9EDEA;          /* page */
   --surface:#F8FAF8;     /* cards, menus, inputs-on-surface */
-  --surface-2:color-mix(in srgb,var(--ink) 6%,var(--surface)); /* keys, pressed rows */
+  --surface-2:color-mix(in srgb,var(--ink) 6%,var(--bg)); /* troughs, keys, pressed rows (mixed over --bg: over --surface it matches the page) */
   --scrim:rgb(0 0 0 / .55);
   --shadow-pop:0 8px 24px rgb(0 0 0 / .25);
 

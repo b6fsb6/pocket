@@ -29,7 +29,7 @@ if(t!=='light'&&t!=='dark')t=window.matchMedia&&matchMedia('(prefers-color-schem
   --early:#2A66B0; --late:#B0304F; --ok:#1F6E44;     /* timing states, separate from the accent; each 4.5:1 or more as small text */
   --warn:var(--accent); --danger:var(--late); --on-danger:#fff;   /* warnings and destructive actions: their own roles, the same values for now */
   --heat:#E5322B; --heat-low:#fff;                  /* the streak meter runs from --heat-low at the first stroke to --heat at the best streak */
-  --surface-2:color-mix(in srgb,var(--ink) 6%,var(--surface));   /* keys, pressed rows */
+  --surface-2:color-mix(in srgb,var(--ink) 6%,var(--bg));   /* troughs, keys, pressed rows: a step down from the page */
   --scrim:rgb(0 0 0 / .55); --shadow-pop:0 8px 24px rgb(0 0 0 / .25);   /* behind dialogs; under menus and dialogs */
   --font-display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
   --font-body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -121,7 +121,6 @@ body[data-run="1"] .notice{display:none}
 :root[data-layout=desktop] .pctl .transport{order:-1}   /* Start stays at the top of the controls, in view */
 .htools{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px}
 .htools .seg{margin:0}
-.htools .seg button{min-height:34px;padding:0 12px;font-size:12px}
 /* Desktop: Library, Scores, Achievements and Settings use the width; History and Help stay one column */
 :root[data-layout=desktop] .page#pageSetup,:root[data-layout=desktop] .page#pageLibrary,:root[data-layout=desktop] .page#pageProgress{max-width:none}   /* as wide as the tab bar and the Play page */
 /* Help: on a wide screen a contents list stays on the left and the text sits beside it; on a phone the page title is the menu. */
@@ -292,11 +291,11 @@ details[open]>summary::after{transform:rotate(-135deg);margin-top:10px}
 [hidden]{display:none!important}
 textarea{font:600 16px/1.55 var(--font-data);letter-spacing:.06em;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:8px;padding:10px;width:100%;min-height:150px;resize:vertical}
 textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.switch{display:grid;grid-template-columns:repeat(var(--n,2),1fr);border-bottom:1px solid var(--line)}
-.switch button{font:700 16px var(--font-display);letter-spacing:.07em;text-transform:uppercase;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;background:transparent;color:var(--muted);min-height:42px;cursor:pointer;border-radius:0}
-.switch button[aria-pressed=true],.switch button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--fill)}
-.switch button:disabled{opacity:.5;cursor:not-allowed}
-.switch button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+/* Tab bar: the four app destinations. A brass pill in a trough. */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:3px;border-radius:var(--r-lg);background:var(--line)}
+.tabs button{font:700 var(--t-nav) var(--font-display);letter-spacing:.06em;text-transform:uppercase;border:0;background:transparent;color:var(--muted);min-height:var(--hit);padding:0 2px;border-radius:var(--r-md);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--fill);color:var(--accent-ink)}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
 body[data-run="1"] .sub,body[data-run="1"] #playSummary{display:none}
 :root:not([data-layout=desktop]) body[data-run="1"] .cfg{display:none}
 /* Desktop keeps the settings in view while playing, but dimmed and out of reach. */
@@ -304,10 +303,6 @@ body[data-run="1"] .sub,body[data-run="1"] #playSummary{display:none}
 :root[data-layout=desktop] body[data-run="1"] .cfg:not(.panel){display:none}
 /* Playing: hide the page controls too, so only the strokes and Stop remain. */
 body[data-run="1"][data-rm="play"] header,body[data-run="1"][data-rm="play"] .tabs{display:none}
-.switch.tabs{--n:4;gap:3px;padding:3px;border:0;border-radius:11px;background:var(--line)}
-.switch.tabs button{font-size:15px;padding:0 2px;min-height:44px;border:0;margin:0;border-radius:8px}
-.switch.tabs button[aria-selected=true]{background:var(--fill);color:var(--accent-ink)}
-.switch.three button{font-size:14px;padding:0 2px;letter-spacing:.04em}
 .pcol{display:contents}   /* the Play page groups its controls and its view; on a phone the groups add nothing */
 .page{display:grid;gap:22px}
 .page>*{min-width:0}
@@ -333,10 +328,13 @@ svg.spark{display:block;overflow:visible}
 #pvHist section{display:grid;gap:14px}
 #recMsg.flash{color:var(--ink);font-weight:700}
 .sortrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 6px} .sortrow .seg{margin:0;letter-spacing:0;text-transform:none}
-.seg{display:inline-flex;width:fit-content;justify-self:start;align-self:flex-start;margin:4px 8px 10px 0;border:1px solid var(--line-strong);border-radius:10px;overflow:hidden;background:var(--surface);vertical-align:top}
-.seg button{background:none;border:0;border-left:1px solid var(--line);color:var(--muted);min-height:40px;padding:0 16px;font:700 13px var(--font-body);cursor:pointer}
-.seg button:first-child{border-left:0}
-.seg button.on{color:var(--ink);background:var(--bg);box-shadow:inset 0 -2px 0 var(--fill)}
+/* Segmented control: switches the view below it. One size; the selected item is raised, with no brass. .wide stretches it across, for a page's sub-views. */
+.seg{display:inline-flex;width:fit-content;justify-self:start;align-self:flex-start;gap:2px;padding:2px;margin:4px 8px 10px 0;border-radius:var(--r-md);background:var(--surface-2);vertical-align:top}
+.seg button{flex:1 0 auto;background:none;border:1px solid transparent;border-radius:var(--r-md);color:var(--muted);min-height:var(--hit);padding:0 var(--s-3);font:600 var(--t-small) var(--font-body);cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--ink);background:var(--surface);border-color:var(--line-strong)}
+.seg button:disabled{opacity:.5;cursor:not-allowed}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.seg.wide{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:auto;justify-self:stretch;margin:0}
 #pvHist section>*{margin:0}
 .hist{display:grid;gap:6px}
 .hist h4{margin:10px 0 0;font-size:13px;color:var(--muted);font-weight:600}
@@ -678,7 +676,6 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 .lnkrow{position:relative;display:grid;gap:4px;padding:10px 84px 10px 0;border-bottom:1px solid var(--line)}
 .lnkrow .ha{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex}
 .lnkrow .ib{min-width:36px}
-.lhead .seg button{min-height:34px;padding:0 12px;font-size:12px}
 .lhead .btns .btn.small{min-height:34px;padding:0 12px;font-size:13px}
 #advBar{display:none;grid-column:1/-1;gap:8px}
 #advBar .advmain{margin-top:0}
@@ -735,7 +732,7 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 .key .k.late{color:var(--late);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
 .key .k.miss{color:var(--muted);opacity:.4}
 .hint .linkbtn{font-size:inherit}
-@media (max-width:359px){.switch.tabs button{font-size:13px;letter-spacing:.02em}}   /* four tab names fit the narrowest phones */
+@media (max-width:359px){.tabs button{font-size:13px;letter-spacing:0}}   /* four tab names fit the narrowest phones */
 .dur{display:grid;grid-template-columns:minmax(70px,1fr) minmax(110px,1.4fr);gap:8px}
 .pickrow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:48px;padding:8px 12px;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;cursor:pointer}
 .pickrow small{color:var(--muted);font:500 13px var(--font-body);white-space:nowrap;text-align:right;line-height:1.4}
@@ -765,7 +762,7 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
   </header>
 
 
-  <nav class="switch tabs" role="tablist" aria-label="Pages">
+  <nav class="tabs" role="tablist" aria-label="Pages">
     <button type="button" role="tab" id="tabPlay" aria-controls="pagePlay" aria-selected="true">Play</button>
     <button type="button" role="tab" id="tabLibrary" aria-controls="pageLibrary" aria-selected="false">Library</button>
     <button type="button" role="tab" id="tabProgress" aria-controls="pageProgress" aria-selected="false">Progress</button>
@@ -777,7 +774,7 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 
   <!-- ===== Setup: on-time window, microphone, calibration ===== -->
   <div class="page" id="pageSetup" role="tabpanel" aria-labelledby="tabSetup" hidden>
-    <div class="switch three" style="--n:3" role="group" aria-label="Settings view">
+    <div class="seg wide" role="group" aria-label="Settings view">
       <button type="button" id="svBtnPref" aria-pressed="true">Preferences</button>
       <button type="button" id="svBtnDev" aria-pressed="false">Device</button>
       <button type="button" id="svBtnData" aria-pressed="false">Data</button>
@@ -922,7 +919,7 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
       <div class="bmenu" id="saveMenu" role="menu" hidden><button class="btn" id="saveNew" type="button">Save as new</button><button class="btn" id="saveFile" type="button">Download file</button></div>
       <div class="bmain" id="bMain">
         <section class="panel" aria-label="Editor mode">
-          <div class="switch" id="bMode" role="group" aria-label="How to enter the strokes">
+          <div class="seg wide" id="bMode" role="group" aria-label="How to enter the strokes">
             <button type="button" id="bModeBuild" aria-pressed="true">Builder</button>
             <button type="button" id="bModeType" aria-pressed="false">Text</button>
           </div>
@@ -1032,7 +1029,7 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
   <!-- ===== Progress: scores kept per exercise and tempo ===== -->
   <div class="page" id="pageProgress" role="tabpanel" aria-labelledby="tabProgress" hidden>
     <p class="notice" id="bakNote" hidden><span id="bakText"></span> <button class="linkbtn" id="bakGo" type="button">Export now</button></p>
-    <div class="switch three" style="--n:3" role="group" aria-label="Progress view">
+    <div class="seg wide" role="group" aria-label="Progress view">
       <button type="button" id="pvBtnHist" aria-pressed="true">History</button>
       <button type="button" id="pvBtnStats" aria-pressed="false">Scores</button>
       <button type="button" id="pvBtnAch" aria-pressed="false">Achievements</button>
@@ -2681,7 +2678,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.16';                           /* shown beside the title */
+const VERSION='1.5.17';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;

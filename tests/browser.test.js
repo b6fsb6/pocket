@@ -257,10 +257,10 @@ test('staff rows stack their label above the staff, whatever else is on the page
 test('no empty box sits between the tabs and the page on any tab', async () => {
   const p = await open({ seeded: true, input: 'kb' });
   for (const t of ['Play', 'Library', 'Progress', 'Settings']) {
-    await p.evaluate(t => [...document.querySelectorAll('.switch.tabs button')].find(x => x.textContent.trim() === t).click(), t);
+    await p.evaluate(t => [...document.querySelectorAll('.tabs button')].find(x => x.textContent.trim() === t).click(), t);
     await p.waitForTimeout(150);
     const gap = await p.evaluate(() => {
-      const tabs = document.querySelector('.switch.tabs').getBoundingClientRect().bottom;
+      const tabs = document.querySelector('.tabs').getBoundingClientRect().bottom;
       const pg = [...document.querySelectorAll('main > [id^=page]')].find(x => !x.hidden);
       return pg.getBoundingClientRect().top - tabs;
     });
@@ -323,7 +323,7 @@ test('Help: a menu in the title on a phone, a contents list beside the text on d
 
 test('every badge has one medal, with a written step name, on the Achievements page', async () => {
   const p = await open({ seeded: true, input: 'kb' }, { width: 1440, height: 900 });
-  await p.evaluate(() => [...document.querySelectorAll('.switch.tabs button')].find(x => x.textContent.trim() === 'Progress').click());
+  await p.evaluate(() => [...document.querySelectorAll('.tabs button')].find(x => x.textContent.trim() === 'Progress').click());
   await p.evaluate(() => document.getElementById('pvBtnAch').click());
   await p.waitForTimeout(200);
   const r = await p.evaluate(() => ({ n: document.querySelectorAll('#badges .medal').length, bad: [...document.querySelectorAll('#badges .medal')].filter(m => /undefined|NaN/.test(m.title) || !m.title).length, off: document.querySelectorAll('#badges .medal.off').length }));
