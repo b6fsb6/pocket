@@ -34,3 +34,4 @@ Before finishing a UI change, check it in light, dark and colour-blind palettes,
 - **A new violation fails the test.** Fix it as the guide says. Do not add it to the baseline.
 - **A fixed violation also fails the test**, until it is taken off the list with `npm run style:baseline`. That command only removes entries. Commit the baseline change together with the fix.
 - `node tests/style.js --accept` records the current violations as they are. Use it only when the user agrees to a deliberate exception.
+- The browser checks start with the practice history in `tests/fixtures/seed-records.json`, at a fixed date and time zone. To refresh it from a newer export, put the export in `tests/fixtures/` as `*.raw.json` (git ignores these) and run `node tests/fixtures/make-seed.js <file>`. The script replaces every sticking that is not in `routines/*.txt`, because the repository holds no book content. Never commit a raw export.

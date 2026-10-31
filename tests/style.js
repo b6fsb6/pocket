@@ -76,6 +76,7 @@ const VIEWS = [
   ['play', ['#tabPlay']],
   ['library', ['#tabLibrary', '.glib>summary']],
   ['history', ['#tabProgress', '#pvBtnHist']],
+  ['run', ['#tabProgress', '#pvBtnHist', '.lrow:visible']],
   ['scores', ['#tabProgress', '#pvBtnStats']],
   ['achievements', ['#tabProgress', '#pvBtnAch']],
   ['preferences', ['#tabSetup', '#svBtnPref']],
@@ -128,13 +129,25 @@ async function inPage({ loaded, theme }) {
   return found;
 }
 
-/* Opens every view in every theme at phone and desktop width. Each violation is listed once. */
+/* Opens every view in every theme at phone and desktop width, with the seed history (tests/fixtures/make-seed.js),
+   and twice more as a new install, for the empty states. The clock and time zone are fixed, so "Yesterday" and the
+   streak calendar come out the same on any machine on any day. Each violation is listed once. */
+const SEED = require('./fixtures/seed-records.json');
+const NOW = '2026-10-31T12:00:00Z';
 async function browserViolations(browser, base) {
   const loaded = loadedWeights(), all = {};
-  for (const [theme, settings] of THEMES) for (const [, viewport] of SIZES_PX) {
-    const ctx = await browser.newContext({ viewport });
+  const runs = [];
+  for (const [theme, settings] of THEMES) for (const [, viewport] of SIZES_PX) runs.push([theme, settings, viewport, SEED]);
+  runs.push([THEMES[0][0], THEMES[0][1], SIZES_PX[0][1], null], [THEMES[1][0], THEMES[1][1], SIZES_PX[1][1], null]);
+  /* Four browser windows at a time: each run is independent, and one at a time takes minutes. */
+  const one = async ([theme, settings, viewport, seed]) => {
+    const ctx = await browser.newContext({ viewport, timezoneId: 'UTC' });
     const p = await ctx.newPage();
-    await p.addInitScript(s => localStorage.setItem('stick-timing-trainer.v1', JSON.stringify({ settings: s, cal: null })), settings);
+    await p.clock.setFixedTime(new Date(NOW));
+    await p.addInitScript(([s, r]) => {
+      localStorage.setItem('stick-timing-trainer.v1', JSON.stringify({ settings: s, cal: null }));
+      if (r) localStorage.setItem('stick-timing-trainer.records.v2', JSON.stringify(r));
+    }, [settings, seed]);
     await p.goto(base);
     await p.waitForTimeout(400);
     for (const [, clicks] of VIEWS) {
@@ -143,10 +156,12 @@ async function browserViolations(browser, base) {
       if (!(await p.evaluate(() => typeof axe !== 'undefined'))) await p.addScriptTag({ path: require.resolve('axe-core/axe.min.js') });
       const f = await p.evaluate(inPage, { loaded, theme });
       for (const k in f) (all[k] = all[k] || new Set()), f[k].forEach(x => all[k].add(x));
-      if (await p.locator('#pg').isVisible()) await p.locator('#pgBack').click().catch(() => {});
+      if (await p.locator('#pgBack').isVisible()) await p.locator('#pgBack').click();   /* Help has a Back button; a run page closes on Escape */
+      else if (await p.locator('#pg').isVisible()) await p.keyboard.press('Escape');
     }
     await ctx.close();
-  }
+  };
+  for (let i = 0; i < runs.length; i += 4) await Promise.all(runs.slice(i, i + 4).map(one));
   const out = {};
   for (const k in all) out[k] = [...all[k]];
   return out;
