@@ -20,4 +20,16 @@ function loadCore(names) {
 /* Values made inside the vm have their own Array, so tests compare plain copies. */
 const plain = x => JSON.parse(JSON.stringify(x));
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
-module.exports = { ROOT, html, script, loadCore, read, plain };
+
+/* Serves a page as the app, and the repository's files beside it, on a free port. */
+function serve(page) {
+  const server = require('http').createServer((req, res) => {
+    const u = req.url.split('?')[0];
+    if (u === '/' || u === '/index.html') { res.setHeader('content-type', 'text/html'); return res.end(page); }
+    const f = path.join(ROOT, u);
+    if (f.startsWith(ROOT) && fs.existsSync(f) && fs.statSync(f).isFile()) return res.end(fs.readFileSync(f));
+    res.statusCode = 404; res.end();
+  });
+  return new Promise(r => server.listen(0, () => r({ server, base: 'http://localhost:' + server.address().port + '/' })));
+}
+module.exports = { ROOT, html, script, loadCore, read, plain, serve };

@@ -26,3 +26,11 @@ Rules:
 - **Copy:** sentence case, except for display, navigation and eyebrow labels. Labels are nouns and buttons are verbs. Numbers carry units (`60 BPM`, `±20 ms`). Use *exercise* for a single pattern and *routine* for a set; *early* and *late* for timing.
 
 Before finishing a UI change, check it in light, dark and colour-blind palettes, at phone width (390px) and desktop width (1280px).
+
+### Style checks
+
+`npm test` checks the rules above. `tests/style.test.js` checks the stylesheet: raw colours, font sizes, radii, letter-spacing and undefined variables. `tests/a11y.test.js` opens every view in all four palettes at both widths, and checks axe's WCAG rules, 44px targets, 3:1 field edges and font weights that are not loaded. Violations from before the guide are listed in `tests/style-baseline.json`.
+
+- **A new violation fails the test.** Fix it as the guide says. Do not add it to the baseline.
+- **A fixed violation also fails the test**, until it is taken off the list with `npm run style:baseline`. That command only removes entries. Commit the baseline change together with the fix.
+- `node tests/style.js --accept` records the current violations as they are. Use it only when the user agrees to a deliberate exception.
