@@ -323,8 +323,8 @@ body[data-tab=pattern] header,body[data-tab=pattern] .tabs{display:none}   /* th
 .etitle b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .etitle .hint{margin:0;font-size:12px}
 .rtname{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.rtname+.patrow{margin-top:-10px}   /* the name and its line read as one block */
-.rtname b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}.rtname .btn.link{flex:none}
+.rtname~.patrow{margin-top:calc(-1*var(--s-1))}   /* the name and its line read as one block */
+.rtname b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}.rtname .btn.link{flex:none;margin-block:calc(-1*var(--s-2))}   /* a 44px target that does not make the name's row 44px tall */
 :root:not([data-layout=desktop]) body[data-review="1"] header,:root:not([data-layout=desktop]) body[data-review="1"] .tabs,:root:not([data-layout=desktop]) body[data-review="1"] .cfg,:root:not([data-layout=desktop]) body[data-review="1"] .transport,:root:not([data-layout=desktop]) body[data-review="1"] .notice{display:none}
 .advmain{margin-top:10px}
 svg.spark{display:block;overflow:visible}
@@ -660,7 +660,7 @@ output.bigbpm{display:block;font:800 var(--t-hero) var(--font-display);font-vari
 :root[data-layout=desktop] #setBox>summary,:root[data-layout=desktop] #detBox>summary,body:not([data-review="1"]) #detBox>summary,:root[data-layout=desktop] #exBox>summary{display:none}
 #exBox>summary{border-top:0;padding:4px 0 0}
 #exBox[open]>summary{padding-bottom:10px}
-.rtname+#exBox{margin-top:-8px}
+.rtname~#exBox{margin-top:-8px}   /* ~, not +: the single exercise's hidden line sits between them */
 :root[data-layout=desktop] #setBox .sbody{margin-top:0}
 :root:not([data-layout=desktop]) body[data-run="1"] #setBox,:root:not([data-layout=desktop]) body[data-review="1"] #setBox{display:none}
 /* On a phone the run controls are large and pinned to the bottom of the screen, where a thumb can reach them. */
@@ -2646,7 +2646,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.38';                           /* shown beside the title */
+const VERSION='1.5.39';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
