@@ -2285,14 +2285,10 @@ const strokeRate=(k,bpm)=>Math.round(strokesPerBeat(k)*bpm);
 const masteryTier=(k,bpm)=>{const r=strokeRate(k,bpm);return RATE_AT.filter(n=>r>=n).length;};
 const tierOf=(i,n)=>n<2?0:Math.round(i/(n-1)*7);   /* where a step sits on its ladder, as one of the eight medal looks */
 const fmtBadge=(b,n)=>b.lead?b.lead+' '+n.toLocaleString('en-US')+(b.suf||''):(n===1&&b.one?'1 '+b.one:(n.toLocaleString('en-US')+' '+b.unit).replace(/^1 exercises/,'1 exercise'));
-const BGROUPS=[{name:'Runs',d:'Runs where at least one exercise was played through once and scored.',ids:['ses']},
-  {name:'Days in a row',d:'Your longest run of practice days. A day counts at 5 minutes or more. One rest day a week does not break it.',ids:['str']},
+/* Badge groups: the single badges share one Milestones section, each with its own explanation (each); a ladder of levels has its own section. */
+const BGROUPS=[{name:'Milestones',each:{ses:'Runs where at least one exercise was played through once and scored.',str:'Your longest run of practice days. A day counts at 5 minutes or more. One rest day a week does not break it.',cln:'The most strokes in one routine, played start to finish, with every exercise at 90% or more. A routine of any length counts.',prf:'An exercise of at least 16 strokes with every stroke on time.',dyn:'Exercises cleared with an accent or ghost rule: 90% or more of strokes on time and played as written. The same exercise with another rule counts again.',tmp:'The fastest tempo at which you have cleared any exercise.'},ids:['ses','str','cln','prf','dyn','tmp']},
   {name:'Exercises cleared',d:'An exercise is cleared on a level when you play it at 90% or more of strokes on time at that click level. Each exercise counts once on each level, whatever the accent rule. Each level is cleared on its own. The table counts exercises by the fastest tempo they were cleared at.',grid:true,ids:['lstrokes','lbeat','lhalf','lbar','lnone','all']},
-  {name:'Accents and ghosts',d:'Exercises cleared with an accent or ghost rule: 90% or more of strokes on time and played as written. The same exercise with another rule counts again.',ids:['dyn']},
-  {name:'High score',d:'Your best score in one run, at each click level. Every stroke scores by its timing: on time scores most, off time a little, a miss nothing (it costs points on Extreme and Master). Strokes on time in a row build a bonus of up to five times. Harder levels score more, and so do faster strokes: 240 strokes a minute counts once, from half to double.',ids:['hstrokes','hbeat','hhalf','hbar','hnone']},
-  {name:'Longest clean run',d:'The most strokes in one routine, played start to finish, with every exercise at 90% or more. A routine of any length counts.',ids:['cln']},
-  {name:'Perfect exercises',d:'An exercise of at least 16 strokes with every stroke on time.',ids:['prf']},
-  {name:'Tempo',d:'The fastest tempo at which you have cleared any exercise.',ids:['tmp']}];
+  {name:'High score',d:'Your best score in one run, at each click level. Every stroke scores by its timing: on time scores most, off time a little, a miss nothing (it costs points on Extreme and Master). Strokes on time in a row build a bonus of up to five times. Harder levels score more, and so do faster strokes: 240 strokes a minute counts once, from half to double.',ids:['hstrokes','hbeat','hhalf','hbar','hnone']}];
 /* Cleared exercises per level: each sticking once, at the fastest tempo it was cleared at, whatever the accent rule. */
 function clearedByLevel(st){
   const o={};LEVELS.forEach(l=>{o[l.v]=new Map();});
@@ -2646,7 +2642,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.39';                           /* shown beside the title */
+const VERSION='1.5.40';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4721,7 +4717,7 @@ function renderBadges(){
   const how=$('achHowList');how.textContent='';   /* what each group counts, out of the way until asked for */
   {const t=document.createElement('dd');t.textContent='Steps you have earned are in colour.';how.appendChild(t);}
   BGROUPS.forEach(g=>{
-    const dt=document.createElement('dt');dt.textContent=g.name;const dd=document.createElement('dd');dd.textContent=g.d;how.append(dt,dd);
+    (g.each?g.ids.map(id=>[BADGES.find(x=>x.id===id).name,g.each[id]]):[[g.name,g.d]]).forEach(([n,d])=>{const dt=document.createElement('dt');dt.textContent=n;const dd=document.createElement('dd');dd.textContent=d;how.append(dt,dd);});
     const w=document.createElement('section');w.className='bw panel';w.setAttribute('aria-label',g.name);
     const h=document.createElement('h3');h.textContent=g.name;w.appendChild(h);
     if(g.grid){
@@ -4741,7 +4737,8 @@ function renderBadges(){
       row.appendChild(medal(b,Math.max(done-1,0),done>0));
       const tx=document.createElement('div');tx.className='bx';
       const t=document.createElement('span');t.className='bt';t.textContent=g.ids.length>1?b.name:g.name;tx.appendChild(t);
-      const c=document.createElement('p');c.className='bc2';c.textContent=(done?b.nm[done-1]+' \u00b7 ':'')+fmtBadge(b,v[id]);tx.appendChild(c);
+      const val=b.lead?v[id].toLocaleString('en-US')+(b.suf||''):fmtBadge(b,v[id]);   /* under the badge's own title, so not "Fastest clear 80 BPM" again */
+      const c=document.createElement('p');c.className='bc2';c.textContent=(done?b.nm[done-1]+' \u00b7 ':'')+val;tx.appendChild(c);
       const bar=document.createElement('div');bar.className='bbar';const f=document.createElement('i');f.style.width=(next?100*(v[id]-prev)/(next-prev):100)+'%';bar.appendChild(f);tx.appendChild(bar);
       const g2=document.createElement('p');g2.className='bgo';g2.textContent=next?(b.lead?(next-v[id]).toLocaleString('en-US')+b.suf:(next-v[id]).toLocaleString('en-US'))+' to go for '+b.nm[done]+'':'Every step earned';tx.appendChild(g2);
       row.appendChild(tx);w.appendChild(row);
