@@ -7,7 +7,6 @@
  "font-size": [
   "#advBadge .bwt>b { font-size: 22px }",
   "#bReadP { font-size: clamp(16px,5.3vw,24px) }",
-  "#helpNav b { font-size: 12px }",
   "#pattern { font-size: 24px }",
   "#setup p { font-size: 14.5px }",
   ".advmain .btn.primary { font-size: 18px }",
@@ -22,7 +21,6 @@
   ".clc { font-size: 12px }",
   ".clk .cln { font-size: 12px }",
   ".ctp { font-size: 72px }",
-  ".dayh { font-size: 12px }",
   ".dots { font-size: 22px }",
   ".etitle .hint { font-size: 12px }",
   ".g-ends { font-size: 12px }",
@@ -36,7 +34,6 @@
   ".libitem span { font-size: 12px }",
   ".live b { font-size: 22px }",
   ".live em { font-size: 22px }",
-  ".live small { font-size: 10px }",
   ".lnkurl { font-size: .9em }",
   ".lrow .ar { font-size: 22px }",
   ".lrow .sb,.rp .sb { font-size: 12px }",
@@ -54,7 +51,6 @@
   ".rp .key { font-size: 12px }",
   ".rrun .ar { font-size: 22px }",
   ".srow .nt { font-size: 12px }",
-  ".stat .k { font-size: 10px }",
   ".sum .big { font-size: 22px }",
   ".sum small { font-size: 12px }",
   ".tempo .btn { font-size: 22px }",
@@ -64,25 +60,19 @@
   ":root:not([data-layout=desktop]) body[data-review=\"1\"] #advBtns1 .btn { font-size: 18px }",
   ":root:not([data-layout=desktop]) body[data-run=\"1\"] #runBtns .btn { font-size: 17px }",
   "h1 { font-size: clamp(26px,7.5vw,40px) }",
-  "h3 { font-size: 12px }",
   "header .ver { font-size: 12px }"
  ],
  "font-weight": [],
  "letter-spacing": [
   ".btn.primary { letter-spacing: .07em }",
-  ".clk .clt { letter-spacing: .07em }",
-  ".field>label,.lbl { letter-spacing: .09em }",
   ".lrow .nm.seq,.rp h2.seq { letter-spacing: .05em }",
   ".pghd .ttl.seq { letter-spacing: .04em }",
   ".rp .exr .seq,.rp .wr .seq { letter-spacing: .05em }",
   ".srow .sn small,.rrun .sn small { letter-spacing: .04em }",
-  ".stat .k { letter-spacing: .07em }",
   ".switch button { letter-spacing: .07em }",
   ".switch.three button { letter-spacing: .04em }",
   "@media (max-width:359px) .switch.tabs button { letter-spacing: .02em }",
-  "h3 { letter-spacing: .09em }",
-  "header .ver { letter-spacing: .04em }",
-  "th { letter-spacing: .07em }"
+  "header .ver { letter-spacing: .04em }"
  ],
  "radius": [
   "#advBadge { border-radius: 14px }",

@@ -66,7 +66,9 @@ body{
 header .sub{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
 header .ver{font:600 12px var(--font-data);letter-spacing:.04em;text-transform:none;color:var(--muted);white-space:nowrap;vertical-align:baseline}
 h1{font:800 clamp(26px,7.5vw,40px)/1 var(--font-display);text-transform:uppercase;letter-spacing:.01em;margin:0}
-h3{font:600 12px var(--font-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+/* Eyebrow: every small uppercase label. A section label (h3) is ink, with the panel's hairline and gap above; a field label is muted. */
+.eyebrow,h3,.field>label,.lbl,th,#helpNav b,.stat .k,.sortrow,.dayh,.rp .lbl,#advBadge .lbl,.clk .clt,.olbl,.live small,.res .slab{font:600 var(--t-eyebrow) var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+h3{color:var(--ink);margin:0 0 var(--s-2)}
 .sub{color:var(--muted);font-size:13px;margin:2px 0 0;line-height:1.2}
 .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 12px}
 .pill{font:600 12px var(--font-data);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);white-space:nowrap;background:var(--surface)}
@@ -87,8 +89,7 @@ h3{font:600 12px var(--font-body);letter-spacing:.09em;text-transform:uppercase;
 .btn:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
-.field{display:grid;gap:5px;min-width:0}
-.field>label,.lbl{font:600 11px var(--font-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.field{display:grid;gap:var(--s-2);min-width:0}
 .field output{color:var(--ink);font-family:var(--font-data);letter-spacing:0;text-transform:none;margin-left:6px}
 input[type=text],input[type=number],select{font:500 16px var(--font-body);color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;min-height:44px;width:100%}
 input[type=range]{width:100%;accent-color:var(--accent);min-height:32px}
@@ -131,7 +132,7 @@ body[data-run="1"] .notice{display:none}
 :root[data-layout=desktop] .page#pageHelp{max-width:none;margin:0;display:grid;grid-template-columns:230px minmax(0,760px);column-gap:56px;align-items:start}
 :root[data-layout=desktop] #pageHelp>.panel{grid-column:2}
 :root[data-layout=desktop] #helpNav{display:grid;grid-column:1;grid-row:1/span 20;position:sticky;top:0;gap:2px;align-content:start}
-#helpNav b{font:700 12px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 10px 8px}
+#helpNav b{padding:0 10px 8px}
 #helpNav button{border:0;background:none;color:var(--ink);font:600 14px var(--font-body);text-align:left;padding:8px 10px;border-radius:8px;cursor:pointer}
 #helpNav button:hover{background:var(--surface)}
 #helpNav button[aria-current],.rmenu button[aria-current]{background:var(--surface);box-shadow:inset 3px 0 0 var(--accent)}
@@ -256,7 +257,6 @@ body[data-run="1"] #setup{display:none}
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:12px}
 .stat{padding:10px 0;border-top:1px solid var(--line);min-width:0}
 .stat .v{font:600 20px var(--font-data);font-variant-numeric:tabular-nums}
-.stat .k{font:600 10px/1.25 var(--font-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .insight{font-size:15px;margin:0;min-height:1.5em}
 canvas{display:block;width:100%;height:170px}
 
@@ -332,7 +332,7 @@ svg.spark{display:block;overflow:visible}
 .pv[hidden]{display:none}
 #pvHist section{display:grid;gap:14px}
 #recMsg.flash{color:var(--ink);font-weight:700}
-.sortrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 6px;font:600 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)} .sortrow .seg{margin:0;letter-spacing:0;text-transform:none}
+.sortrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 6px} .sortrow .seg{margin:0;letter-spacing:0;text-transform:none}
 .seg{display:inline-flex;width:fit-content;justify-self:start;align-self:flex-start;margin:4px 8px 10px 0;border:1px solid var(--line-strong);border-radius:10px;overflow:hidden;background:var(--surface);vertical-align:top}
 .seg button{background:none;border:0;border-left:1px solid var(--line);color:var(--muted);min-height:40px;padding:0 16px;font:700 13px var(--font-body);cursor:pointer}
 .seg button:first-child{border-left:0}
@@ -368,7 +368,7 @@ svg.spark{display:block;overflow:visible}
 .nextp .seq{font:600 14px var(--font-data);letter-spacing:.06em;overflow-wrap:normal}
 .nextp .nt{font:12px var(--font-body);color:var(--muted)}
 .hint b{color:var(--ink);font-weight:600}
-.dayh{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 8px;color:var(--muted);font:600 12px var(--font-body);letter-spacing:.1em;text-transform:uppercase}
+.dayh{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 8px}
 .dayh span:last-child{font-weight:400;letter-spacing:0;text-transform:none}
 .dayp{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
 .lrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:start;column-gap:10px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;color:inherit;font:inherit}
@@ -408,7 +408,7 @@ html.pgopen{overflow:hidden}
 .rp .stats .v.ok{color:var(--ok)} .rp .stats .v.late{color:var(--late)} .rp .stats .v.muted{color:var(--muted)}
 .rp .res{margin:12px 0 4px} .rp .res .sacc b.ok{color:var(--ok)} .rp .res .sacc b.late{color:var(--late)} .rp .res .sacc b.muted{color:var(--muted)}
 .rp .bk{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:13px;color:var(--muted)} .rp .bk b{color:var(--ink);font-weight:700}
-.rp .lbl{font:600 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+.rp .lbl{margin:16px 0 6px}
 .rp .cell.sel{outline:2px solid var(--ink);outline-offset:1px} .rp .cell{cursor:pointer} .rp .lvbars{display:flex;align-items:flex-end;gap:1px;height:56px;border-bottom:1px solid var(--line)} .rp .lvbars i{flex:1;min-width:1px;background:var(--early);cursor:pointer} .rp .lvbars i.acc{background:var(--fill)} .rp .lvbars i.sel{background:var(--ink);box-shadow:0 0 0 2px var(--ink);position:relative} .rp .tapinfo{padding:8px 0}
 .rp .strip{display:grid;grid-template-columns:repeat(12,1fr);gap:4px}
 .rp .cell{aspect-ratio:1;border-radius:4px;background:var(--line)} .rp .cell.ok{background:var(--ok)} .rp .cell.late{background:var(--late)} .rp .cell.skip{background:transparent;border:1px dashed var(--line)} .rp .cell.lvl{background:var(--fill);color:var(--accent-ink);font:700 10px/1 var(--font-body);display:grid;place-items:center}
@@ -473,7 +473,6 @@ html.pgopen{overflow:hidden}
 #advBadge{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:14px;margin:0 0 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 #advBadge .medal{width:72px;height:72px}
 #advBadge .bwt{display:grid;gap:2px;min-width:0}
-#advBadge .lbl{font:700 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 #advBadge .bwt>b{font:700 22px/1.1 var(--font-body)}
 #advBadge .tier{font:700 11px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 #advBadge .sent{font-size:14px;color:var(--muted)}
@@ -547,7 +546,7 @@ body[data-mode="routine"] .single-only{display:none}
 #bReadP{font:600 clamp(16px,5.3vw,24px) var(--font-data);letter-spacing:.06em}
 /* click level diagrams in Help */
 .clk{display:grid;grid-template-columns:64px repeat(var(--c),1fr);gap:3px;align-items:center;margin:10px 0 2px}
-.clk .clt{grid-column:1/-1;font:600 11px var(--font-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.clk .clt{grid-column:1/-1}
 .clk .cln{font-size:12px;color:var(--muted)}
 .clk i{display:block;aspect-ratio:1;border-radius:3px;border:1px solid var(--line);background:transparent}
 .clk i.on{background:var(--fill);border-color:var(--fill)}
@@ -569,7 +568,6 @@ body[data-mode="routine"] .single-only{display:none}
 body[data-edit=type] .buildonly{display:none}
 .osec{display:grid;gap:8px;padding-top:14px;border-top:1px solid var(--line)}
 .mbox .mhead+.osec{border-top:0;padding-top:0}
-.olbl{font:700 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .mhead{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .mhead h3{margin:0}
 .lsstaff{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 4px;max-height:58vh;overflow-y:auto;overflow-x:hidden}
@@ -604,7 +602,7 @@ body[data-edit=type] .buildonly{display:none}
 .live{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px 12px;margin:0 0 10px}
 .live[hidden]{display:none}
 .live b{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums}
-.live small{font:700 10px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:4px}
+.live small{margin-left:4px}
 .live .lvm i{position:relative}
 .live .lvm i.fl{background:none;box-shadow:none}
 .live .fire{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;visibility:hidden}
@@ -633,7 +631,7 @@ body[data-edit=type] .buildonly{display:none}
 /* the exercise number stays in view while the table scrolls sideways */
 .tablewrap.s1 th:first-child,.tablewrap.s1 td:first-child{position:sticky;left:0;z-index:1;background:var(--surface);box-shadow:1px 0 0 var(--line)}
 table{border-collapse:collapse;width:100%;font:13px var(--font-data);font-variant-numeric:tabular-nums}
-th{text-align:left;font:600 11px var(--font-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 tr:last-child td{border-bottom:0}
 td.seq{letter-spacing:.08em;font-weight:600}
@@ -715,7 +713,7 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 .res{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .res[hidden]{display:none}
 .res .sacc small{display:block;color:var(--muted);font-size:13px}
-.res .slab{font:700 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:-6px}
+.res .slab{margin-bottom:-6px}
 .res .shd{display:flex;align-items:baseline;gap:8px}
 .res .shd b{font:800 64px/1 var(--font-display)}
 .res .shd span{font:500 16px var(--font-body);color:var(--muted)}
@@ -2683,7 +2681,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.15';                           /* shown beside the title */
+const VERSION='1.5.16';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
