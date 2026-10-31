@@ -109,17 +109,7 @@
   ".switch.tabs { border-radius: 11px }",
   "details { border-radius: 10px }"
  ],
- "raw-colour": [
-  ".bbar i { background: var(--accent,#E0A91F) }",
-  ".bmenu { box-shadow: 0 8px 24px rgba(0,0,0,.35) }",
-  ".live .lvm i.on { background: color-mix(in srgb,#E5322B calc(var(--t)*100%),#fff) }",
-  ".live em.late { color: var(--late,#c0305a) }",
-  ".modal { background: rgba(0,0,0,.55) }",
-  ".rmenu button.arm { color: #fff }",
-  ".rmenu { box-shadow: 0 8px 24px rgba(0,0,0,.35) }",
-  ".rp .cell.lvl { color: #14110a }",
-  ".strip .sc { border: 1px solid var(--line,#8884) }"
- ],
+ "raw-colour": [],
  "target-44": [
   "#bakGo",
   "#bpm",
