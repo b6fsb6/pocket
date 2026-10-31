@@ -81,10 +81,11 @@ h3{color:var(--ink);margin:0 0 var(--s-2)}
 .status{font:400 13px/1.4 var(--font-data);color:var(--muted);margin:0}
 .status:empty{display:none}
 #stTop:empty,#stTop:has(.status:empty){display:none}   /* on Play the message moves under the staff, and the empty box would add a second gap */
-.btn{font:600 14px var(--font-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer;min-height:40px}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.btn.small{min-height:40px;padding:6px 12px;font-size:14px}
-.btn.primary{background:var(--fill);color:var(--accent-ink);border-color:transparent;min-width:140px;min-height:58px;font:800 24px var(--font-display);letter-spacing:.07em;text-transform:uppercase}
+.btn{font:600 var(--t-small) var(--font-body);border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r-md);padding:var(--s-1) var(--s-3);cursor:pointer;min-height:var(--hit)}
+@media (hover:hover){.btn:hover:not(:disabled){filter:brightness(.96)}}
+.btn:active:not(:disabled){filter:brightness(.92)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--fill);color:var(--accent-ink);border-color:transparent;min-width:140px;min-height:var(--hit-lg);font:800 var(--t-title) var(--font-display);letter-spacing:.06em;text-transform:uppercase}   /* one per view */
 .btn.primary.running{background:var(--ink);color:var(--bg)}
 .btn:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
@@ -318,8 +319,6 @@ body[data-tab=pattern] header,body[data-tab=pattern] .tabs{display:none}   /* th
 .rtname b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}.rtname .linkbtn{flex:none}
 :root:not([data-layout=desktop]) body[data-review="1"] header,:root:not([data-layout=desktop]) body[data-review="1"] .tabs,:root:not([data-layout=desktop]) body[data-review="1"] .cfg,:root:not([data-layout=desktop]) body[data-review="1"] .transport,:root:not([data-layout=desktop]) body[data-review="1"] .notice{display:none}
 .advmain{margin-top:10px}
-.advmain .btn{min-height:48px;font-weight:700}
-.advmain .btn.primary{min-width:0;min-height:48px;font-size:18px;padding:0 22px}
 svg.spark{display:block;overflow:visible}
 .badges{display:grid;gap:22px}
 .pv{display:grid;gap:22px}
@@ -415,7 +414,6 @@ html.pgopen{overflow:hidden}
 .rp .exr .seq,.rp .wr .seq{font:600 13px/1.5 var(--font-data);letter-spacing:.05em}
 .rp .sn{display:flex;flex-wrap:wrap;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums} .rp .sn small{color:var(--muted);font:11px var(--font-body);margin-left:3px}
 .rp .sn .ok{color:var(--ok)} .rp .sn .late{color:var(--late)} .rp .sn .early{color:var(--early)} .rp .sn .muted{color:var(--muted)}
-.rp .btn.main{background:var(--fill);color:var(--accent-ink);border-color:transparent;font-weight:700}
 .hint.hl{margin:2px 0 0}
 .srow .nt{font:12px var(--font-body);color:var(--muted)} .srow .nt.go{color:var(--ok)}
 .srow{gap:8px;padding:14px 2px}
@@ -673,7 +671,6 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 .lnkrow{position:relative;display:grid;gap:4px;padding:10px 84px 10px 0;border-bottom:1px solid var(--line)}
 .lnkrow .ha{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex}
 .lnkrow .ib{min-width:36px}
-.lhead .btns .btn.small{min-height:34px;padding:0 12px;font-size:13px}
 #advBar{display:none;grid-column:1/-1;gap:8px}
 #advBar .advmain{margin-top:0}
 :root[data-layout=desktop] body[data-review="1"] #advBar{display:grid}
@@ -699,10 +696,10 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 :root:not([data-layout=desktop]) body[data-run="1"] .transport{position:fixed;left:0;right:0;bottom:0;z-index:20;grid-template-columns:1fr;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line)}
 :root:not([data-layout=desktop]) body[data-run="1"] .transport #startBtn{width:100%;min-height:72px}
 :root:not([data-layout=desktop]) body[data-run="1"] #runBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-:root:not([data-layout=desktop]) body[data-run="1"] #runBtns .btn{min-height:56px;font-size:17px}
+:root:not([data-layout=desktop]) body[data-run="1"] #runBtns .btn{min-height:var(--hit-lg)}
 :root:not([data-layout=desktop]) body[data-run="1"] #pagePlay{padding-bottom:190px}
 :root:not([data-layout=desktop]) body[data-review="1"] #advBtns1{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line);margin:0}
-:root:not([data-layout=desktop]) body[data-review="1"] #advBtns1 .btn{min-height:64px;font-size:18px}
+:root:not([data-layout=desktop]) body[data-review="1"] #advBtns1 .btn{min-height:var(--hit-lg)}
 :root:not([data-layout=desktop]) body[data-review="1"] #pagePlay{padding-bottom:120px}
 .res{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .res[hidden]{display:none}
@@ -829,7 +826,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
         <input type="range" id="settle" min="20" max="120" step="5">
         <p class="hint">How long the app ignores the pad after a hit. Raise it if one stroke counts twice.</p>
       </div>
-      <div class="btns"><button class="btn small" id="testMic" type="button">Test microphone</button><button class="btn small" id="micCheck" type="button">Mic check</button><span class="heard" id="heard" aria-live="off"></span></div>
+      <div class="btns"><button class="btn" id="testMic" type="button">Test microphone</button><button class="btn" id="micCheck" type="button">Mic check</button><span class="heard" id="heard" aria-live="off"></span></div>
       <p class="err" id="micMsg" role="alert"></p>
       <p class="chkmsg" id="chkMsg" aria-live="polite"></p>
       <ul class="chkout" id="chkOut"></ul>
@@ -839,10 +836,10 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
     <section class="panel mic-only" aria-label="Stick calibration">
       <h3>Stick calibration</h3>
       <div class="btns">
-        <button class="btn small" id="calL" type="button">Calibrate left stick</button>
-        <button class="btn small" id="calR" type="button">Calibrate right stick</button>
-        <button class="btn small" id="calReset" type="button">Clear</button>
-        <button class="btn small" id="calTest" type="button">Test left vs right</button>
+        <button class="btn" id="calL" type="button">Calibrate left stick</button>
+        <button class="btn" id="calR" type="button">Calibrate right stick</button>
+        <button class="btn" id="calReset" type="button">Clear</button>
+        <button class="btn" id="calTest" type="button">Test left vs right</button>
       </div>
       <div class="calst" id="calSt"></div>
       <p class="hint" id="calInfo"></p>
@@ -856,7 +853,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
       <h3>Latency</h3>
       <div class="row">
         <div class="field"><label for="latency">Compensation (ms)</label><input type="number" id="latency" min="0" max="400" step="1" inputmode="numeric" placeholder="auto"></div>
-        <div class="field"><span class="lbl">Estimate it</span><div class="btns"><button class="btn" id="calLoop" type="button">Auto calibrate</button><button class="btn small" id="calLatency" type="button">Calibrate by playing</button></div></div>
+        <div class="field"><span class="lbl">Estimate it</span><div class="btns"><button class="btn" id="calLoop" type="button">Auto calibrate</button><button class="btn" id="calLatency" type="button">Calibrate by playing</button></div></div>
       </div>
       <p class="hint"><b>Auto calibrate (recommended):</b> times 12 clicks through the speakers, so keep the room quiet and don't play.</p>
       <p class="hint"><b>Calibrate by playing:</b> hit the pad on each click until the number settles. Use it to fine-tune, or with headphones.</p>
@@ -870,9 +867,9 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
       <h3>Your data</h3>
       <p class="hint">Scores are saved in this browser only, so export a copy now and then. <button class="linkbtn" type="button" data-help="help-scores">Help</button></p>
       <div class="btns">
-        <button class="btn small" id="recExport" type="button">Export</button>
-        <button class="btn small" id="recImport" type="button">Import</button>
-        <button class="btn small" id="recClear" type="button">Clear…</button>
+        <button class="btn" id="recExport" type="button">Export</button>
+        <button class="btn" id="recImport" type="button">Import</button>
+        <button class="btn" id="recClear" type="button">Clear…</button>
         <input type="file" id="recFile" accept=".json,application/json" hidden>
       </div>
       <p class="hint" id="recMsg"></p>
@@ -896,7 +893,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
   <!-- ===== Library: your saved routines, and where routines come from ===== -->
   <div class="page" id="pageLibrary" role="tabpanel" aria-labelledby="tabLibrary" hidden>
     <section class="libsec" aria-label="Your routines">
-      <div class="lhead"><div class="seg hfilter" role="group" aria-label="Sort by"><button class="on" id="lsRecent" type="button" aria-pressed="true">Recent</button><button id="lsName" type="button" aria-pressed="false">Name</button></div><div class="btns"><button class="btn small" id="clearRoutine" type="button">New</button><button class="btn small" id="openBtn" type="button">Import</button><button class="btn small" id="exportLib" type="button">Export</button></div></div>
+      <div class="lhead"><div class="seg hfilter" role="group" aria-label="Sort by"><button class="on" id="lsRecent" type="button" aria-pressed="true">Recent</button><button id="lsName" type="button" aria-pressed="false">Name</button></div><div class="btns"><button class="btn" id="clearRoutine" type="button">New</button><button class="btn" id="openBtn" type="button">Import</button><button class="btn" id="exportLib" type="button">Export</button></div></div>
       <p class="hint" id="libMsg" aria-live="polite"></p>
       <div class="hist" id="libPage"></div>
       <p class="hint" id="libEmpty" hidden>Nothing saved yet. New starts a routine. Import brings one in from a file or a link.</p>
@@ -908,9 +905,9 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
     <!-- Editor: one panel per job, like the Play page. Builder or Text is how the strokes are entered; both edit the same routine. -->
     <div class="editor cfg" id="builder" aria-label="Editor">
       <div class="etop">
-        <button class="btn small" id="edBack" type="button">&larr; Back</button>
+        <button class="btn" id="edBack" type="button">&larr; Back</button>
         <div class="etitle"><b id="edName"></b><span class="hint estate"><span id="edState"></span><button class="linkbtn" id="edDiscard" type="button" hidden>Discard</button></span></div>
-        <button class="btn small" id="saveBtn" type="button">Save</button>
+        <button class="btn" id="saveBtn" type="button">Save</button>
         <button class="dots" id="saveMore" type="button" aria-label="More ways to save" aria-haspopup="menu">&#8942;</button>
       </div>
       <div class="bmenu" id="saveMenu" role="menu" hidden><button class="btn" id="saveNew" type="button">Save as new</button><button class="btn" id="saveFile" type="button">Download file</button></div>
@@ -945,7 +942,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
           <div class="b-routine bhdr buildonly">
             <div class="field"><label for="editList">Exercises</label>
               <div class="exercises" id="editList" role="listbox" aria-label="Exercises in this routine. Tap one to edit it."></div>
-              <button class="btn small addbtn" id="bAddEx" type="button">+ Add exercise</button>
+              <button class="btn addbtn" id="bAddEx" type="button">+ Add exercise</button>
             </div>
             <div class="bmenu" id="rowMenu" role="menu" hidden>
               <button class="btn" id="bAddAbove" type="button">Insert above</button>
@@ -958,7 +955,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
               <button class="btn del" id="bDel" type="button">Delete</button>
             </div>
           </div>
-          <div class="b-single"><button class="btn small addbtn" id="bAddEx1" type="button">+ Add exercise</button> <span class="hint">A second exercise makes this a routine.</span></div>
+          <div class="b-single"><button class="btn addbtn" id="bAddEx1" type="button">+ Add exercise</button> <span class="hint">A second exercise makes this a routine.</span></div>
         </section>
         <section class="panel buildonly b-routine" aria-label="This exercise">
           <h3>This exercise</h3>
@@ -983,7 +980,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
           </div>
           <div class="bmeta">
     <div class="bmsg"><p class="err" id="patErr" role="alert"></p><p class="err" id="routineErr" role="alert"></p><p class="hint" id="bStatus" aria-live="polite"></p><button class="linkbtn" id="exLink" type="button" data-help="help-format">Examples &rarr;</button></div>
-            <div class="bbtns"><button class="btn small iconbtn" id="bListen" type="button" aria-label="Listen to this exercise" title="Listen"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg></button></div>
+            <div class="bbtns"><button class="btn iconbtn" id="bListen" type="button" aria-label="Listen to this exercise" title="Listen"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg></button></div>
           </div>
 
         <div class="bpane" id="buildPane">
@@ -1081,7 +1078,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
         </div>
         <p class="hint" id="histHint"></p>
         <div class="hist" id="histList"></div>
-        <div class="btns"><button class="btn small" id="histMore" type="button" hidden>Show more</button></div>
+        <div class="btns"><button class="btn" id="histMore" type="button" hidden>Show more</button></div>
       </section>
     </div>
   </div>
@@ -1135,7 +1132,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
         <div class="clk" style="--c:16"><div class="clt">4/4: one bar, sixteen strokes</div><span class="cln">Easy</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><span class="cln">Medium</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><span class="cln">Hard</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><span class="cln">Extreme</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><p class="clc">Each mark is one stroke. A filled mark has a click.</p>
         <div class="clk" style="--c:6"><div class="clt">6/8: one bar, six eighths</div><span class="cln">Medium</span><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><span class="cln">Hard</span><i class="on"></i><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><span class="cln">Extreme</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><p class="clc">Hard follows the two groups of three. Easy is every stroke, as above.</p>
         <p>Choose the click level on the Play page. Easy clicks every stroke (none on rests), Medium every beat, Hard the strong beats (1 and 3, or the start of each group), and Extreme beat 1 of each bar. Master only clicks the count-in, so you hold the tempo yourself. Each level is scored on its own, against the same grid. Set Scoring to Practice to try something without saving it: you still see the result, but nothing is added to your records. It is back on the next time you open the app. Use headphones, or the click is heard as strokes.</p>
-        <button class="btn small" type="button" data-try="single" data-text="RLRR LRLL RLRR LRLL">Try it</button>
+        <button class="btn" type="button" data-try="single" data-text="RLRR LRLL RLRR LRLL">Try it</button>
       </div>
     </section>
 
@@ -1149,31 +1146,31 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
         <h4>Four beats of sixteenths</h4>
         <pre>RLRL RLRL RLRL RLRL</pre>
         <p>Four groups of four, one beat each. A barline falls every two beats.</p>
-        <button class="btn small" type="button" data-try="single" data-text="RLRL RLRL RLRL RLRL">Try it</button>
+        <button class="btn" type="button" data-try="single" data-text="RLRL RLRL RLRL RLRL">Try it</button>
       </div>
       <div class="ex">
         <h4>Two triplets in one beat</h4>
         <pre>8t RLR LRL</pre>
         <p>Two groups of three, each with its own "3". The click accents each beat.</p>
-        <button class="btn small" type="button" data-try="single" data-text="8t RLR LRL">Try it</button>
+        <button class="btn" type="button" data-try="single" data-text="8t RLR LRL">Try it</button>
       </div>
       <div class="ex">
         <h4>Sixteenths then sextuplets</h4>
         <pre>16 RLRL 16t RLR LRL</pre>
         <p>A beat of sixteenths, then a beat of sextuplets written as two triplets. <b>16t RLRLRL</b> with no space gives one run of six, with a single "6".</p>
-        <button class="btn small" type="button" data-try="single" data-text="16 RLRL 16t RLR LRL">Try it</button>
+        <button class="btn" type="button" data-try="single" data-text="16 RLRL 16t RLR LRL">Try it</button>
       </div>
       <div class="ex">
         <h4>Rests</h4>
         <pre>16 R _ L _ R L _ L</pre>
         <p>A rest takes time but expects no hit. A hit during a rest counts as an extra.</p>
-        <button class="btn small" type="button" data-try="single" data-text="16 R _ L _ R L _ L">Try it</button>
+        <button class="btn" type="button" data-try="single" data-text="16 R _ L _ R L _ L">Try it</button>
       </div>
       <div class="ex">
         <h4>Flams and drags</h4>
         <pre>8 fR fL dR dL</pre>
         <p><b>f</b> in front of a stroke is a flam and <b>d</b> a drag (two grace notes). The other hand plays the grace, so <b>fR</b> is a left grace into a right stroke. Play the main stroke on the click and the grace just before it, softer.</p>
-        <button class="btn small" type="button" data-try="single" data-text="8 fR fL dR dL">Try it</button>
+        <button class="btn" type="button" data-try="single" data-text="8 fR fL dR dL">Try it</button>
       </div>
       <h4>Using the editor</h4>
       <p>You do not have to type any of this. <b>Builder</b> and <b>Text</b> are two views of one routine. In Builder, pick a note code, then tap R, L, rest and space to add strokes. Tap <b>flam</b> or <b>drag</b> first to put grace notes on the next stroke. Each exercise has a <b>&#8942;</b> menu to insert, clone, move or delete it. In Text you edit the whole routine, one exercise per line, with line numbers beside any errors. The editor remembers your last view on each device.</p>
@@ -1203,7 +1200,7 @@ RLRL RLRL RLRL RLRL
 LRLR LRLR LRLR LRLR  x8
 RRLL RRLL RRLL RRLL  30s</pre>
         <p>At 60 BPM a pass takes 4 seconds. The first exercise gets the default 4 passes and the second gets 8. The third plays for 30 seconds, which rounds to 8 passes.</p>
-        <button class="btn small" type="button" data-try="routine" data-text="title: Passes demo&#10;each: x4&#10;RLRL RLRL RLRL RLRL&#10;LRLR LRLR LRLR LRLR  x8&#10;RRLL RRLL RRLL RRLL  30s">Try it</button>
+        <button class="btn" type="button" data-try="routine" data-text="title: Passes demo&#10;each: x4&#10;RLRL RLRL RLRL RLRL&#10;LRLR LRLR LRLR LRLR  x8&#10;RRLL RRLL RRLL RRLL  30s">Try it</button>
       </div>
       <div class="ex">
         <h4>A routine of Stick Control-style lines</h4>
@@ -1216,7 +1213,7 @@ LLRR LLRR LLRR LLRR
 RLRR LRLL RLRR LRLL
 RLLR LRRL RLLR LRRL
 RRLR LLRL RRLR LLRL</pre>
-        <button class="btn small" type="button" data-try="routine" data-text="title: Stick Control warm-up&#10;each: x8&#10;RLRL RLRL RLRL RLRL&#10;LRLR LRLR LRLR LRLR&#10;RRLL RRLL RRLL RRLL&#10;LLRR LLRR LLRR LLRR&#10;RLRR LRLL RLRR LRLL&#10;RLLR LRRL RLLR LRRL&#10;RRLR LLRL RRLR LLRL">Try it</button>
+        <button class="btn" type="button" data-try="routine" data-text="title: Stick Control warm-up&#10;each: x8&#10;RLRL RLRL RLRL RLRL&#10;LRLR LRLR LRLR LRLR&#10;RRLL RRLL RRLL RRLL&#10;LLRR LLRR LLRR LLRR&#10;RLRR LRLL RLRR LRLL&#10;RLLR LRRL RLLR LRRL&#10;RRLR LLRL RRLR LLRL">Try it</button>
       </div>
       <div class="ex">
         <h4>Mixed subdivisions and tempos</h4>
@@ -1224,7 +1221,7 @@ RRLR LLRL RRLR LLRL</pre>
 RLRL RLRL RLRL RLRL  x6
 8t RLR LRL RLR LRL RLR LRL RLR LRL  x6 @70
 16 RLRL 16t RLR LRL  x6</pre>
-        <button class="btn small" type="button" data-try="routine" data-text="title: Mixed&#10;RLRL RLRL RLRL RLRL  x6&#10;8t RLR LRL RLR LRL RLR LRL RLR LRL  x6 @70&#10;16 RLRL 16t RLR LRL  x6">Try it</button>
+        <button class="btn" type="button" data-try="routine" data-text="title: Mixed&#10;RLRL RLRL RLRL RLRL  x6&#10;8t RLR LRL RLR LRL RLR LRL RLR LRL  x6 @70&#10;16 RLRL 16t RLR LRL  x6">Try it</button>
       </div>
       <h4>Time signatures</h4>
       <p>An exercise is as long as its strokes unless you add a time signature. Write it with a colon at the start of a line (<b>7/8:</b>), or on its own line as <b>time: 7/8</b> for every exercise after it. <b>time: off</b> goes back to plain exercises, and an exercise's own signature wins.</p>
@@ -1247,7 +1244,7 @@ RLRLRL  x8
 RLRLRLRLRLRL  x8
 time: 5/4
 RLRLR  x8</pre>
-        <button class="btn small" type="button" data-try="routine" data-text="title: Odd meters&#10;time: 7/8&#10;RLRLRLR  x8&#10;RLRLRLRLRLRLRL  x8&#10;7/8 (3+2+2): RLRLRLR  x8&#10;time: 6/8&#10;RLRLRL  x8&#10;RLRLRLRLRLRL  x8&#10;time: 5/4&#10;RLRLR  x8">Try it</button>
+        <button class="btn" type="button" data-try="routine" data-text="title: Odd meters&#10;time: 7/8&#10;RLRLRLR  x8&#10;RLRLRLRLRLRLRL  x8&#10;7/8 (3+2+2): RLRLRLR  x8&#10;time: 6/8&#10;RLRLRL  x8&#10;RLRLRLRLRLRL  x8&#10;time: 5/4&#10;RLRLR  x8">Try it</button>
       </div>
       <div class="ex">
         <h4>A cut-time book page</h4>
@@ -1257,7 +1254,7 @@ strokes: 8
 RLRL RLRL RLRL RLRL  x8
 LRLR LRLR LRLR LRLR  x8</pre>
         <p>Two bars of eighth notes, written as the page reads. The ¢ sign means a half-note beat, so BPM is the book's half-note tempo.</p>
-        <button class="btn small" type="button" data-try="routine" data-text="title: Cut time&#10;time: 2/2&#10;strokes: 8&#10;RLRL RLRL RLRL RLRL  x8&#10;LRLR LRLR LRLR LRLR  x8">Try it</button>
+        <button class="btn" type="button" data-try="routine" data-text="title: Cut time&#10;time: 2/2&#10;strokes: 8&#10;RLRL RLRL RLRL RLRL  x8&#10;LRLR LRLR LRLR LRLR  x8">Try it</button>
       </div>
       <h4>Between exercises and the visual pulse</h4>
       <p><b>Between exercises</b> can be a 4-beat count-in or <b>Straight on</b> (the default). Straight on starts the next exercise with no pause, and only the notation marks the change: the rows slide up and the new exercise starts on the next beat.</p>
@@ -1422,8 +1419,8 @@ RLRR LRLL RLRR LRLL</pre>
       <button class="btn primary" id="startBtn" type="button">Start</button>
       <p class="hint cfg" id="playSummary"></p>
       <div class="btns" id="runBtns" hidden>
-        <button class="btn small" id="restartBtn" type="button">Restart</button>
-        <button class="btn small" id="stopBtn" type="button">Stop</button>
+        <button class="btn" id="restartBtn" type="button">Restart</button>
+        <button class="btn" id="stopBtn" type="button">Stop</button>
       </div>
       <div id="advBar"></div>
     </div>
@@ -1474,7 +1471,7 @@ RLRR LRLL RLRR LRLL</pre>
         <button class="btn" id="advDone" type="button" hidden>Done</button>
       </div>
       <div class="btns" id="advBtns2" style="margin-top:8px">
-        <button class="btn small" id="advWeak" type="button" hidden></button>
+        <button class="btn" id="advWeak" type="button" hidden></button>
       </div>
     </section>
 
@@ -1507,14 +1504,14 @@ RLRR LRLL RLRR LRLL</pre>
           <div class="word" id="lvWord">Waiting for strokes</div>
         </div>
         <p class="hint" id="lvDyn" hidden></p>
-        <div class="hscw"><div class="hscroll lv" id="lvBox"><div class="hscin" id="lvIn"><canvas id="lvCv" role="img" aria-label="Loudness of every stroke in the run, newest at the right"></canvas></div></div><button class="btn small jump" id="lvJump" type="button" hidden>Newest &#9656;</button></div>
+        <div class="hscw"><div class="hscroll lv" id="lvBox"><div class="hscin" id="lvIn"><canvas id="lvCv" role="img" aria-label="Loudness of every stroke in the run, newest at the right"></canvas></div></div><button class="btn jump" id="lvJump" type="button" hidden>Newest &#9656;</button></div>
         <div class="g-ends"><span>◀ older, scroll back</span><span>newest ▶</span></div>
         <p class="cap" id="lvTap" aria-live="polite">Tap a bar to read that stroke.</p>
       </section>
 
       <section class="panel" aria-label="Timing trace">
         <h3>Timing trace</h3>
-        <div class="hscw"><div class="hscroll" id="trBox"><div class="hscin" id="trIn"><canvas id="trace" role="img" aria-label="Timing error of every heard stroke in the run, in milliseconds, newest at the right"></canvas></div></div><button class="btn small jump" id="trJump" type="button" hidden>Newest &#9656;</button></div>
+        <div class="hscw"><div class="hscroll" id="trBox"><div class="hscin" id="trIn"><canvas id="trace" role="img" aria-label="Timing error of every heard stroke in the run, in milliseconds, newest at the right"></canvas></div></div><button class="btn jump" id="trJump" type="button" hidden>Newest &#9656;</button></div>
         <p class="cap" id="trTap" aria-live="polite">Tap a dot to read that stroke.</p>
         <p class="cap">Up is late, down is early. Ring is the left stick, solid dot the right.</p>
       </section>
@@ -1553,37 +1550,37 @@ RLRR LRLL RLRR LRLL</pre>
         <h3>Results by exercise</h3>
         <div class="tablewrap s1"><table id="resTable"></table></div>
         <p class="insight" id="resInsight"></p>
-        <div class="btns"><button class="btn small" id="csvBtn" type="button">Download CSV</button></div>
+        <div class="btns"><button class="btn" id="csvBtn" type="button">Download CSV</button></div>
       </section>
     </div>
       </div>
     </details>
-    <div class="discrow" id="advDiscRow" hidden><button class="btn small" id="advDiscard" type="button">Discard this run</button></div>
+    <div class="discrow" id="advDiscRow" hidden><button class="btn" id="advDiscard" type="button">Discard this run</button></div>
     </div>
   </div>
 </main>
 
 <div class="modal" id="lsModal" role="dialog" aria-modal="true" aria-label="Listen to this exercise" hidden>
   <div class="mbox">
-    <div class="mhead"><h3>Listen</h3><button class="btn small" id="lsClose" type="button">Close</button></div>
+    <div class="mhead"><h3>Listen</h3><button class="btn" id="lsClose" type="button">Close</button></div>
     <div class="lsstaff" id="lsStaff" aria-hidden="true"></div>
     <div class="bnote">
       <p class="hint" id="lsInfo" style="flex:1"></p>
-      <button class="btn small iconbtn" id="lsPlay" type="button" aria-label="Play again" title="Play again"></button>
+      <button class="btn iconbtn" id="lsPlay" type="button" aria-label="Play again" title="Play again"></button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="pickModal" role="dialog" aria-modal="true" aria-label="Choose a routine" hidden>
   <div class="mbox scroll">
-    <div class="mhead"><h3>Choose a routine</h3><button class="btn small" id="pickClose" type="button">Close</button></div>
+    <div class="mhead"><h3>Choose a routine</h3><button class="btn" id="pickClose" type="button">Close</button></div>
     <div id="pickList"></div>
   </div>
 </div>
 
 <div class="modal" id="openModal" role="dialog" aria-modal="true" aria-label="Import a routine" hidden>
   <div class="mbox scroll">
-    <div class="mhead"><h3>Import a routine</h3><button class="btn small" id="openClose" type="button">Close</button></div>
+    <div class="mhead"><h3>Import a routine</h3><button class="btn" id="openClose" type="button">Close</button></div>
     <div class="osec">
       <div class="olbl">File</div>
       <button class="btn" id="fileBtn" type="button">Choose a file&hellip;</button>
@@ -1600,9 +1597,9 @@ RLRR LRLL RLRR LRLL</pre>
       <p class="err" id="libErr" role="alert"></p>
       <p class="hint" id="libUrl"></p>
       <p class="hint" id="libInfo"></p>
-      <button class="btn small" id="libAll" type="button" hidden>Import all</button>
+      <button class="btn" id="libAll" type="button" hidden>Import all</button>
       <div class="exercises" id="libList" role="list" aria-label="Routines in the library" hidden></div>
-      <p class="hint">A library is one text file of routines, split by lines of dashes. A link can point to one routine or to a library. <button class="btn small" id="openHelp" type="button" data-help="help-library">Help</button></p>
+      <p class="hint">A library is one text file of routines, split by lines of dashes. A link can point to one routine or to a library. <button class="btn" id="openHelp" type="button" data-help="help-library">Help</button></p>
     </div>
   </div>
 </div>
@@ -2675,7 +2672,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.18';                           /* shown beside the title */
+const VERSION='1.5.19';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -6009,10 +6006,10 @@ function arm(b,fn,label){
   return b;
 }
 function armBtn(label,fn){
-  const b=document.createElement('button');b.type='button';b.className='btn small';b.textContent=label;
+  const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=label;
   return arm(b,fn);
 }
-const textBtn=(label,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn small';b.textContent=label;b.addEventListener('click',fn);return b;};
+const textBtn=(label,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=label;b.addEventListener('click',fn);return b;};
 /* The Library page: the pad if it holds something unsaved, then every saved routine. */
 const libGrpOpen=new Set();   /* the groups that are open on the Library page */
 /* The ⋮ on a row opens a small menu: its items are buttons, and a destructive one asks for a second tap. */
@@ -6163,7 +6160,7 @@ const NEW={url:'',name:''};
 function renderLinks(){
   const box=$('lnkList');box.textContent='';
   if(lnkEdit&&lnkEdit!==NEW&&!S.lists.includes(lnkEdit))lnkEdit=null;
-  const mk=(t,f)=>{const b=document.createElement('button');b.type='button';b.className='btn small';b.textContent=t;b.addEventListener('click',f);return b;};
+  const mk=(t,f)=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=t;b.addEventListener('click',f);return b;};
   const form=l=>{
     const row=document.createElement('div');row.className='lnk';
     const nm=document.createElement('input'),ur=document.createElement('input'),ac=document.createElement('div'),er=document.createElement('p');
@@ -6405,9 +6402,9 @@ function syncSetup(){
     if(st.done){li.className='ok';li.textContent=st.ok;list.appendChild(li);return true;}
     cur=i;
     const t=document.createElement('span');t.textContent=st.label;
-    const b=document.createElement('button');b.type='button';b.className='btn small';b.textContent=st.btn;b.addEventListener('click',st.go);
+    const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=st.btn;b.addEventListener('click',st.go);
     const sk=st.skip?document.createElement('button'):null;
-    if(sk){sk.type='button';sk.className='btn small';sk.textContent='Skip';sk.addEventListener('click',st.skip);}
+    if(sk){sk.type='button';sk.className='btn';sk.textContent='Skip';sk.addEventListener('click',st.skip);}
     const m=document.createElement('p');m.className='hint';m.setAttribute('aria-live','polite');m.textContent=st.msg();
     const bt=document.createElement('div');bt.className='btns';bt.append(b);if(sk)bt.append(sk);
     li.append(t,bt,m);list.appendChild(li);return false;
