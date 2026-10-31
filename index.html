@@ -148,6 +148,7 @@ body[data-run="1"] .notice{display:none}
 .ttl.hmenu{cursor:pointer}
 :root:not([data-layout=desktop]) .ttl.hmenu::after{content:"";display:inline-block;width:7px;height:7px;margin:0 0 3px 8px;border:solid var(--muted);border-width:0 2px 2px 0;transform:rotate(45deg)}
 :root[data-layout=desktop] #pvStats:not([hidden]),:root[data-layout=desktop] #pvAch:not([hidden]){grid-template-columns:minmax(280px,340px) minmax(0,1fr);column-gap:28px;align-items:start}
+#pvStats.none>.pside{display:none}:root[data-layout=desktop] #pvStats.none:not([hidden]){grid-template-columns:minmax(0,1fr)}   /* nothing scored: one column, so the empty state centres on the page as History's does */
 :root[data-layout=desktop] .pv>.pcol{display:grid;gap:22px;align-content:start;min-width:0}
 :root[data-layout=desktop] #pvAch .pside{position:sticky;top:16px}
 :root[data-layout=desktop] #svPref:not([hidden]),:root[data-layout=desktop] #svDev:not([hidden]),:root[data-layout=desktop] #svData:not([hidden]){display:block;columns:2 340px;column-gap:22px}
@@ -2649,7 +2650,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.45';                           /* shown beside the title */
+const VERSION='1.5.46';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4957,7 +4958,7 @@ function renderProgress(){
   renderScoreSummary(stats);
   renderScoreGroups(stats,practise,scoreUsual(stats));
   renderRoutineRows(routines,replayRoutine);
-  if(none)$('patGroups').textContent='';$('scoreRt').hidden=none;$('scoreEx').querySelector('h3').hidden=none;   /* one empty state, not three, and no heading over it */
+  if(none)$('patGroups').textContent='';$('scoreRt').hidden=none;$('pvStats').classList.toggle('none',none);$('scoreEx').querySelector('h3').hidden=none;   /* one empty state, not three, and no heading over it */
   renderHistory();syncData();
 }
 const showTabs=(v,tabs)=>tabs.forEach(x=>{$(x[1]).hidden=v!==x[0];$(x[2]).setAttribute('aria-pressed',String(v===x[0]));});
