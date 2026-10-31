@@ -1069,7 +1069,6 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
       <section aria-label="History">
         <div class="htools">
           <div class="seg hfilter" role="group" aria-label="View"><button class="on" id="hvDay" type="button" aria-pressed="true">By day</button><button id="hvEx" type="button" aria-pressed="false">By exercise</button></div>
-          <div class="seg hfilter" role="group" aria-label="Show"><button class="on" id="hfAll" type="button" aria-pressed="true">All</button><button id="hfSaved" type="button" aria-pressed="false">In library</button></div>
         </div>
         <p class="hint" id="histHint"></p>
         <div class="hist" id="histList"></div>
@@ -2667,7 +2666,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.7';                           /* shown beside the title */
+const VERSION='1.5.8';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4931,7 +4930,6 @@ function renderProgress(){
   renderHistory();syncData();
 }
 const showTabs=(v,tabs)=>tabs.forEach(x=>{$(x[1]).hidden=v!==x[0];$(x[2]).setAttribute('aria-pressed',String(v===x[0]));});
-const syncFilter=saved=>{$('hfAll').classList.toggle('on',!saved);$('hfAll').setAttribute('aria-pressed',String(!saved));$('hfSaved').classList.toggle('on',saved);$('hfSaved').setAttribute('aria-pressed',String(saved));};
 let sview='pref';
 function setSview(v){
   sview=v;if(v==='data')renderStorage();
@@ -4956,7 +4954,7 @@ function renderStorage(){
   $('stoNote').textContent='Stroke detail is what lets a run show its staff and strokes again. It may use up to '+fmt(Math.floor(QUOTA*DETAIL_SHARE))+'. Past that the oldest runs lose their detail first and keep their totals. '+n+(n===1?' run has':' runs have')+' its detail now.';
 }
 function showSetup(v){setSview(v);showTab('setup');}
-let pview='hist',histShown=20,histDays=7,histFilter='all',hview='day';
+let pview='hist',histShown=20,histDays=7,hview='day';
 function setPview(v){
   pview=v;
   showTabs(v,[['stats','pvStats','pvBtnStats'],['hist','pvHist','pvBtnHist'],['ach','pvAch','pvBtnAch']]);
@@ -5153,12 +5151,9 @@ function openRunFrom(id,label){runBack=label;histStack.push({run:id});pgPush();r
 /* The log: runs by day, newest first. Consecutive identical runs in a day fold into one row. */
 function renderHistoryDays(){
   const box=$('histList');box.textContent='';
-  const saved=histFilter==='saved';
-  syncFilter(saved);
   const gkey=r=>r.mode==='routine'?(r.rk||''):r.exercises[0].k;
   let runs=recs.runs.slice().sort((a,b)=>b.t-a.t);
-  if(saved)runs=runs.filter(r=>libFor(gkey(r)));
-  $('histHint').textContent=runs.length?'':(saved?'Nothing saved yet. Tap the bookmark on a routine, or use Save in the editor.':'Nothing yet. Play an exercise or a routine and each run shows up here.');
+  $('histHint').textContent=runs.length?'':'Nothing yet. Play an exercise or a routine and each run shows up here.';
   const days=[];
   runs.forEach(r=>{const k=dayKey(r.t);let d=days[days.length-1];if(!d||d.k!==k){d={k:k,t:r.t,runs:[]};days.push(d);}d.runs.push(r);});
   const dword=t=>{const w=dayWord(t);return w==='today'?'Today':w==='yesterday'?'Yesterday':w;};
@@ -5315,8 +5310,9 @@ function renderRunPage(r){
     }
   }
   if(hasStaff&&!staffDone)staffSection(page,r);
-  const acts=[replayBtn(r)];   /* Play and Rename sit beside the title; Delete waits in the menu */
+  const acts=[];   /* edit, play, menu: the order of every row of icons; Delete waits in the menu */
   if(r.mode==='routine'&&!plainRun(r))acts.push(renameBtn(h,r.rk));
+  acts.push(replayBtn(r));
   acts.push(kebab('More actions',[{t:'Delete',fn:()=>{closePages();deleteRun(r.id);},arm:true,danger:true}]));
   showPage({owner:'hist',key:'run'+r.id,back:'\u2039 '+(histStack.length>1?'Back':runBack),title:t.text,mono:t.mono,body:page,acts:acts});
 }
@@ -5337,26 +5333,16 @@ function renderGroupPage(ids){
 /* Runs grouped by exercise or routine, newest group first. A group of one run looks the same as a larger one. */
 function renderHistoryGroups(){
   const box=$('histList');box.textContent='';
-  const gkey=r=>r.mode==='routine'?(r.rk||''):r.exercises[0].k;
   const groups=new Map();
   recs.runs.slice().sort((x,y)=>y.t-x.t).forEach(r=>{const k=runKey(r)+'|'+r.lv+'|'+(r.dy||'');if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);});
   let list=[...groups.values()];
-  const saved=histFilter==='saved';
-  if(saved)list=list.filter(g=>libFor(gkey(g[0])));
-  const played=new Set(recs.runs.map(gkey));
-  const unplayed=saved?recs.lib.filter(e=>!played.has(libKey(e))).sort((x,y)=>y.t-x.t):[];
-  syncFilter(saved);
-  $('histHint').textContent=saved?(list.length||unplayed.length?'Routines you saved, with their runs.':'Nothing saved yet. Tap the bookmark on a routine, or use Save in the editor.'):list.length?'Your runs grouped by exercise or routine, most recent first. Tap one to see its runs.':'No runs yet. Each run you finish is listed here.';
+  $('histHint').textContent=list.length?'Your runs grouped by exercise or routine, most recent first. Tap one to see its runs.':'No runs yet. Each run you finish is listed here.';
   const panel=document.createElement('div');panel.className='dayp';
   list.slice(0,histShown).forEach(g=>{
     const f=g[0],t=runTitle(f),fig=runFigures(f);
     const best=bestPct(g);
     const sub=(f.lv==='off'?'Count-in only':levelName(f.lv))+' · '+g.length+(g.length===1?' run':' runs')+' · latest '+dayWord(f.t)+(best!==null&&g.length>1?' · best '+Math.round(best*100)+'%':'');
     panel.appendChild(listRow(t.text,t.mono,sub,dyLine(f),fig.acc,()=>openHist(g.length===1?{run:f.id}:{group:g.map(x=>x.id)})));
-  });
-  unplayed.forEach(e=>{
-    const k=libKey(e),c=exerciseCount(e.x);
-    panel.appendChild(listRow(entryName(e),false,c+(c===1?' exercise':' exercises')+' · no runs yet','',null,()=>playEntry(e)));
   });
   if(panel.children.length)box.appendChild(panel);
   $('histMore').textContent='Show more';
@@ -6997,8 +6983,6 @@ function wire(){
   $('histMore').addEventListener('click',()=>{if(hview==='day')histDays+=7;else histShown+=20;renderHistory();});
   $('hvDay').addEventListener('click',()=>{hview='day';histDays=7;histStack=[];renderHistory();});
   $('hvEx').addEventListener('click',()=>{hview='ex';histShown=20;histStack=[];renderHistory();});
-  $('hfAll').addEventListener('click',()=>{histFilter='all';histShown=20;histDays=7;renderHistory();});
-  $('hfSaved').addEventListener('click',()=>{histFilter='saved';histShown=20;histDays=7;renderHistory();});
   $('recExport').addEventListener('click',openExport);
   $('bakGo').addEventListener('click',openExport);
   let clrT=0;
