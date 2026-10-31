@@ -1,7 +1,7 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const { loadCore, plain } = require('./helpers');
 const c = loadCore(['parseStrokes', 'parseExerciseLine', 'parseRoutine', 'resolveExercises', 'buildPlan', 'builderApply',
-  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runScore', 'highScores', 'unpackStrokes', 'BADGES', 'maxPoints', 'tempoMult', 'scoreParts', 'runShare', 'bestShares', 'scoreBreakdown', 'streakAfter']);
+  'graceSlot', 'OnsetDetector', 'patKey', 'parseSig', 'textKey', 'nearestSlot', 'analyseCheck', 'strokeRate', 'masteryTier', 'MTIER', 'RATE_AT', 'badgeValues', 'newSum', 'runScore', 'runMax', 'winMult', 'highScores', 'unpackStrokes', 'BADGES', 'maxPoints', 'tempoMult', 'scoreParts', 'runShare', 'bestShares', 'scoreBreakdown', 'streakAfter']);
 
 const runPoints = (codes, lv) => c.scoreParts([[codes, 1]], lv);
 const plan = (text, opt) => {
@@ -211,4 +211,14 @@ test('the longest clean run counts strokes, so a short routine counts too', () =
   assert.equal(c.badgeValues([run([32, 32], [32, 20])], c.newSum()).cln, 0, 'one exercise under 90% and the run is not clean');
   const sum = c.newSum(); sum.cs = 3000;
   assert.equal(c.badgeValues([run([32, 32], [32, 32])], sum).cln, 3000, 'an older folded best still stands');
+});
+
+test('the on-time window scales points, and the share of max is measured at the standard window', () => {
+  const run = tol => ({ id: 'w' + tol, t: 1, lv: 'half', bpm: 60, tol, exercises: [{ k: 'e', due: 8, within: 8, q: 'oooooooo' }] });
+  const std = c.runScore(run(20));
+  assert.equal(c.runMax(run(20)), std, 'a flawless run at the standard window is 100%');
+  assert.equal(c.runScore(run(50)), Math.round(std * 0.5));
+  assert.equal(c.runScore(run(10)), Math.round(std * 1.5));
+  assert.equal(c.runMax(run(50)), c.runMax(run(20)), 'the maximum does not depend on the window');
+  assert.equal(c.winMult(undefined), 1, 'a run saved without a window counts once');
 });

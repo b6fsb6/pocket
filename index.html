@@ -741,10 +741,12 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
       <div class="fields">
         <div class="field"><label for="tol">On-time window</label>
           <select id="tol">
-            <option value="10">± 10 ms</option>
-            <option value="15">± 15 ms</option>
-            <option value="20">± 20 ms</option>
-            <option value="30">± 30 ms</option>
+            <option value="10">± 10 ms · tight, points ×1.5</option>
+            <option value="15">± 15 ms · tight, points ×1.25</option>
+            <option value="20">± 20 ms · standard</option>
+            <option value="30">± 30 ms · relaxed, points ×0.75</option>
+            <option value="40">± 40 ms · relaxed, points ×0.6</option>
+            <option value="50">± 50 ms · relaxed, points ×0.5</option>
           </select></div>
         <div class="field"><label for="pulse">Visual pulse</label>
           <select id="pulse"><option value="on">On</option><option value="off">Off</option></select></div>
@@ -1252,7 +1254,7 @@ RLRR LRLL RLRR LRLL</pre>
       <h3>Scores, tempo and progress</h3>
       <ul>
         <li><b>On time</b> is the share of due strokes inside your on-time window. With an accent or ghost rule a stroke must also be played as written: an accent clearly louder and a ghost clearly softer than its neighbours. An exercise needs at least one full pass to be scored.</li>
-        <li><b>Score:</b> every run is scored when Scored is on. Each stroke earns points by its timing and the click level: on time scores most, off time a little, and a miss scores nothing (it costs 2 on Extreme and 5 on Master). A rest keeps the streak going and scores nothing, and a hit on it is a miss. Strokes on time in a row add a quarter to a multiplier, up to five times. An off-time stroke takes the streak back two steps, and a miss resets it. Faster strokes score more: 240 strokes a minute (sixteenths at 60 BPM) counts once, and the range is half to double. The streak carries from one exercise to the next. The total never goes below zero. Your best score at each click level is an achievement, and a new one is announced when the run ends.</li>
+        <li><b>Score:</b> every run is scored when Scored is on. Each stroke earns points by its timing and the click level: on time scores most, off time a little, and a miss scores nothing (it costs 2 on Extreme and 5 on Master). A rest keeps the streak going and scores nothing, and a hit on it is a miss. Strokes on time in a row add a quarter to a multiplier, up to five times. An off-time stroke takes the streak back two steps, and a miss resets it. Faster strokes score more: 240 strokes a minute (sixteenths at 60 BPM) counts once, and the range is half to double. A narrower on-time window scores more and a wider one less: ±20 ms counts once, ±10 ms one and a half times and ±50 ms half. The share of max is always measured at ±20 ms. The streak carries from one exercise to the next. The total never goes below zero. Your best score at each click level is an achievement, and a new one is announced when the run ends.</li>
         <li><b>Medals:</b> each exercise gets a medal for each click level, from the fastest tempo you have cleared it at. It is measured in strokes a minute, so sixteenths count for more than eighths at the same BPM. Hickory is cleared at any speed, then Bronze at 120 strokes a minute, Silver 180, Gold 240, Platinum 320, Sapphire 400, Ruby 480 and Diamond 600. Sixteenths at 60 BPM is 240, so Gold.</li>
         <li><b>Exercise table:</b> after a routine run, each exercise gets its accuracy, average error and spread, plus your earlier best at that tempo.</li>
         <li><b>The target is 90%.</b> An exercise is "cleared" at a tempo when it reaches 90% there. After a run the app names the weak exercises and suggests staying at that tempo until they settle. Any tempo is always allowed.</li>
@@ -2137,6 +2139,9 @@ const STREAK_MOD=0.25,STREAK_CAP=16,STREAK_SLIP=2;   /* each stroke on time adds
 const streakAfter=(streak,c)=>c==='o'?Math.min(STREAK_CAP,streak+1):(c==='m'?0:Math.max(0,streak-STREAK_SLIP));
 /* Faster strokes score more: 240 strokes a minute (Gold pace, sixteenths at 60 BPM) is x1, between half and double. */
 const tempoMult=(k,bpm)=>{const r=strokeRate(k,bpm);return r>0?Math.min(2,Math.max(0.5,r/240)):1;};
+/* A narrower on-time window scores more: ±20 ms (Standard) is x1. The share of max is always measured at ±20, so a wider window reads lower instead of making every score easier. */
+const WIN_MULT={10:1.5,15:1.25,20:1,30:.75,40:.6,50:.5};
+const winMult=tol=>WIN_MULT[tol]||1;
 /* parts: [codes, tempo multiplier] for each exercise in order, so the streak carries from one to the next. */
 function scoreParts(parts,lv){
   const p=LV_PTS[lv];if(!p)return 0;
@@ -2162,7 +2167,7 @@ function unpackStrokes(sp){
   return out;
 }
 const exCodes=b=>typeof b.q==='string'?b.q:(typeof b.sp==='string'?unpackStrokes(b.sp).map(x=>x.r==='s'||x.r==='l'?'b':x.r).join(''):'');
-const runScore=run=>scoreParts(run.exercises.map(b=>[exCodes(b),tempoMult(b.k,b.bpm||run.bpm)]),run.lv);
+const runScore=run=>scoreParts(run.exercises.map(b=>[exCodes(b),tempoMult(b.k,b.bpm||run.bpm)*winMult(run.tol)]),run.lv);   /* runMax leaves the window out: the maximum is the standard window's */
 /* The score of a flawless run at a level: every stroke on time. segs is [strokes, tempo multiplier] for each exercise in order. */
 const maxPoints=(segs,lv)=>{
   const p=LV_PTS[lv];if(!p)return 0;const c=STREAK_CAP;
@@ -2635,7 +2640,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.34';                           /* shown beside the title */
+const VERSION='1.5.35';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -2664,7 +2669,7 @@ S.latCal=S.latCal===true;                          /* set once a calibration has
 S.editTab=S.editTab==='type'?'type':'build';       /* Build or Type, remembered on each device. Build is first. */
 S.bpm=clamp(Math.round(+S.bpm)||60,40,220);
 S.subdiv=4;                                        /* strokes with no note code are sixteenths */
-S.tol=[10,15,20,30].includes(+S.tol)?+S.tol:20;
+S.tol=[10,15,20,30,40,50].includes(+S.tol)?+S.tol:20;
 S.sens=clamp(Math.round(+S.sens)||-30,-55,-8);
 S.accent=/^[gbm2-7RL]?$/.test(S.accent)?S.accent:'';   /* which strokes are accented */
 S.others=S.others==='g'?'g':'n';                          /* the other strokes: normal or ghost */
@@ -3214,11 +3219,15 @@ function tick(){
   if(r.nextFin>=plan.slots.length)endRun();
 }
 /* The score as the run goes. Strokes judged too soft or too loud only count against it when the run ends, so the final score can come out a little lower. */
+/* The on-time window for a stroke: the setting, capped at 40% of the stroke spacing (sl.w is half of it), so at a fast tempo neighbouring strokes stay apart. */
+const slotTol=sl=>Math.min(S.tol,Math.round(sl.w*800));
+/* The window, as said beside a score when it is not the standard one. */
+const winNote=tol=>tol&&tol!==20?' \u00b7 \u00b1'+tol+' ms window, points \u00d7'+winMult(tol):'';
 function liveScore(r,sg,c){
   if(!r.hud)return;
   const p=LV_PTS[S.click],si=r.plan.segs.indexOf(sg);
   if(r.tm[si]===undefined)r.tm[si]=tempoMult(patKey(sg.notes,sg.groupStart,sg.subs,sg.defSub,sg.sig),sg.bpm);
-  const m=r.tm[si];let d;
+  const m=r.tm[si]*winMult(S.tol);let d;
   d=m*(c==='o'?p[1]*(1+STREAK_MOD*r.sk):(c==='m'?p[2]:p[0]));
   r.sk=streakAfter(r.sk,c);
   r.pts=Math.max(0,r.pts+d);r.flash={c:c,d:Math.round(d)};r.hudDirty=true;
@@ -3276,13 +3285,13 @@ function finalizeSlot(i){
     r.errs.push(ms);Q.errs.push(ms);r.hand[hand].push(ms);Q.hand[hand].push(ms);
     const db=h.kb?null:strokeDb(h.pk,h.raw);
     if(db!==null){r.lv.push({db:db,hand:hand,dy:sl.dy||''});Q.lv.push({db:db,hand:hand,dy:sl.dy||''});}
-    const on=Math.abs(ms)<=S.tol;
+    const on=Math.abs(ms)<=slotTol(sl);
     if(db!==null&&sl.dy&&!sl.tight)r.dyl.push({db:db,dy:sl.dy,si:sl.seg,ci:Q.sc.length,on:on});
     Q.sy.push(sl.dy||'n');Q.sw.push(wrong?1:0);Q.sm.push(Math.round(ms));Q.sb.push(db===null?null:Math.round(db));
     Q.ev.push({t:sl.t,ci:Q.sc.length});Q.sc.push(on?'o':'b');liveScore(r,sg,on?'o':'b');   /* o on time, b off time, m missed; s and l (accent too soft, ghost too loud) are set when the run ends */
     r.seq.push({db:db,hand:hand,dy:sl.dy||''});if(r.seq.length>STRIP_MAX)r.seq.shift();   /* one entry per stroke due, so a miss leaves a gap in the level bars */
     r.missRun=0;if(r.mode==='lat')latLive(r);
-    if(Math.abs(ms)<=S.tol){r.within++;Q.within++;r.streak++;if(r.streak>r.best)r.best=r.streak;}else r.streak=0;
+    if(on){r.within++;Q.within++;r.streak++;if(r.streak>r.best)r.best=r.streak;}else r.streak=0;
     Q.posSum[pos]+=ms;Q.posCnt[pos]++;
     r.trace.push({ms:ms,hand:hand,wrong:wrong});if(r.trace.length>STRIP_MAX)r.trace.shift();
   }
@@ -3436,7 +3445,7 @@ function handleHit(h){
   let i=nearestSlot(plan.slots,tc),sl=plan.slots[i],e=tc-sl.t;
   /* A hit a little before a flam or drag belongs to it as a grace note, even when another stroke is nearer. */
   const gj=graceSlot(plan.slots,tc,r.nextFin);
-  const viaGrace=gj>=0&&(gj===i||!(i>=r.nextFin&&Math.abs(e)<=Math.min(sl.w,S.tol/1000)));
+  const viaGrace=gj>=0&&(gj===i||!(i>=r.nextFin&&Math.abs(e)<=Math.min(sl.w,slotTol(sl)/1000)));
   if(viaGrace){i=gj;sl=plan.slots[i];e=tc-sl.t;}
   /* The detector listens below the trigger line when ghost notes are on. A quiet hit only counts on a ghost note. */
   if(!h.kb&&h.pk>0&&h.pk<Math.pow(10,S.sens/20)&&!(Math.abs(e)<=sl.w&&i>=r.nextFin&&sl.dy==='g'))return;
@@ -4521,7 +4530,7 @@ function renderAdvice(){
         const bar=$('advScoreBar');bar.firstChild.style.width=Math.min(100,100*L.score/mx)+'%';
         const tk=bar.lastChild,showTk=L.share0>0&&L.share0<1;tk.hidden=!showTk;if(showTk)tk.style.left=(100*L.share0)+'%';
         $('advPrev').textContent=L.share0>0?'Best on '+lv+': '+Math.round(100*L.share0)+'%':'First score on '+lv;
-        $('advOfMax').textContent='This run: '+Math.round(100*L.score/mx)+'%';
+        $('advOfMax').textContent='This run: '+Math.round(100*L.score/mx)+'%'+winNote(L.run.tol);
       }
     }
   }
@@ -5112,6 +5121,7 @@ function runMeta(r,withTime,noScore){
   bits.push(r.lv==='off'?'Count-in only':levelName(r.lv));
   if(r.mode==='routine'&&r.ne>1){const n=r.exercises.length;bits.push((n<r.ne?n+' of '+r.ne:r.ne)+' exercises');}   /* a partial run says how many were played */
   bits.push(r.bpm+' BPM');
+  if(r.tol&&r.tol!==20)bits.push('\u00b1'+r.tol+' ms');   /* a window other than the standard one */
   const m=runMins(r);if(m)bits.push(m);
   if(!noScore&&r.lv!=='off'){const v=runScore(r);if(v)bits.push('Score: '+v.toLocaleString('en-US'));}
   return bits.join(' · ');
@@ -5254,7 +5264,7 @@ function renderRunPage(r){
     mk('span','slab','Score');
     const hd=mk('div','shd');mk('b',null,f0(sc),hd);mk('span',null,'of '+f0(mx),hd);
     const bar=mk('div','sbar');mk('i',null,null,bar).style.width=Math.min(100,100*sc/mx)+'%';
-    const cp=mk('div','scap');mk('span',null,Math.round(100*sc/mx)+'% of max',cp);mk('span',null,'Best on '+levelName(r.lv)+': '+Math.round(100*(bestShares(recs.runs,recs.sum)[r.lv]||0))+'%',cp);
+    const cp=mk('div','scap');mk('span',null,Math.round(100*sc/mx)+'% of max'+winNote(r.tol),cp);mk('span',null,'Best on '+levelName(r.lv)+': '+Math.round(100*(bestShares(recs.runs,recs.sum)[r.lv]||0))+'%',cp);
     const ac=mk('div','sacc'),pb=mk('b',null,a[0],ac);pb.className=a[1];
     const sp=mk('span',null,'on time',ac);
     const sm=document.createElement('small');sm.textContent=[isNaN(f.ms)?'':fmtMs(f.ms,1)+' ms',isNaN(f.db)?'':'±'+f.db.toFixed(1)+' dB'].filter(Boolean).join(' \u00b7 ');if(sm.textContent)sp.appendChild(sm);
@@ -6341,7 +6351,7 @@ function showCachedList(){
 }
 
 /* ---------- controls ---------- */
-const LOCKED=['accent','others','pulse','bpm','bpmDown','bpmUp','subdiv','click','inputMode','routineText','fileBtn','openBtn','clearRoutine','playChange','libSel','libraryUrl','libName','libGo','libAll','eachVal','eachUnit','gap'];
+const LOCKED=['tol','accent','others','pulse','bpm','bpmDown','bpmUp','subdiv','click','inputMode','routineText','fileBtn','openBtn','clearRoutine','playChange','libSel','libraryUrl','libName','libGo','libAll','eachVal','eachUnit','gap'];
 function syncRunUI(){
   const on=!!(run&&!run.ended),play=on&&run.mode==='play',paused=on&&!!run.paused;
   const b=$('startBtn');
