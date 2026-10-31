@@ -331,6 +331,12 @@ body[data-tab=pattern] header,body[data-tab=pattern] .tabs{display:none}   /* th
 .advmain{margin-top:10px}
 svg.spark{display:block;overflow:visible}
 .badges{display:grid;gap:22px}   /* one column of badges, also on desktop */
+/* Empty state: centred in the view, a muted line icon, one line, one sentence and one button to the next step. */
+.empty{display:grid;justify-items:center;gap:var(--s-2);padding:var(--s-7) var(--s-4);text-align:center}
+.empty svg{width:40px;height:40px;color:var(--muted)}
+.empty b{font:600 var(--t-body) var(--font-body)}
+.empty p{margin:0;max-width:36ch;font:var(--t-caption) var(--font-body);color:var(--muted)}
+.empty .btn{margin-top:var(--s-2)}
 /* An in-page disclosure: a hairline, a body-size summary and its chevron at the right. */
 details.how{border:0;border-top:1px solid var(--line);border-radius:0;background:none}
 details.how>summary{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);min-height:var(--hit);padding:var(--s-2) 0;font:600 var(--t-body) var(--font-body);letter-spacing:normal;text-transform:none}
@@ -859,7 +865,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
       <div class="lhead"><div class="seg hfilter" role="group" aria-label="Sort by"><button class="on" id="lsRecent" type="button" aria-pressed="true">Recent</button><button id="lsName" type="button" aria-pressed="false">Name</button></div><div class="btns"><button class="btn" id="clearRoutine" type="button">New</button><button class="btn" id="openBtn" type="button">Import</button><button class="btn" id="exportLib" type="button">Export</button></div></div>
       <p class="hint" id="libMsg" aria-live="polite"></p>
       <div class="hist" id="libPage"></div>
-      <p class="hint" id="libEmpty" hidden>Nothing saved yet. New starts a routine. Import brings one in from a file or a link.</p>
+      <div id="libEmpty" hidden></div>
     </section>
   </div>
 
@@ -1026,7 +1032,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
     <div class="pcol pmain">
     <section class="panel" aria-label="Rudiments" id="scoreEx">
       <h3>Exercises</h3>
-      <p class="hint" id="progHint"></p>
+      <div id="progHint"></div>
       <div class="hist" id="patGroups"></div>
     </section>
     <section class="panel" aria-label="Routines" id="scoreRt">
@@ -2636,7 +2642,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.29';                           /* shown beside the title */
+const VERSION='1.5.30';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4901,7 +4907,8 @@ function renderScoreSummary(stats){
 function renderProgress(){
   renderPractice();renderBadges();
   const stats=patStats(recs.runs,recs.sum),routines=routineStats(recs.runs,recs.sum);
-  $('progHint').textContent=stats.length?'':'Nothing yet. Play an exercise or a routine and each exercise\'s score shows up here, so you can see which rudiments need work.';
+  const none=!stats.length&&!routines.length,ph=$('progHint');ph.textContent='';
+  if(none)ph.appendChild(emptyState('chart','No scores yet','Each exercise you play is scored here, so you can see which rudiments need work.','Play an exercise',()=>showTab('play')));
   $('scoreKey').hidden=!stats.length&&!routines.length;
   const practise=(k,lv,dy)=>iconBtn('play','Play this exercise',()=>practisePattern(k,lv,dy));
   /* A routine is replayed from its newest run at that level, while that run's text is still kept. */
@@ -4910,6 +4917,7 @@ function renderProgress(){
   renderScoreSummary(stats);
   renderScoreGroups(stats,practise,scoreUsual(stats));
   renderRoutineRows(routines,replayRoutine);
+  if(none)$('patGroups').textContent='';$('scoreRt').hidden=none;$('scoreEx').querySelector('h3').hidden=none;   /* one empty state, not three, and no heading over it */
   renderHistory();syncData();
 }
 const showTabs=(v,tabs)=>tabs.forEach(x=>{$(x[1]).hidden=v!==x[0];$(x[2]).setAttribute('aria-pressed',String(v===x[0]));});
@@ -4949,12 +4957,24 @@ const runKey=r=>r.mode==='routine'?'r:'+(r.rk||r.id):'p:'+r.exercises[0].k;
 const ICON={replay:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg>',
   sun:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
   moon:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M7 16v-5M12 16V7M17 16v-8"/></svg>',
+  book:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-2-1.5-5-2-8-1.5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-13c-3-.5-6 0-8 1.5zM12 6v13"/></svg>',
   kebab:'<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>',
   down:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
   more:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>',
   play:'<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
   edit:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
   del:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>'};
+/* An empty view: a muted icon, one line, one sentence and one button that leads to the next step. */
+function emptyState(icon,title,text,label,fn){
+  const e=document.createElement('div');e.className='empty';
+  const i=document.createElement('span');i.innerHTML=ICON[icon];
+  const t=document.createElement('b');t.textContent=title;
+  const p=document.createElement('p');p.textContent=text;
+  const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=label;b.addEventListener('click',fn);
+  e.append(i,t,p,b);return e;
+}
 /* A row's trailing arrow: › opens a page, the chevron opens the row in place. Decoration only; the row's button carries the action. */
 function rowArrow(kind){const s=document.createElement('span');s.className='ar'+(kind==='up'?' up':'');s.innerHTML=ICON[kind==='up'?'down':kind];s.setAttribute('aria-hidden','true');return s;}
 function iconBtn(kind,label,fn){
@@ -5139,7 +5159,8 @@ function renderHistoryDays(){
   const box=$('histList');box.textContent='';
   const gkey=r=>r.mode==='routine'?(r.rk||''):r.exercises[0].k;
   let runs=recs.runs.slice().sort((a,b)=>b.t-a.t);
-  $('histHint').textContent=runs.length?'':'Nothing yet. Play an exercise or a routine and each run shows up here.';
+  $('histHint').textContent='';
+  if(!runs.length)box.appendChild(emptyState('clock','No runs yet','Each run you finish shows up here, newest first.','Play an exercise',()=>showTab('play')));
   const days=[];
   runs.forEach(r=>{const k=dayKey(r.t);let d=days[days.length-1];if(!d||d.k!==k){d={k:k,t:r.t,runs:[]};days.push(d);}d.runs.push(r);});
   const dword=t=>{const w=dayWord(t);return w==='today'?'Today':w==='yesterday'?'Yesterday':w;};
@@ -5307,7 +5328,8 @@ function renderHistoryGroups(){
   const groups=new Map();
   recs.runs.slice().sort((x,y)=>y.t-x.t).forEach(r=>{const k=runKey(r)+'|'+r.lv+'|'+(r.dy||'');if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);});
   let list=[...groups.values()];
-  $('histHint').textContent=list.length?'Your runs grouped by exercise or routine, most recent first. Tap a row to see its runs.':'No runs yet. Each run you finish is listed here.';
+  $('histHint').textContent=list.length?'Your runs grouped by exercise or routine, most recent first. Tap a row to see its runs.':'';
+  if(!list.length)box.appendChild(emptyState('clock','No runs yet','Each run you finish shows up here, grouped by exercise or routine.','Play an exercise',()=>showTab('play')));
   const panel=document.createElement('div');panel.className='dayp';
   list.slice(0,histShown).forEach(g=>{
     const f=g[0],t=runTitle(f),fig=runFigures(f);
@@ -6035,7 +6057,7 @@ function openPick(){
   const byName=libSort==='name';
   const list=recs.lib.slice().sort(byName?(a,b)=>entryName(a).localeCompare(entryName(b),undefined,{numeric:true,sensitivity:'base'}):(a,b)=>b.t-a.t);
   if(!list.length){
-    const p=document.createElement('p');p.className='hint';p.textContent='No saved routines yet. Add some in Library.';box.appendChild(p);
+    box.appendChild(emptyState('book','No saved routines yet','Routines you write or import show up here.','Open the Library',()=>{closePick();showTab('library');}));
   }
   libGroups(list,byName).forEach(([g,items])=>{
     const det=document.createElement('details');det.className='glib';
@@ -6115,7 +6137,8 @@ function renderLibraryPage(){
     det.append(sm,body);box.appendChild(det);
   });
   $('libEmpty').hidden=!!(list.length||st==='scratch');
-  $('exportLib').disabled=!recs.lib.length;
+  if(!$('libEmpty').firstChild)$('libEmpty').appendChild(emptyState('book','Nothing saved yet','Write a routine, or import one from a file or a link.','Write a routine',()=>$('clearRoutine').click()));
+  $('exportLib').hidden=!recs.lib.length;   /* nothing to export: hidden, not disabled without a reason */
 }
 const exerciseCount=x=>parseRoutine(x).exercises.length;
 /* ---------- routine library (a list of routine files on the web) ---------- */
