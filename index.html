@@ -2646,7 +2646,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.37';                           /* shown beside the title */
+const VERSION='1.5.38';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -6935,7 +6935,7 @@ function wire(){
   const dyChanged=()=>{save();pushDet();refreshPreview();};
   $('accent').addEventListener('change',e=>{S.accent=e.target.value;dyChanged();});
   $('others').addEventListener('change',e=>{S.others=e.target.value;dyChanged();});
-  $('tol').addEventListener('change',e=>{S.tol=+e.target.value;save();renderAll();});
+  $('tol').addEventListener('change',e=>{S.tol=+e.target.value;save();renderAll();syncInfo();});   /* the routine's Max score carries the window */
   $('inputMode').addEventListener('change',e=>{S.input=e.target.value;save();setInputMode();});
   $('routineText').addEventListener('input',e=>{const v=plainText(e.target.value);if(v!==e.target.value)e.target.value=v;S.routineText=v.slice(0,MAX_TEXT);S.startExercise=1;save();onRoutineChanged();});
   $('fileBtn').addEventListener('click',()=>$('routineFile').click());

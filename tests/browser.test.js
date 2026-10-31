@@ -499,3 +499,13 @@ test('A kept routine is saved to the library on its own, and discarding the run 
   await p.waitForTimeout(300);
   assert.equal(await libN(), n0, 'discarding takes it back out');
 });
+
+test('changing the on-time window updates the routine\'s Max score at once', async () => {
+  const p = await open({ input: 'kb', bpm: 120, routineText: 'RLRL RLRL\nLRLR LRLR', eachUnit: 'pass', eachVal: 1, click: 'half', tol: 20, seeded: true });
+  const max = () => p.evaluate(() => +document.getElementById('maxLine').textContent.replace(/\D/g, ''));
+  const at20 = await max();
+  await p.evaluate(() => { const s = document.getElementById('tol'); s.value = '50'; s.dispatchEvent(new Event('change')); });
+  const at50 = await max();
+  assert.ok(at20 > 0);
+  assert.ok(Math.abs(at50 - at20 / 1.5) <= 1, '±50 ms is x1 against x1.5 at ±20: ' + at20 + ' then ' + at50);
+});
