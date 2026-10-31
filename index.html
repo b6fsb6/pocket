@@ -30,6 +30,13 @@ if(t!=='light'&&t!=='dark')t=window.matchMedia&&matchMedia('(prefers-color-schem
   --font-display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
   --font-body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
   --font-data:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  /* Type scale (size/line), used in font shorthands: font:600 var(--t-body) var(--font-body) */
+  --t-hero:clamp(56px,16vw,72px)/1; --t-display:clamp(26px,7.5vw,40px)/1; --t-title:20px/1.25; --t-nav:15px/1;
+  --t-body:16px/1.45; --t-small:14px/1.45; --t-caption:13px/1.4; --t-eyebrow:11px/1.2; --t-data:14px/1.4;
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px;   /* 4-pt spacing scale */
+  --r-sm:4px; --r-md:8px; --r-lg:12px; --r-full:999px;   /* cells; buttons and inputs; cards and menus; pills */
+  --hit:44px; --hit-lg:56px;                             /* smallest tap target; primary action */
+  --dur-1:.15s; --dur-2:.24s; --dur-3:.6s; --ease:cubic-bezier(.2,.7,.2,1);   /* state change; layout; celebration */
   color-scheme:light;
 }
   :root[data-theme=dark]{
@@ -2670,7 +2677,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.13';                           /* shown beside the title */
+const VERSION='1.5.14';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
