@@ -1,7 +1,6 @@
 {
  "axe": [
-  "nested-interactive #histList > div.dayp > div.lrow.pl",
-  "nested-interactive details.glib > div.gb > details.hrow.hgrp > summary"
+  "nested-interactive #histList > div.dayp > div.lrow.pl"
  ],
  "field-edge": [],
  "font-size": [
@@ -24,7 +23,6 @@
   ".hand.rest { font-size: 18px }",
   ".help p,.help li { font-size: 14.5px }",
   ".help pre { font-size: 12.5px }",
-  ".hrow .hn { font-size: 17px }",
   ".libitem span { font-size: 12px }",
   ".live b { font-size: 22px }",
   ".live em { font-size: 22px }",
@@ -73,7 +71,6 @@
   ".g-band { border-radius: 2px }",
   ".g-needle { border-radius: 2px }",
   ".g-track { border-radius: 6px }",
-  ".hrow { border-radius: 10px }",
   ".live .lvm i { border-radius: 3px }",
   ".pad { border-radius: 10px }",
   ".panel { border-radius: 10px }",

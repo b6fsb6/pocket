@@ -95,7 +95,7 @@ h3{color:var(--ink);margin:0 0 var(--s-2)}
 input[type=text],input[type=number],select{font:500 16px var(--font-body);color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;min-height:44px;width:100%}
 input[type=range]{width:100%;accent-color:var(--accent);min-height:32px}
 #pattern{font:600 24px var(--font-data);letter-spacing:.1em}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}   /* fields side by side */
 .tempo{display:grid;grid-template-columns:44px 1fr 44px;gap:8px;align-items:center}
 .tempo .btn{padding:0;font-size:22px;min-height:44px}
 .tc{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:12px;align-items:start}   /* both columns: a label line, then a 44px control, so the two lines meet */
@@ -339,21 +339,22 @@ svg.spark{display:block;overflow:visible}
 #pvHist section>*{margin:0}
 .hist{display:grid;gap:6px}
 .hist h4{margin:10px 0 0;font-size:13px;color:var(--muted);font-weight:600}
-.hrow{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
-.hrow summary,.hrow .sm{cursor:pointer;padding:10px 118px 10px 12px;display:grid;gap:2px;font:400 16px var(--font-body);letter-spacing:normal;text-transform:none;position:relative}
-.hrow summary::after{position:absolute;right:14px;top:calc(50% - 8px);margin:0}
-.hrow[open]>summary::after{margin:0;top:calc(50% - 2px)}
-.hrow .hn{font:600 17px var(--font-data);letter-spacing:.06em;overflow-wrap:anywhere}
-.hrow .hs{font-size:13px;color:var(--muted)}
-.hrow.flat .sm{cursor:default;padding-right:92px}
-.hgrp .hrow .sm{padding-right:54px}
-.hgrp .hrow summary{padding-right:84px}
-.hgrp>summary{padding-right:116px}
-.hrow .ha{position:absolute;right:38px;top:50%;transform:translateY(-50%);display:flex;gap:2px}
-.hrow.flat .ha{right:8px}
+/* Row: one anatomy for list rows. Title (.rt) and meta line (.rm) on the left; the trailing area (.ra) is its own column, so it never covers the title. */
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:var(--s-2);row-gap:2px;width:100%;padding:var(--s-3) 0;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left}
+.row:first-child{border-top:0}
+.row>*{grid-column:1;min-width:0}
+.row>.ra{grid-column:2;grid-row:1/span 2;display:flex;align-items:center;gap:2px;margin-block:calc(-1*var(--s-2))}   /* icons are 44px; they may reach into the padding */
+.row .rt{font:600 var(--t-body) var(--font-body);overflow-wrap:anywhere}
+.row .rt.seq{font:600 var(--t-data) var(--font-data);letter-spacing:.08em}   /* a title that is a sticking */
+.row .rm{font:var(--t-caption) var(--font-body);color:var(--muted)}
+.row.cur{background:color-mix(in srgb,var(--fill) 15%,transparent);box-shadow:inset 3px 0 0 var(--fill)}
+@media (hover:hover){:is(button,summary,[role=button]).row:hover{background:color-mix(in srgb,var(--fill) 8%,transparent)}}
+.hrow{border-bottom:1px solid var(--line)}   /* a Library entry: its summary is the row, its body opens beneath */
+.hrow>.row{border:0}
+.row.tog{cursor:pointer}   /* the whole row opens it, as well as its chevron */
 .btn.icon{min-width:var(--hit);padding:0;border-color:transparent;background:transparent;color:var(--muted);display:grid;place-items:center}   /* a 20px SVG, an aria-label and a title */
 .btn.icon.replay,.btn.icon.play{color:var(--accent)}
-.hrow .hb{padding:0 12px 12px;display:grid;gap:8px}
+.hrow .hb{margin:0 0 var(--s-3);padding:var(--s-2) var(--s-3);background:var(--surface);border-left:3px solid var(--accent);display:grid;gap:var(--s-2)}   /* open: the children on a band with a rail */
 .slist{display:grid}
 .sum{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .sum .big{font:600 22px var(--font-data)} .sum small{font:12px var(--font-body);color:var(--muted);margin-left:4px}
@@ -427,13 +428,8 @@ html.pgopen{overflow:hidden}
 .srow .sn .muted,.rrun .sn .muted{color:var(--muted)} .srow .sn .ok,.rrun .sn .ok{color:var(--ok)} .srow .sn .late,.rrun .sn .late{color:var(--late)} .srow .sn .early,.rrun .sn .early{color:var(--early)}
 .srow .btn.icon{flex:none;margin:-6px 0}
 .srow .sq .seq{flex:1;min-width:0;overflow-wrap:anywhere} #rtList .srow{cursor:pointer} .lexs{cursor:default} .lexs .erow{cursor:default;grid-template-columns:30px minmax(0,1fr) 40px;align-items:center} .lexs .muted{color:var(--muted)} #rtList .srow .rtruns{cursor:default}
-.hgrp .tablewrap td,.hgrp .tablewrap th{padding-left:6px;padding-right:6px}
-.hgrp .tablewrap .btn.icon{margin:-8px -6px}
-.hgrp .tablewrap .btn.icon svg{width:17px;height:17px}
-.hgrp tbody tr:has(.cv){cursor:pointer}
 .btn.icon.cv span{width:8px;height:8px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
 .btn.icon.cv.open span{transform:rotate(-135deg) translate(-2px,-2px)}
-.hgrp .hrow{background:var(--bg)}
 .hrow ul{margin:0;padding:0;list-style:none;font-size:13px;display:grid;gap:2px}
 .hrow li{display:flex;gap:8px;justify-content:space-between}
 .cgrid{border-collapse:collapse;margin:8px 0 4px;font-size:13px;width:100%;max-width:360px}
@@ -501,7 +497,7 @@ body[data-mode="routine"] .single-only{display:none}
 .urlrow{display:grid;grid-template-columns:1fr auto;gap:8px}
 #libUrl{word-break:break-all}
 .lnk{display:grid;gap:8px;margin:0 0 14px}
-.lnk input{min-width:0}.lnkrow>*{min-width:0}.lnkurl{word-break:break-all;color:var(--muted,inherit);font-size:.9em}.lnk .btns{margin:0}
+.lnk input{min-width:0}.lnkurl{word-break:break-all;color:var(--muted,inherit);font-size:.9em}.lnk .btns{margin:0}
 .exercises{max-height:288px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
 .erow{cursor:pointer;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);font:13px var(--font-data);align-items:baseline}
 .erow:last-child{border-bottom:0}
@@ -641,34 +637,23 @@ body[data-input="kb"] #micPill{display:none}
 .help .panel>h3{margin:0}
 .help .panel{gap:4px}
 /* Library lists are flat: a line above each group, hairlines between routines, no boxes inside boxes. */
-#libPage>.hrow.flat,.glib{border:0;border-radius:0;background:none}
-.glib{border-top:1px solid var(--line)}
+.glib{border:0;border-top:1px solid var(--line);border-radius:0;background:none}
 .glib>summary{padding:14px 0}
 .glib>.gb{padding:0;gap:0}
-.gb .hrow,#libPage>.hrow.flat{border:0;border-bottom:1px solid var(--line);border-radius:0;background:var(--bg)}
 .gb>.hrow:last-child{border-bottom:0}
-.glib .hrow>summary,#libPage>.hrow.flat .sm{padding-left:0}
 /* Every page is flat: a line between sections and between rows, no boxes. Dialogs and the staff keep theirs. */
 .page .panel{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:16px 0 0}
 .page :is(.page,.pv,.pcol)>.panel:first-child,.page>.panel:first-child,.pv>.panel:first-child,.pcol>.panel:first-child{border-top:0;padding-top:0}
-.page .hrow{border:0;border-bottom:1px solid var(--line);border-radius:0;background:none}
-.page .hrow summary,.page .hrow .sm{padding-left:0}
 .page .hist{gap:0}
 .page .hist>.hrow:last-child,.page .slist>.hrow:last-child{border-bottom:0}
 .page .dayp{background:none;border:0;border-radius:0;padding:0}
 .page .dayp .lrow:first-child{border-top:1px solid var(--line)}
-.glib .hrow>summary{padding-right:calc(4*var(--hit) + var(--s-3))}   /* room for the four actions; step 7 moves them into the row's flow */
-.glib .hrow>summary::after{display:none}
-.glib .hrow .ha{right:6px}
-.lnkrow{position:relative;display:grid;gap:4px;padding:10px calc(2*var(--hit) + var(--s-1)) 10px 0;border-bottom:1px solid var(--line)}
-.lnkrow .ha{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex}
 #advBar{display:none;grid-column:1/-1;gap:8px}
 #advBar .advmain{margin-top:0}
 :root[data-layout=desktop] body[data-review="1"] #advBar{display:grid}
 :root[data-layout=desktop] body[data-review="1"] #startBtn,:root[data-layout=desktop] body[data-review="1"] #playSummary{display:none}
 .exercises.lexs{border:0;border-radius:0;background:none}
 /* An open row is lifted with a lighter background that reaches a little past the text on both sides. */
-.page .hrow[open]{background:var(--surface);box-shadow:-10px 0 0 var(--surface),10px 0 0 var(--surface)}
 .bigbpm{display:block;font:600 40px/1.1 var(--font-data);margin:2px 0 8px}
 .bigrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .bigrow .hint{margin:0;text-align:right}
@@ -725,7 +710,7 @@ body[data-input="kb"] #micPill{display:none}
 .pickrow.on{background:var(--bg);box-shadow:inset 3px 0 0 var(--fill)}
 #pickList{display:grid;gap:10px}
 .btn.icon.down svg{transition:transform .18s}
-.hrow[open] .btn.icon.down svg{transform:rotate(180deg)}
+.hrow.open .btn.icon.down svg{transform:rotate(180deg)}
 .btn.icon.gap{visibility:hidden;pointer-events:none}
 .rmenu{position:fixed;z-index:60;min-width:150px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:var(--shadow-pop);display:grid}
 .rmenu button{border:0;background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;padding:12px 14px;border-radius:7px;cursor:pointer;min-height:44px}
@@ -765,7 +750,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
     <div class="pv" id="svPref">
     <section class="panel" aria-label="Timing and click sound">
       <h3>Timing and click sound</h3>
-      <div class="row">
+      <div class="fields">
         <div class="field"><label for="tol">On-time window</label>
           <select id="tol">
             <option value="10">± 10 ms</option>
@@ -911,16 +896,16 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
         <section class="panel buildonly" aria-label="Defaults">
           <div class="bset" id="bSet">
             <div class="field"><label for="bTitle">Title</label><input type="text" id="bTitle" maxlength="80" autocomplete="off" autocorrect="off" data-lpignore="true" data-1p-ignore data-bwignore data-form-type="other" placeholder="Name this routine"></div>
-            <div class="row b-routine">
+            <div class="fields b-routine">
               <div class="field"><label for="bEachU">Each exercise plays for</label><select id="bEachU"></select></div>
               <div class="field"><label for="bEachV">Amount</label><input type="number" id="bEachV" min="1" max="999" step="any" inputmode="decimal"></div>
             </div>
-            <div class="row b-routine">
+            <div class="fields b-routine">
               <div class="field"><label for="bTime">Time</label><select id="bTime"></select></div>
               <div class="field"><label for="bGroup">Grouping</label><select id="bGroup"></select></div>
               <div class="field"><label for="bStrokes">Default note</label><select id="bStrokes"></select></div>
             </div>
-            <div class="row b-single">
+            <div class="fields b-single">
               <div class="field"><label for="bTime1">Time</label><select id="bTime1"></select></div>
               <div class="field"><label for="bGroup1">Grouping</label><select id="bGroup1"></select></div>
               <div class="field"><label for="subdiv">Default note</label><select id="subdiv"></select></div>
@@ -949,12 +934,12 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
         <section class="panel buildonly b-routine" aria-label="This exercise">
           <h3>This exercise</h3>
           <div class="bset">
-            <div class="row">
+            <div class="fields">
               <div class="field"><label for="oLenU">Plays for</label><select id="oLenU"></select></div>
               <div class="field"><label for="oLenV">Amount</label><input type="number" id="oLenV" min="1" max="999" step="any" inputmode="decimal"></div>
               <div class="field"><label for="oBpm">Tempo (BPM)</label><input type="number" id="oBpm" min="40" max="220" inputmode="numeric" placeholder="Same as Play"></div>
             </div>
-            <div class="row">
+            <div class="fields">
               <div class="field"><label for="oTime">Time</label><select id="oTime"></select></div>
               <div class="field"><label for="oGroup">Grouping</label><select id="oGroup"></select></div>
             </div>
@@ -1351,7 +1336,7 @@ RLRR LRLL RLRR LRLL</pre>
       <summary id="setSum"></summary>
       <div class="sbody">
     <section class="panel cfg" aria-label="How long it plays">
-      <div class="row">
+      <div class="fields">
         <div class="field"><label for="eachVal"><span class="routine-only">Each exercise plays for</span><span class="single-only">Plays for</span></label>
           <div class="dur"><input type="number" id="eachVal" min="1" max="200" step="1" inputmode="decimal"><select id="eachUnit" aria-label="Measured in"><option value="min">minutes</option><option value="pass">passes</option></select></div></div>
         <div class="field routine-only"><label for="gap">Between exercises</label>
@@ -2661,7 +2646,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.22';                           /* shown beside the title */
+const VERSION='1.5.23';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -6084,11 +6069,11 @@ function renderLibraryPage(){
   $('lsName').classList.toggle('on',byName);$('lsName').setAttribute('aria-pressed',String(byName));
   const list=recs.lib.slice().sort(byName?(a,b)=>entryName(a).localeCompare(entryName(b),undefined,{numeric:true,sensitivity:'base'}):(a,b)=>b.t-a.t),st=scratchState(),locked=!!(run&&!run.ended);
   if(st==='scratch'){
-    const row=document.createElement('div');row.className='hrow flat lib';
-    const sm=document.createElement('div');sm.className='sm';
-    const n=document.createElement('span');n.className='hn';n.textContent=curName();
-    const hs=document.createElement('span');hs.className='hs';hs.textContent='Not in your library';
-    const ac=document.createElement('span');ac.className='ha';
+    const row=document.createElement('div');row.className='hrow';
+    const sm=document.createElement('div');sm.className='row';
+    const n=document.createElement('span');n.className='rt';n.textContent=curName();
+    const hs=document.createElement('span');hs.className='rm';hs.textContent='Not in your library';
+    const ac=document.createElement('span');ac.className='ra';
     ac.appendChild(iconBtn('edit','Edit',()=>openEditor('library')));
     ac.appendChild(iconBtn('play','Play',()=>showTab('play')));
     sm.append(n,hs,ac);row.appendChild(sm);box.appendChild(row);
@@ -6100,23 +6085,24 @@ function renderLibraryPage(){
   const deleteEntry=e=>{const was=e.id===S.libId,name=recs.names[libKey(e)],label=entryName(e);removeLibEntry(e);renderLibraryPage();libUndo(e,was,name,label);};
   const mkEntry=(e,label)=>{
     const k=libKey(e),mine=recs.runs.filter(r=>(r.mode==='routine'?r.rk:r.exercises[0].k)===k);
-    const det=document.createElement('details');det.className='hrow hgrp';
-    const sm=document.createElement('summary');
-    const n=document.createElement('span');n.className='hn';n.textContent=label;
-    const c=exerciseCount(e.x),hs=document.createElement('span');hs.className='hs';
+    const det=document.createElement('div');det.className='hrow';
+    const sm=document.createElement('div');sm.className='row';
+    const n=document.createElement('span');n.className='rt'+(!recs.names[k]&&!isRoutineKey(k)?' seq':'');n.textContent=label;   /* mono when the title is the sticking */
+    const c=exerciseCount(e.x),hs=document.createElement('span');hs.className='rm';
     const latest=mine.reduce((m,r)=>Math.max(m,r.t),0);
     hs.textContent=c+(c===1?' exercise':' exercises')+' · '+mine.length+(mine.length===1?' run':' runs')+(latest?' · latest '+dayWord(latest):'')+(e.id===S.libId?(st==='dirty'?' · open, unsaved changes':' · open'):'');
-    const ac=document.createElement('span');ac.className='ha';
+    const ac=document.createElement('span');ac.className='ra';
     const ed=iconBtn('edit','Edit',()=>editEntry(e)),pl=iconBtn('play','Play',()=>playEntry(e));
     ed.disabled=pl.disabled=locked;
     const km=kebab('More actions',[{t:'Download',fn:()=>downloadEntry(e)},{t:'Delete',fn:()=>deleteEntry(e),arm:true,danger:true}]);
     /* The chevron shows when opening the row reveals something the row does not already say: more than one exercise, or an exercise behind a title. */
     const more=exerciseCount(e.x)>1||!!recs.names[libKey(e)];
-    const ex=more?iconBtn('down','Show exercises',()=>{det.open=!det.open;}):document.createElement('span');
-    if(more){ex.setAttribute('aria-expanded','false');det.addEventListener('toggle',()=>ex.setAttribute('aria-expanded',String(det.open)));}else ex.className='btn icon gap';
+    const body=document.createElement('div');body.className='hb';body.hidden=true;
+    const setOpen=o=>{det.classList.toggle('open',o);body.hidden=!o;ex.setAttribute('aria-expanded',String(o));};
+    const ex=more?iconBtn('down','Show exercises',()=>setOpen(body.hidden)):document.createElement('span');
+    if(more){ex.setAttribute('aria-expanded','false');sm.addEventListener('click',ev=>{if(!ev.target.closest('button'))setOpen(body.hidden);});sm.classList.add('tog');}else ex.className='btn icon gap';
     ac.append(ed,pl,km,ex);
     sm.append(n,hs,ac);det.appendChild(sm);
-    const body=document.createElement('div');body.className='hb';
     const exl=exerciseListEl(e.x);if(exl)body.appendChild(exl);
     det.appendChild(body);
     return det;
@@ -6181,10 +6167,10 @@ function renderLinks(){
   S.lists.forEach(l=>{
     if(l===lnkEdit){box.appendChild(form(l));return;}
     const nm=document.createElement('b'),ur=document.createElement('span'),ac=document.createElement('span');
-    nm.textContent=listName(l);ur.className='lnkurl';ur.textContent=l.url;ac.className='ha';
+    nm.className='rt';nm.textContent=listName(l);ur.className='rm lnkurl';ur.textContent=l.url;ac.className='ra';
     ac.appendChild(iconBtn('edit','Edit',()=>{lnkEdit=l;renderLinks();}));
     ac.appendChild(kebab('More actions',[{t:'Delete',fn:()=>{S.lists=S.lists.filter(q=>q!==l);if(S.listSel===l.url){S.listSel='';lib={items:[],loaded:false,busy:false,cur:''};}libMode='';save();renderLibrary();},arm:true,danger:true}]));
-    const inner=document.createElement('div');inner.className='lnkrow';inner.append(nm,ur,ac);
+    const inner=document.createElement('div');inner.className='row';inner.append(nm,ur,ac);
     box.appendChild(inner);
   });
   if(lnkEdit===NEW)box.appendChild(form(NEW));
