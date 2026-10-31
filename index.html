@@ -2670,7 +2670,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.11';                           /* shown beside the title */
+const VERSION='1.5.12';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4924,7 +4924,7 @@ function renderScoreSummary(stats){
     const r=document.createElement('div');r.className='nr';
     const t=document.createElement('div');
     const a=document.createElement('div');a.className='seq';a.textContent=showKey(x.k)+(x.dy?' \u00B7 '+dynText(x.dy):'');
-    const b=document.createElement('div');b.className='nt';b.textContent=Math.round(x.recent*100)+'% at '+x.bpm+' BPM'+(i===0?' \u00B7 weakest':'');
+    const b=document.createElement('div');b.className='nt';b.textContent=Math.round(x.recent*100)+'% at '+x.bpm+' BPM'+(i===0?' \u00B7 lowest accuracy':'');
     t.appendChild(a);t.appendChild(b);r.appendChild(t);
     r.appendChild(iconBtn('play','Play this exercise',()=>practisePattern(x.k,x.lv,x.dy)));box.appendChild(r);
   });
