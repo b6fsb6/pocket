@@ -149,8 +149,6 @@ body[data-run="1"] .notice{display:none}
 :root[data-layout=desktop] #pvStats:not([hidden]),:root[data-layout=desktop] #pvAch:not([hidden]){grid-template-columns:minmax(280px,340px) minmax(0,1fr);column-gap:28px;align-items:start}
 :root[data-layout=desktop] .pv>.pcol{display:grid;gap:22px;align-content:start;min-width:0}
 :root[data-layout=desktop] #pvAch .pside{position:sticky;top:16px}
-:root[data-layout=desktop] #badges{display:block;columns:300px;column-gap:28px}   /* cards of different heights pack into columns with no gaps */
-:root[data-layout=desktop] #badges>.bw{break-inside:avoid;margin:0 0 22px;border-top:1px solid var(--line);padding-top:16px}
 :root[data-layout=desktop] #svPref:not([hidden]),:root[data-layout=desktop] #svDev:not([hidden]),:root[data-layout=desktop] #svData:not([hidden]){display:block;columns:2 340px;column-gap:22px}
 :root[data-layout=desktop] #svPref>*,:root[data-layout=desktop] #svDev>*,:root[data-layout=desktop] #svData>*{break-inside:avoid;margin-bottom:22px}
 .libsec{display:grid;gap:14px}
@@ -332,7 +330,15 @@ body[data-tab=pattern] header,body[data-tab=pattern] .tabs{display:none}   /* th
 :root:not([data-layout=desktop]) body[data-review="1"] header,:root:not([data-layout=desktop]) body[data-review="1"] .tabs,:root:not([data-layout=desktop]) body[data-review="1"] .cfg,:root:not([data-layout=desktop]) body[data-review="1"] .transport,:root:not([data-layout=desktop]) body[data-review="1"] .notice{display:none}
 .advmain{margin-top:10px}
 svg.spark{display:block;overflow:visible}
-.badges{display:grid;gap:22px}
+.badges{display:grid;gap:22px}   /* one column of badges, also on desktop */
+/* An in-page disclosure: a hairline, a body-size summary and its chevron at the right. */
+details.how{border:0;border-top:1px solid var(--line);border-radius:0;background:none}
+details.how>summary{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);min-height:var(--hit);padding:var(--s-2) 0;font:600 var(--t-body) var(--font-body);letter-spacing:normal;text-transform:none}
+details.how>summary::after{float:none;flex:none;margin:0 4px 4px 0}
+details.how[open]>summary::after{margin:4px 4px 0 0}
+.how dl{margin:0 0 var(--s-3);display:grid;gap:var(--s-1) 0}
+.how dt{font:600 var(--t-small) var(--font-body);margin-top:var(--s-2)}
+.how dd{margin:0;font:var(--t-small) var(--font-body);color:var(--muted)}
 .pv{display:grid;gap:22px}
 .pv>*{min-width:0}
 .pv[hidden]{display:none}
@@ -993,6 +999,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
       <div class="strip" id="strip" role="img" aria-label="Last four weeks of practice"></div>
       <p class="hint" id="stripHint"></p>
     </section>
+    <details class="how" id="achHow"><summary>How this is counted</summary><dl id="achHowList"></dl></details>
     </div>
     <div class="badges pmain" id="badges"></div>
     </div>
@@ -2629,7 +2636,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.28';                           /* shown beside the title */
+const VERSION='1.5.29';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4686,10 +4693,12 @@ function renderUnlocked(L){
 function renderBadges(){
   const v=badgeValues(recs.runs,recs.sum),box=$('badges');box.textContent='';
   const st=patStats(recs.runs,recs.sum).filter(e=>e.cleared);
+  const how=$('achHowList');how.textContent='';   /* what each group counts, out of the way until asked for */
+  {const t=document.createElement('dd');t.textContent='Steps you have earned are in colour.';how.appendChild(t);}
   BGROUPS.forEach(g=>{
+    const dt=document.createElement('dt');dt.textContent=g.name;const dd=document.createElement('dd');dd.textContent=g.d;how.append(dt,dd);
     const w=document.createElement('section');w.className='bw panel';w.setAttribute('aria-label',g.name);
     const h=document.createElement('h3');h.textContent=g.name;w.appendChild(h);
-    const d=document.createElement('p');d.className='hint';d.textContent=g.d+(g===BGROUPS[0]?' Steps you have earned are in colour.':'');w.appendChild(d);
     if(g.grid){
       const tb=document.createElement('table');tb.className='cgrid';
       const hd=document.createElement('tr');['Level','Any tempo','60+','80+','100+','120+'].forEach(x=>{const c=document.createElement('th');c.textContent=x;hd.appendChild(c);});tb.appendChild(hd);
