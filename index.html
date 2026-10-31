@@ -274,9 +274,9 @@ details[open]>summary::after{transform:rotate(-135deg);margin-top:10px}
 .libitem.have b{font-weight:400;color:var(--muted)}
 .libitem span{color:var(--muted);font:12px var(--font-data);white-space:nowrap}
 .chkmsg{margin:0;padding:10px 12px;border-left:4px solid var(--accent);background:var(--surface);border-radius:6px;font:600 17px/1.35 var(--font-body);color:var(--ink)} .chkmsg:empty{display:none}
-.rchev{width:40px;height:40px;border:0;background:none;position:relative;flex:none;cursor:pointer} .rchev::after{content:"";position:absolute;left:15px;top:13px;width:9px;height:9px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform .15s} .rchev.up::after{transform:rotate(-135deg);top:18px}
-.rtruns{margin:12px -16px -14px;padding:2px 16px 4px 13px;background:color-mix(in srgb,var(--ink) 7%,transparent);border-left:3px solid var(--accent)}   /* the runs of an open routine sit on a tinted band with an accent rail, so they read as part of it */
-.rrun{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:12px 0;font:inherit;color:inherit;cursor:pointer} .rrun:first-child{border-top:0} .rtruns .rrun{border-top-color:color-mix(in srgb,var(--ink) 12%,transparent)} .rrun .l{flex:1;min-width:0} .rrun .nm{font:600 14px var(--font-body)} .rrun .ar{color:var(--muted);font-size:22px;line-height:1}
+.rtruns{padding:0 var(--s-3);background:var(--surface);border-left:3px solid var(--accent)}   /* the runs of an open row sit on a band with an accent rail, so they read as part of it */
+.row>.rtruns{grid-column:1/-1;margin:var(--s-2) 0 calc(-1*var(--s-3))}
+.rtruns .row{cursor:pointer}
 .rmore{border-top:1px solid var(--line);width:100%;text-align:left;border-radius:0}
 .calst{display:grid;gap:2px;margin:4px 0 8px} .calst .cs{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:14px} .calst .cs:first-child{border-top:0} .calst .good{color:var(--ok)} .calst .warn{color:var(--warn)} .calst .bad{color:var(--danger)} .calst .muted{color:var(--muted)}
 .chkout{margin:0;padding-left:18px;font-size:13px;display:grid;gap:4px} .chkout:empty{display:none} .chkout .bad{color:var(--danger)} .chkout .warn{color:var(--warn)} .chkout .good{color:var(--ok)}
@@ -360,28 +360,14 @@ svg.spark{display:block;overflow:visible}
 .sum .big{font:600 22px var(--font-data)} .sum small{font:12px var(--font-body);color:var(--muted);margin-left:4px}
 .sum .big.early{color:var(--early)} .sum .big.late{color:var(--late)} .sum .big.ok{color:var(--ok)}
 .sum p{margin:2px 0 0;color:var(--muted);font-size:13px}
-.nextp .nr{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
-.nextp .nr:first-child{border-top:0}
-.nextp .seq{font:600 14px var(--font-data);letter-spacing:.06em;overflow-wrap:normal}
-.nextp .nt{font:12px var(--font-body);color:var(--muted)}
 .hint b{color:var(--ink);font-weight:600}
 .dayh{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 8px}
 .dayh span:last-child{font-weight:400;letter-spacing:0;text-transform:none}
 .dayp{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
-.lrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:start;column-gap:10px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;color:inherit;font:inherit}
-.dayp .lrow:first-child{border-top:0}
-.lrow .l{display:contents}   /* title, accuracy and chevron share the top row; the summary lines run the full width beneath */
-.lrow .nm{grid-column:1;grid-row:1}.lrow .ac{grid-column:2;grid-row:1}.lrow .ar{grid-column:3;grid-row:1}.lrow .sb{grid-column:1/-1}
-.lrow .nm,.rp h2{font-weight:600;overflow-wrap:anywhere}.lrow .nm.seq,.rp h2.seq{font:600 14px/1.5 var(--font-data);letter-spacing:.05em}
-.lrow .nm,.lrow .nm.seq{line-height:24px}   /* the accuracy and chevron sit level with the first line of the title */
-.lrow .sb,.rp .sb{font-size:12px;color:var(--muted)} .lrow .sb.dy,.rp .sb.dy{color:var(--accent)}
-.lrow .ac{font:600 16px/24px var(--font-data);white-space:nowrap} .lrow .ac small{font:600 11px var(--font-body);letter-spacing:.06em;color:var(--muted);margin-left:3px}
+.rp h2{font-weight:600;overflow-wrap:anywhere}.rp h2.seq{font:600 var(--t-data) var(--font-data);letter-spacing:.08em}
+.rp .sb{font-size:13px;color:var(--muted)} .rp .sb.dy{color:var(--accent)}
 .ac.ok{color:var(--ok)} .ac.late{color:var(--late)} .ac.muted{color:var(--muted)}
-.lrow .ar{color:var(--muted);font-size:22px;line-height:24px}
-.lrow.pl{grid-template-columns:minmax(0,1fr) auto auto auto} .lrow.pl .btn.icon{grid-column:3;grid-row:1;margin:-8px 0} .lrow.pl .ar{grid-column:4}
-.lrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
-.lrow .ar.chv{position:relative;width:24px} .lrow .ar.chv::after{content:"";position:absolute;left:7px;top:6px;width:9px;height:9px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform .15s} .lrow .ar.chv.up::after{transform:rotate(-135deg);top:11px}
-.dayp{overflow:hidden} .dayp .rtruns{margin:0 -14px;padding:2px 14px 4px 11px} .page .dayp .rtruns{margin:0;padding:2px 0 4px 11px}
+.dayp{overflow:hidden}
 .rp{display:grid;gap:4px}
 
 .rp .back{justify-self:start;padding-left:0}
@@ -417,17 +403,19 @@ html.pgopen{overflow:hidden}
 .rp .sn{display:flex;flex-wrap:wrap;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums} .rp .sn small{color:var(--muted);font:11px var(--font-body);margin-left:3px}
 .rp .sn .ok{color:var(--ok)} .rp .sn .late{color:var(--late)} .rp .sn .early{color:var(--early)} .rp .sn .muted{color:var(--muted)}
 .hint.hl{margin:2px 0 0}
-.srow .nt{font:12px var(--font-body);color:var(--muted)} .srow .nt.go{color:var(--ok)}
-.srow{gap:8px;padding:14px 2px}
-.srow{display:grid;gap:3px;padding:9px 2px;border-top:1px solid var(--line)}
-.srow:first-child{border-top:0}
-.srow .sq{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.srow .seq{font:600 14px var(--font-data);letter-spacing:.06em}
-.srow .sn,.rrun .sn{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums}
-.srow .sn small,.rrun .sn small{color:var(--muted);font:11px var(--font-body);letter-spacing:.04em;margin-left:3px}
-.srow .sn .muted,.rrun .sn .muted{color:var(--muted)} .srow .sn .ok,.rrun .sn .ok{color:var(--ok)} .srow .sn .late,.rrun .sn .late{color:var(--late)} .srow .sn .early,.rrun .sn .early{color:var(--early)}
-.srow .btn.icon{flex:none;margin:-6px 0}
-.srow .sq .seq{flex:1;min-width:0;overflow-wrap:anywhere} #rtList .srow{cursor:pointer} .lexs{cursor:default} .lexs .erow{cursor:default;grid-template-columns:30px minmax(0,1fr) 40px;align-items:center} .lexs .muted{color:var(--muted)} #rtList .srow .rtruns{cursor:default}
+/* A row's parts: the main area as one button, a value, the stats line and the arrow. */
+.row>.rmain{display:grid;gap:2px;align-content:center;min-height:var(--hit);padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.row>.rmain>*{display:block}
+.row>.rmain:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (hover:hover){.row:has(>.rmain:hover){background:color-mix(in srgb,var(--fill) 8%,transparent)}}
+.row .rm.dy{color:var(--accent)} .row .rm.go{color:var(--ok)}
+.row .ac{font:600 var(--t-body) var(--font-data);white-space:nowrap} .row .ac small{font:600 var(--t-eyebrow) var(--font-body);letter-spacing:.06em;color:var(--muted);margin-left:var(--s-1)}
+.row .ar{display:grid;place-items:center;width:var(--s-5);color:var(--muted)}   /* the arrow is an icon, not a control */
+.row .ar svg{transition:transform var(--dur-1) var(--ease)} .row .ar.up svg{transform:rotate(180deg)}
+.row .sn{display:flex;flex-wrap:wrap;align-items:center;gap:2px 14px;font:13px var(--font-data);font-variant-numeric:tabular-nums}
+.row .sn small{color:var(--muted);font:11px var(--font-body);letter-spacing:.06em;margin-left:3px}
+.row .sn .muted{color:var(--muted)} .row .sn .ok{color:var(--ok)} .row .sn .late{color:var(--late)} .row .sn .early{color:var(--early)}
+.lexs{cursor:default} .lexs .erow{cursor:default;grid-template-columns:30px minmax(0,1fr) 40px;align-items:center} .lexs .muted{color:var(--muted)}
 .btn.icon.cv span{width:8px;height:8px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
 .btn.icon.cv.open span{transform:rotate(-135deg) translate(-2px,-2px)}
 .hrow ul{margin:0;padding:0;list-style:none;font-size:13px;display:grid;gap:2px}
@@ -647,7 +635,7 @@ body[data-input="kb"] #micPill{display:none}
 .page .hist{gap:0}
 .page .hist>.hrow:last-child,.page .slist>.hrow:last-child{border-bottom:0}
 .page .dayp{background:none;border:0;border-radius:0;padding:0}
-.page .dayp .lrow:first-child{border-top:1px solid var(--line)}
+.page .dayp .row:first-child{border-top:1px solid var(--line)}   /* under the day heading */
 #advBar{display:none;grid-column:1/-1;gap:8px}
 #advBar .advmain{margin-top:0}
 :root[data-layout=desktop] body[data-review="1"] #advBar{display:grid}
@@ -710,7 +698,7 @@ body[data-input="kb"] #micPill{display:none}
 .pickrow.on{background:var(--bg);box-shadow:inset 3px 0 0 var(--fill)}
 #pickList{display:grid;gap:10px}
 .btn.icon.down svg{transition:transform .18s}
-.hrow.open .btn.icon.down svg{transform:rotate(180deg)}
+:is(.hrow.open>.row,.row.open)>.ra .btn.icon.down svg{transform:rotate(180deg)}   /* an open row's chevron points up */
 .btn.icon.gap{visibility:hidden;pointer-events:none}
 .rmenu{position:fixed;z-index:60;min-width:150px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:var(--shadow-pop);display:grid}
 .rmenu button{border:0;background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;padding:12px 14px;border-radius:7px;cursor:pointer;min-height:44px}
@@ -2646,7 +2634,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.23';                           /* shown beside the title */
+const VERSION='1.5.24';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4790,11 +4778,11 @@ function renderScoreGroups(stats,practise,usual){
   }
   const list=document.createElement('div');list.className='slist';
     rows.slice().sort((a,b)=>scoreSort==='asc'?a.recent-b.recent:b.recent-a.recent).forEach(x=>{
-      const row=document.createElement('div');row.className='srow';
-      const q=document.createElement('div');q.className='sq';
-      const seq=document.createElement('span');seq.className='seq';seq.textContent=showKey(x.k);
-      q.appendChild(seq);q.appendChild(practise(x.k,x.lv,x.dy));row.appendChild(q);
-      const n=document.createElement('div');n.className='sn';
+      const row=document.createElement('div');row.className='row';
+      const seq=document.createElement('span');seq.className='rt seq';seq.textContent=showKey(x.k);
+      const ra=document.createElement('span');ra.className='ra';ra.appendChild(practise(x.k,x.lv,x.dy));
+      row.append(seq,ra);
+      const n=document.createElement('span');n.className='sn';
       const stat=(txt,unit,cls)=>statSpan(n,txt,unit,cls);
       const acc=accCell(x.recent);
       stat(String(x.bpm),'BPM');
@@ -4811,7 +4799,7 @@ function renderScoreGroups(stats,practise,usual){
       if(x.da||x.dg)bits.push('last run: '+causeText(x.da,x.dg));
       const done=x.cleared&&x.cleared>=x.bpm;
       if(x.cleared){const t=masteryTier(x.k,x.cleared);bits.push((done?'Cleared at ':'best cleared ')+x.cleared+' BPM, '+MTIER[t]+' ('+strokeRate(x.k,x.cleared)+' strokes/min)'+(done?'.':''));}
-      const nt=document.createElement('div');nt.className='nt'+(done?' go':'');nt.textContent=bits.join(' \u00B7 ');row.appendChild(nt);
+      const nt=document.createElement('span');nt.className='rm'+(done?' go':'');nt.textContent=bits.join(' \u00B7 ');row.appendChild(nt);
       list.appendChild(row);
     });
   wrap.appendChild(list);
@@ -4821,16 +4809,16 @@ function renderScoreGroups(stats,practise,usual){
 let rtOpen='',rtAll=false;   /* the routine row that is open in Scores, and whether it lists every run */
 /* One run of an open routine or group: its day and time, the figures, and a way into the run. */
 function runBtn(r,back){
-  const b=document.createElement('button');b.type='button';b.className='rrun';
-  const l=document.createElement('div');l.className='l';
-  const nm=document.createElement('div');nm.className='nm';nm.textContent=dayWord(r.t).replace(/^./,c=>c.toUpperCase())+' \u00B7 '+new Date(r.t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});l.appendChild(nm);
+  const b=document.createElement('button');b.type='button';b.className='row';
+  const l=document.createDocumentFragment();
+  const nm=document.createElement('span');nm.className='rt';nm.textContent=dayWord(r.t).replace(/^./,c=>c.toUpperCase())+' \u00B7 '+new Date(r.t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});l.appendChild(nm);
   const f=runFigures(r),a=accHtml(f.acc),sn=document.createElement('div');sn.className='sn';
   const st=(txt,unit,cls)=>{const e=document.createElement('span');if(cls)e.className=cls;e.textContent=txt;const u=document.createElement('small');u.textContent=unit;e.appendChild(u);sn.appendChild(e);};
   st(String(r.bpm),'BPM');st(a[0],'ACC',a[1]);st(isNaN(f.ms)?'\u2014':fmtMs(f.ms,1),'ms',isNaN(f.ms)?'muted':biasCls(f.ms));st(isNaN(f.db)?'\u2014':'\u00B1'+f.db.toFixed(1),'dB');
   l.appendChild(sn);
-  if(r.exercises.length<r.ne){const pn=document.createElement('div');pn.className='nt';pn.textContent=r.exercises.length+' of '+r.ne+' exercises played';l.appendChild(pn);}
-  const ar=document.createElement('span');ar.className='ar';ar.textContent='\u203A';ar.setAttribute('aria-hidden','true');
-  b.appendChild(l);b.appendChild(ar);
+  if(r.exercises.length<r.ne){const pn=document.createElement('span');pn.className='rm';pn.textContent=r.exercises.length+' of '+r.ne+' exercises played';l.appendChild(pn);}
+  const ra=document.createElement('span');ra.className='ra';ra.appendChild(rowArrow('more'));
+  b.append(l,ra);
   b.addEventListener('click',()=>openRunFrom(r.id,back));
   return b;
 }
@@ -4839,15 +4827,14 @@ function renderRoutineRows(routines,replay){
   if(!routines.length){const p=document.createElement('p');p.className='hint';p.textContent='No routines scored yet.';box.appendChild(p);return;}
   routines.forEach(x=>{
     const key=x.rk+'|'+x.lv+'|'+(x.dy||''),open=rtOpen===key;
-    const row=document.createElement('div');row.className='srow';
-    const q=document.createElement('div');q.className='sq';
-    const t=document.createElement('span');t.className='seq';t.textContent=routineName(x.rk);
-    const ch=document.createElement('button');ch.type='button';ch.className='rchev'+(open?' up':'');ch.setAttribute('aria-expanded',String(open));ch.setAttribute('aria-label',(open?'Hide':'Show')+' runs of '+routineName(x.rk));
-    q.appendChild(t);q.appendChild(replay(x));q.appendChild(ch);row.appendChild(q);
+    const row=document.createElement('div');row.className='row'+(open?' open':'');
+    const m=document.createElement('button');m.type='button';m.className='rmain';m.setAttribute('aria-expanded',String(open));
+    const t=document.createElement('span');t.className='rt';t.textContent=routineName(x.rk);m.appendChild(t);
     const toggle=()=>{rtOpen=open?'':key;rtAll=false;renderProgress();};
-    ch.addEventListener('click',toggle);
-    row.addEventListener('click',e=>{if(!e.target.closest('button'))toggle();});
-    const n=document.createElement('div');n.className='sn';
+    const ch=iconBtn('down',(open?'Hide':'Show')+' runs of '+routineName(x.rk),toggle);ch.setAttribute('aria-expanded',String(open));
+    const ra=document.createElement('span');ra.className='ra';ra.append(replay(x),ch);
+    row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b===m)toggle();});
+    const n=document.createElement('span');n.className='sn';
     const stat=(txt,unit,cls)=>statSpan(n,txt,unit,cls);
     if(x.bpm===null){stat('\u2014','ACC','muted');}
     else{
@@ -4858,20 +4845,21 @@ function renderRoutineRows(routines,replay){
       stat(isNaN(x.bias)?'\u2014':fmtMs(x.bias,1),'ms',biasCls(x.bias));
       stat(isNaN(x.even)?'\u2014':'\u00B1'+x.even.toFixed(1),'dB');
     }
-    row.appendChild(n);
+    m.appendChild(n);
     const bits=[levelName(x.lv)];
     if(x.dy)bits.push(dynText(x.dy));
     bits.push(x.ne+(x.ne===1?' exercise':' exercises'));
     bits.push(x.runs+(x.runs===1?' run':' runs'));
     if(x.cleared)bits.push('Cleared at '+x.cleared+' BPM.');
-    const nt=document.createElement('div');nt.className='nt'+(x.cleared&&x.bpm!==null&&x.cleared>=x.bpm?' go':'');nt.textContent=bits.join(' \u00B7 ');row.appendChild(nt);
+    const nt=document.createElement('span');nt.className='rm'+(x.cleared&&x.bpm!==null&&x.cleared>=x.bpm?' go':'');nt.textContent=bits.join(' \u00B7 ');m.appendChild(nt);
+    row.append(m,ra);
     if(open){
       const mine=recs.runs.filter(r=>r.rk===x.rk&&r.lv===x.lv&&(r.dy||'')===(x.dy||'')).sort((a,b)=>b.t-a.t);
       const shown=rtAll?mine:mine.slice(0,4);
       const list=document.createElement('div');list.className='rtruns';
       shown.forEach(r=>list.appendChild(runBtn(r,'Scores')));
       if(mine.length>4){const m=document.createElement('button');m.type='button';m.className='btn link rmore';m.textContent=rtAll?'Show fewer':'Show all '+mine.length+' runs';m.addEventListener('click',()=>{rtAll=!rtAll;renderProgress();});list.appendChild(m);}
-      if(x.runs>mine.length){const o=document.createElement('div');o.className='nt';o.style.padding='6px 0';o.textContent='Older runs are summarised and not listed.';list.appendChild(o);}
+      if(x.runs>mine.length){const o=document.createElement('p');o.className='hint';o.textContent='Older runs are summarised and not listed.';list.appendChild(o);}
       row.appendChild(list);
     }
     box.appendChild(row);
@@ -4898,12 +4886,11 @@ function renderScoreSummary(stats){
   $('scoreNextBox').hidden=false;
   const box=document.createElement('div');box.className='nextp';
   weak.forEach((x,i)=>{
-    const r=document.createElement('div');r.className='nr';
-    const t=document.createElement('div');
-    const a=document.createElement('div');a.className='seq';a.textContent=showKey(x.k)+(x.dy?' \u00B7 '+dynText(x.dy):'');
-    const b=document.createElement('div');b.className='nt';b.textContent=Math.round(x.recent*100)+'% at '+x.bpm+' BPM'+(i===0?' \u00B7 lowest accuracy':'');
-    t.appendChild(a);t.appendChild(b);r.appendChild(t);
-    r.appendChild(iconBtn('play','Play this exercise',()=>practisePattern(x.k,x.lv,x.dy)));box.appendChild(r);
+    const r=document.createElement('div');r.className='row';
+    const a=document.createElement('span');a.className='rt seq';a.textContent=showKey(x.k)+(x.dy?' \u00B7 '+dynText(x.dy):'');
+    const b=document.createElement('span');b.className='rm';b.textContent=Math.round(x.recent*100)+'% at '+x.bpm+' BPM'+(i===0?' \u00B7 lowest accuracy':'');
+    const ra=document.createElement('span');ra.className='ra';ra.appendChild(iconBtn('play','Play this exercise',()=>practisePattern(x.k,x.lv,x.dy)));
+    r.append(a,b,ra);box.appendChild(r);
   });
   nx.appendChild(box);
 }
@@ -4964,6 +4951,8 @@ const ICON={replay:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" 
   play:'<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
   edit:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
   del:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>'};
+/* A row's trailing arrow: › opens a page, the chevron opens the row in place. Decoration only; the row's button carries the action. */
+function rowArrow(kind){const s=document.createElement('span');s.className='ar'+(kind==='up'?' up':'');s.innerHTML=ICON[kind==='up'?'down':kind];s.setAttribute('aria-hidden','true');return s;}
 function iconBtn(kind,label,fn){
   const b=document.createElement('button');b.type='button';b.className='btn icon '+kind;b.innerHTML=ICON[kind];b.setAttribute('aria-label',label);b.title=label;
   b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fn(b);});return b;
@@ -5062,8 +5051,9 @@ function popPage(){
   else if(pgOwner==='score'){scoreLevel=null;renderProgress();}
   else{histStack.pop();renderHistory();}
 }
-function pageBack(){
-  if(pgN>0){try{history.back();return;}catch(e){}}
+let pgSkip=0;   /* the popstates our own history.back() calls will fire, already handled */
+function pageBack(){   /* close now, then step the browser history back: a second Escape before the popstate must not leave the app */
+  if(pgN>0){pgN--;pgSkip++;try{history.back();}catch(e){pgSkip--;}}
   popPage();
 }
 function closePages(){
@@ -5071,7 +5061,7 @@ function closePages(){
   const n=pgN;pgN=0;histStack=[];scoreLevel=null;hidePage();
   if(n){try{history.go(-n);}catch(e){}}
 }
-window.addEventListener('popstate',()=>{if(pgN>0&&!$('pg').hidden){pgN--;popPage();}});
+window.addEventListener('popstate',()=>{if(pgSkip){pgSkip--;return;}if(pgN>0&&!$('pg').hidden){pgN--;popPage();}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('pg').hidden&&!document.querySelector('.pgov input:focus'))pageBack();});
 function renderHistory(){
   $('hvDay').classList.toggle('on',hview==='day');$('hvDay').setAttribute('aria-pressed',String(hview==='day'));
@@ -5112,19 +5102,18 @@ function runFigures(r){
 }
 const accHtml=(pc)=>pc===null?['—','muted']:accCell(pc);
 function listRow(title,mono,sub,dy,pc,onOpen,chev,run){   /* chev: {open} swaps the arrow for a chevron that opens the row in place; run adds Play for it */
-  const row=document.createElement('div');row.className='lrow'+(run?' pl':'');row.setAttribute('role','button');row.tabIndex=0;
-  const l=document.createElement('div');l.className='l';
-  const n=document.createElement('div');n.className='nm'+(mono?' seq':'');n.textContent=title;
-  const b=document.createElement('div');b.className='sb';b.textContent=sub;
-  l.appendChild(n);l.appendChild(b);
-  if(dy){const d=document.createElement('div');d.className='sb dy';d.textContent=dy;l.appendChild(d);}
-  const a=accHtml(pc),ac=document.createElement('div');ac.className='ac '+a[1];ac.textContent=a[0];
+  const row=document.createElement('div');row.className='row lrow';
+  const m=document.createElement('button');m.type='button';m.className='rmain';   /* the title and its lines are the button; Play sits beside it, not inside */
+  const n=document.createElement('span');n.className='rt'+(mono?' seq':'');n.textContent=title;
+  const b=document.createElement('span');b.className='rm';b.textContent=sub;
+  m.append(n,b);
+  if(dy){const d=document.createElement('span');d.className='rm dy';d.textContent=dy;m.appendChild(d);}
+  if(chev)m.setAttribute('aria-expanded',String(chev.open));
+  const a=accHtml(pc),ac=document.createElement('span');ac.className='ac '+a[1];ac.textContent=a[0];
   const u=document.createElement('small');u.textContent='ACC';ac.appendChild(u);
-  const ar=document.createElement('span');ar.className='ar'+(chev?' chv'+(chev.open?' up':''):'');ar.textContent=chev?'':'›';ar.setAttribute('aria-hidden','true');
-  if(chev)row.setAttribute('aria-expanded',String(chev.open));
-  row.appendChild(l);row.appendChild(ac);if(run)row.appendChild(replayBtn(run));row.appendChild(ar);
-  row.addEventListener('click',onOpen);
-  row.addEventListener('keydown',e=>{if(e.target===row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onOpen();}});
+  const ra=document.createElement('span');ra.className='ra';ra.appendChild(ac);if(run)ra.appendChild(replayBtn(run));ra.appendChild(rowArrow(chev?(chev.open?'up':'down'):'more'));
+  row.append(m,ra);
+  row.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||t===m)onOpen();});
   return row;
 }
 let histOpen='',histAll=false;   /* the History row that is open, and whether it lists every run */

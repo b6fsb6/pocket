@@ -1,7 +1,5 @@
 {
- "axe": [
-  "nested-interactive #histList > div.dayp > div.lrow.pl"
- ],
+ "axe": [],
  "field-edge": [],
  "font-size": [
   "#advBadge .bwt>b { font-size: 22px }",
@@ -27,9 +25,6 @@
   ".live b { font-size: 22px }",
   ".live em { font-size: 22px }",
   ".lnkurl { font-size: .9em }",
-  ".lrow .ar { font-size: 22px }",
-  ".lrow .sb,.rp .sb { font-size: 12px }",
-  ".nextp .nt { font-size: 12px }",
   ".pad { font-size: 44px }",
   ".patline { font-size: 18px }",
   ".pill { font-size: 12px }",
@@ -41,8 +36,6 @@
   ".rp .cell.lvl { font-size: 10px }",
   ".rp .exr .en { font-size: 12px }",
   ".rp .key { font-size: 12px }",
-  ".rrun .ar { font-size: 22px }",
-  ".srow .nt { font-size: 12px }",
   ".sum .big { font-size: 22px }",
   ".sum small { font-size: 12px }",
   ".tempo .btn { font-size: 22px }",
@@ -54,10 +47,8 @@
  ],
  "font-weight": [],
  "letter-spacing": [
-  ".lrow .nm.seq,.rp h2.seq { letter-spacing: .05em }",
   ".pghd .ttl.seq { letter-spacing: .04em }",
   ".rp .exr .seq,.rp .wr .seq { letter-spacing: .05em }",
-  ".srow .sn small,.rrun .sn small { letter-spacing: .04em }",
   "header .ver { letter-spacing: .04em }"
  ],
  "radius": [
@@ -87,7 +78,6 @@
   "#bpm",
   "#helpNav > button",
   "#pgTtl",
-  "#rtList > div.srow > div.sq > button.rchev",
   "#sens",
   "#setSum",
   "#settle",
