@@ -2642,7 +2642,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.40';                           /* shown beside the title */
+const VERSION='1.5.41';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3952,11 +3952,13 @@ function finishSlide(){
 }
 /* While playing, a passage that wraps to two or more lines shows four lines at a time, and they scroll with the cursor:
    it starts on the first line, moves to the second, and from then on the lines slide up so the cursor stays on the second. */
-const WIN_LINES=4,REVIEW_ROWS=500;
+const REVIEW_ROWS=500;
+/* Staff lines in the window: three on a phone, where height is short, four on desktop. The cursor's line is always the first. */
+const winLines=()=>document.documentElement.dataset.layout==='desktop'?4:3;
 let winKey='',lastCur=null;
 const playing=()=>!!run&&!run.ended&&run.mode==='play';
 /* The window applies before Start, while playing and after Stop. After Stop it scrolls by hand, so every stroke can still be checked. */
-const winWanted=()=>labelMode!=='lat'&&((+$('rows').dataset.lines||1)>=2||(document.body.dataset.state==='done'&&rowMap.size>WIN_LINES));
+const winWanted=()=>labelMode!=='lat'&&((+$('rows').dataset.lines||1)>=2||(document.body.dataset.state==='done'&&rowMap.size>winLines()));
 function syncWindow(cursor){
   const box=$('rows'),tr=$('rowsTrack');
   if(!winWanted()){
@@ -3970,7 +3972,7 @@ function syncWindow(cursor){
   let ci=card?lines.findIndex(x=>x.sv===card.ownerSVGElement):-1;
   if(ci<0)ci=Math.max(0,lines.findIndex(x=>x.o===rowMap.get(rowTop)));
   const review=document.body.dataset.state==='done';
-  const ti=review?0:(playing()?Math.max(0,ci-1):ci),T=lines[ti];
+  const ti=review?0:ci,T=lines[ti];   /* the line being played on top: the lines ahead matter more than the one just played */
   const key=[rowTop,ti,staffAvail(),T.o.lab.hidden,review].join('|');
   if(key===winKey&&box.classList.contains('win'))return;
   winKey=key;
@@ -3980,7 +3982,7 @@ function syncWindow(cursor){
   const t0=tr.getBoundingClientRect().top,anchor=T.i===0?T.o.el:T.sv;
   const top=Math.max(0,Math.round(anchor.getBoundingClientRect().top-t0));
   box.classList.add('win');box.classList.toggle('rv',review);if(!review)box.scrollTop=0;
-  box.style.setProperty('--winh',Math.ceil(WIN_LINES*lh+(WIN_LINES-1)*2+labH*2)+'px');
+  const n=winLines();box.style.setProperty('--winh',Math.ceil(n*lh+(n-1)*2+labH*2)+'px');
   tr.style.transform=review?'':'translateY(-'+top+'px)';
 }
 /* Shows pass g on top with the next passes underneath. When g is the pass that was second, the rows slide
@@ -4021,15 +4023,14 @@ function setRows(plan,g,animate){
     prebuildNext(plan,g+rowsShown);
     return;
   }
-  /* Playing in a window keeps the pass before as well, so the lines can scroll on smoothly. */
-  const win=winWanted()&&playing(),lo=win&&g>0?g-1:g;
+  const win=winWanted()&&playing(),lo=g;
   tr.textContent='';rowMap.clear();rowTop=g;winKey='';
   if(plan){
     let k=lo,after=0;
     const lines=o=>o.el.querySelectorAll('svg.staff').length;
     for(;k<Math.min(total,g+rowsShown);k++){const o=makeRow(plan,k);if(k>g)after+=lines(o);}
-    /* The window shows four lines from the one before the cursor, so two lines must wait below the last line of this pass. Rows of different heights can leave fewer, so more rows are drawn out of sight until there are enough. */
-    if(win)for(;k<total&&after<2;k++)after+=lines(makeRow(plan,k));
+    /* The window starts at the cursor's line, so a full window less one must wait below the last line of this pass. Rows of different heights can leave fewer, so more rows are drawn out of sight until there are enough. */
+    if(win)for(;k<total&&after<winLines()-1;k++)after+=lines(makeRow(plan,k));
   }
   roleRows();
   tr.style.transition='none';syncWindow(null);void tr.offsetWidth;tr.style.transition='';
@@ -4161,7 +4162,7 @@ function staffSection(page,r){
     }
     /* four lines of staff high, the same as the Play page */
     const sv=tr.querySelector('svg.staff'),lab=tr.querySelector('.rl');
-    if(sv){const h=Math.ceil(WIN_LINES*sv.getBoundingClientRect().height+(WIN_LINES-1)*2+(lab?lab.offsetHeight+4:0)*2);host.style.height=Math.min(h,tr.scrollHeight)+'px';}
+    if(sv){const h=Math.ceil(winLines()*sv.getBoundingClientRect().height+(winLines()-1)*2+(lab?lab.offsetHeight+4:0)*2);host.style.height=Math.min(h,tr.scrollHeight)+'px';}
     if(totalPasses(rm.plan)>REVIEW_ROWS){const n=document.createElement('div');n.className='key';n.textContent='Showing the first '+REVIEW_ROWS+' of '+totalPasses(rm.plan)+' passes.';body.appendChild(n);}
   });
 }
