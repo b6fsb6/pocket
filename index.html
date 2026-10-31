@@ -109,8 +109,8 @@ input[type=range]{width:100%;accent-color:var(--accent);min-height:32px}
 .panel>p:empty,.panel>ul:empty{display:none}   /* empty message slots would add a grid gap each */
 .hint{font-size:13px;color:var(--muted);margin:0}
 .notice{font-size:14px;margin:8px 0 0;padding:8px 12px;border:1px solid var(--accent);border-left-width:4px;border-radius:8px;background:var(--surface)}
-.btn.link{background:none;border-color:transparent;color:var(--accent);padding-inline:var(--s-1)}   /* tertiary: brass text, no box */
-p.hint .btn.link{font-size:inherit;min-height:0;padding:0;vertical-align:baseline}   /* a link inside a sentence sits on the line */
+.btn.link{background:none;border-color:transparent;color:var(--accent);padding-inline:var(--s-1);min-width:var(--hit)}   /* tertiary: brass text, no box */
+p.hint .btn.link{font-size:inherit;min-height:0;min-width:0;padding:0;vertical-align:baseline}   /* a link inside a sentence sits on the line */
 body[data-run="1"] .notice{display:none}
 /* Desktop layout: the Play page puts the controls in a column beside the staff and results. Other pages stay a readable width. */
 :root[data-layout=desktop] .app{max-width:1200px}
@@ -287,7 +287,8 @@ details[open]>summary::after{transform:rotate(-135deg);margin-top:10px}
 .m-fill{height:100%;width:0;background:var(--fill)}
 .m-thr{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
 .m-ghost{width:0;background:none;border-left:2px dashed var(--muted)}
-.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btns{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+.btns.even{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}   /* two or three secondary buttons share one width */
 .heard{font:600 13px var(--font-data);color:var(--accent)}
 
 [hidden]{display:none!important}
@@ -823,11 +824,13 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
 
     <section class="panel mic-only" aria-label="Stick calibration">
       <h3>Stick calibration</h3>
-      <div class="btns">
+      <div class="btns even">
         <button class="btn" id="calL" type="button">Calibrate left stick</button>
         <button class="btn" id="calR" type="button">Calibrate right stick</button>
+      </div>
+      <div class="btns even">
+        <button class="btn" id="calTest" type="button" hidden>Test left vs right</button>
         <button class="btn" id="calReset" type="button">Clear</button>
-        <button class="btn" id="calTest" type="button">Test left vs right</button>
       </div>
       <div class="calst" id="calSt"></div>
       <p class="hint" id="calInfo"></p>
@@ -839,10 +842,8 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
 
     <section class="panel mic-only" aria-label="Latency">
       <h3>Latency</h3>
-      <div class="row">
-        <div class="field"><label for="latency">Compensation (ms)</label><input type="number" id="latency" min="0" max="400" step="1" inputmode="numeric" placeholder="auto"></div>
-        <div class="field"><span class="lbl">Estimate it</span><div class="btns"><button class="btn" id="calLoop" type="button">Auto calibrate</button><button class="btn" id="calLatency" type="button">Calibrate by playing</button></div></div>
-      </div>
+      <div class="field"><label for="latency">Compensation (ms)</label><input type="number" id="latency" min="0" max="400" step="1" inputmode="numeric" placeholder="auto"></div>
+      <div class="btns even"><button class="btn" id="calLoop" type="button">Auto calibrate</button><button class="btn" id="calLatency" type="button">Calibrate by playing</button></div>
       <p class="hint"><b>Auto calibrate (recommended):</b> times 12 clicks through the speakers, so keep the room quiet and don't play.</p>
       <p class="hint"><b>Calibrate by playing:</b> hit the pad on each click until the number settles. Use it to fine-tune, or with headphones.</p>
       <p class="hint" id="latMsg">Sound reaches the page late, and the click reaches your ears late. This number removes that delay. The result of a calibration appears here.</p>
@@ -854,7 +855,7 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
     <section class="panel" aria-label="Data">
       <h3>Your data</h3>
       <p class="hint">Scores are saved in this browser only, so export a copy now and then. <button class="btn link" type="button" data-help="help-scores">Help</button></p>
-      <div class="btns">
+      <div class="btns even">
         <button class="btn" id="recExport" type="button">Export</button>
         <button class="btn" id="recImport" type="button">Import</button>
         <button class="btn" id="recClear" type="button">Clear…</button>
@@ -1325,7 +1326,7 @@ RLRR LRLL RLRR LRLL</pre>
     </section>
     <div class="pcol pctl">
     <section class="panel cfg" aria-label="Exercises">
-      <div class="rtname"><b id="playName"></b><button class="btn icon" id="editPlay" type="button" aria-label="Edit routine" title="Edit routine"></button><button class="btn link" id="playChange" type="button">Change</button></div>
+      <div class="rtname"><b id="playName"></b><button class="btn link" id="editPlay" type="button" aria-label="Edit routine">Edit</button><button class="btn link" id="playChange" type="button" aria-label="Choose a routine">Choose</button></div>
       <div class="patrow single-only"><p class="patline" id="playPat"></p></div>
       <details id="exBox" class="setbox routine-only">
         <summary id="routineInfo"></summary>
@@ -1404,7 +1405,7 @@ RLRR LRLL RLRR LRLL</pre>
       </div>
     </details>
     <div class="transport">
-      <button class="btn primary" id="startBtn" type="button">Start</button>
+      <button class="btn primary" id="startBtn" type="button" aria-describedby="playSummary">Start</button>
       <p class="hint cfg" id="playSummary"></p>
       <div class="btns" id="runBtns" hidden>
         <button class="btn" id="restartBtn" type="button">Restart</button>
@@ -2660,7 +2661,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.21';                           /* shown beside the title */
+const VERSION='1.5.22';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3614,6 +3615,7 @@ function updateCalUI(){
   $('calLatency').disabled=busy||!!calMode||tst||lp||!!chk;
   $('calLoop').textContent=lp?'Cancel auto calibrate':'Auto calibrate';
   $('calLoop').disabled=busy||!!calMode||tst||!!chk;
+  $('calTest').hidden=!model&&!tst;   /* it needs both sticks; the hint below says so */
   $('calTest').disabled=busy||!!calMode||!model||!!chk||lp;
   $('calTest').textContent=tst?'Cancel test ('+calTest.res.length+'/'+TEST_N+')':'Test left vs right';
 }
@@ -6429,6 +6431,7 @@ function syncInfo(){
   if(!exercises.length)sum.textContent=S.mode==='single'?'Type an exercise in the editor, then press Start.':'Add some exercises in the editor, then press Start.';
   else if(S.mode==='single'){const b=exercises[0];sum.textContent=S.bpm+' BPM'+pulseNote(exercises)+playsFor();}
   else{const g=routineGuide();sum.textContent=g?'Routine cleared at '+g.split(' at ')[1]:'';}
+  if(setupNeeded()&&!(run&&!run.ended))sum.textContent='Finish set up to start: '+(S.noise===null?'run the mic check.':'calibrate latency, or skip it.');   /* a disabled Start always says why */
   {const b=exercises[0];$('playPat').textContent=exercises.length&&S.mode==='single'?showPattern(b.notes,b.groupStart,b.subs,b.defSub,b.sig,b.src):'';}
   $('bpmOut').textContent=S.bpm+' BPM';
   {   /* what the closed Settings drawer holds, so a setting that matters is never hidden */
@@ -7024,7 +7027,6 @@ function wire(){
     }
     startPlay();
   });
-  $('editPlay').innerHTML=ICON.edit;
   $('editPlay').addEventListener('click',editFromPlayPage);
   $('advWeak').addEventListener('click',()=>{if(lastRun)startPlay(lastRun.weakIdx);});
   TABS.forEach(n=>{
