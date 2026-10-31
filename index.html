@@ -353,8 +353,6 @@ svg.spark{display:block;overflow:visible}
 .ib{border:0;background:transparent;color:var(--muted);min-width:40px;height:40px;border-radius:8px;display:grid;place-items:center;cursor:pointer;font:700 12px var(--font-body);padding:0 6px}
 .ib.replay,.ib.play{color:var(--accent)}
 .ib:disabled{opacity:.35;cursor:not-allowed}
-.btn.arm{color:var(--danger);border-color:var(--danger)}
-.ib.del.arm{color:var(--danger);border:1px solid var(--danger);padding:0 8px}
 .hrow .hb{padding:0 12px 12px;display:grid;gap:8px}
 .slist{display:grid}
 .sum{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -582,7 +580,6 @@ body[data-edit=type] .buildonly{display:none}
 .bkey.wide2{grid-column:span 2}
 .bkey[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
 .bkey:disabled{opacity:.35;cursor:not-allowed}
-.linkbtn.arm{color:var(--danger)}
 .estate{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
 #edDiscard{min-height:0;padding:0;font-size:13px}
 .bkey.R{color:var(--accent)}
@@ -747,7 +744,7 @@ button.pill.warn{color:var(--warn);border-color:var(--warn)}
 .rmenu button{border:0;background:none;color:var(--ink);font:600 15px var(--font-body);text-align:left;padding:12px 14px;border-radius:7px;cursor:pointer;min-height:44px}
 .rmenu button:hover,.rmenu button:focus-visible{background:var(--bg)}
 .rmenu button.danger,.btn.danger{color:var(--danger)}
-.rmenu button.arm{background:var(--danger);color:var(--on-danger)}
+button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--danger);color:var(--on-danger);border:1px solid var(--danger);padding-inline:var(--s-3)}   /* the one armed look, on every kind of button */
 @media (max-width:359px){.glib .hrow>summary{padding-right:128px}.glib .hrow .ib{min-width:30px}}
 </style>
 </head>
@@ -2678,7 +2675,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.17';                           /* shown beside the title */
+const VERSION='1.5.18';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -5493,7 +5490,7 @@ let exMode='recs';
 function openExport(){exMode='recs';tickDialog('Export','Export',EXP_PARTS,k=>!!S.expSel[k]);}
 /* One dialog of ticks for both Export and Import. */
 function tickDialog(title,go,parts,on){
-  $('exTitle').textContent=title;$('exGo').textContent=go;$('exGo').classList.remove('arm');$('exGo').classList.toggle('danger',exMode==='clr');
+  $('exTitle').textContent=title;$('exGo').textContent=go;delete $('exGo').dataset.armed;$('exGo').classList.toggle('danger',exMode==='clr');
   const box=$('exOpts');box.textContent='';
   parts.forEach(([k,name,det])=>{
     const l=document.createElement('label');l.className='xrow';
@@ -5997,14 +5994,16 @@ function libUndo(e,wasOpen,name,label){
     saveRecs();m.textContent='Restored “'+entryName(e)+'”.';renderLibraryPage();
   }));
 }
-/* Every destructive button asks twice: the first tap turns it red and adds "?" to its label for four seconds, the second does it. */
+/* "Tap again to delete": the label of an armed button, made from its own label. */
+const armLabel=v=>'Tap again to '+v.trim().charAt(0).toLowerCase()+v.trim().slice(1);
+/* Every destructive button asks twice: the first tap arms it (solid red, "Tap again to ...") for four seconds, the second does it. */
 function arm(b,fn,label){
-  const html=b.innerHTML;let t=0;
-  const back=()=>{t=0;b.innerHTML=html;b.classList.remove('arm');};
+  const html=b.innerHTML,aria=b.getAttribute('aria-label');let t=0;
+  const back=()=>{t=0;b.innerHTML=html;delete b.dataset.armed;if(aria)b.setAttribute('aria-label',aria);};
   b._disarm=()=>{clearTimeout(t);back();};
   b.addEventListener('click',e=>{
     e.preventDefault();e.stopPropagation();
-    if(!t){b.textContent=(label||b.textContent)+'?';b.classList.add('arm');t=setTimeout(back,4000);return;}
+    if(!t){const l=armLabel(label||aria||b.textContent);b.textContent=l;if(aria)b.setAttribute('aria-label',l);b.dataset.armed='';t=setTimeout(back,4000);return;}
     clearTimeout(t);back();fn();
   });
   return b;
@@ -6995,7 +6994,7 @@ function wire(){
   $('exGo').addEventListener('click',()=>{
     if(exMode==='clr'){
       const g=$('exGo');
-      if(!clrT){g.textContent='Clear?';g.classList.add('arm');clrT=setTimeout(()=>{clrT=0;g.textContent='Clear';g.classList.remove('arm');},4000);return;}
+      if(!clrT){g.textContent=armLabel('Clear');g.dataset.armed='';clrT=setTimeout(()=>{clrT=0;g.textContent='Clear';delete g.dataset.armed;},4000);return;}
       clearTimeout(clrT);clrT=0;clearSelected();return;
     }
     if(exMode==='lib')doLibExport();else if(exMode==='imp')importSelected();else exportRecs();

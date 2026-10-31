@@ -133,7 +133,7 @@ test('editor: Discard puts a saved routine back', async () => {
   await p.click('.bkey[data-k="R"]');
   assert.equal(await p.textContent('#edState'), 'Unsaved');
   await p.click('#edDiscard');
-  assert.equal(await p.textContent('#edDiscard'), 'Discard?');
+  assert.equal(await p.textContent('#edDiscard'), 'Tap again to discard');
   await p.click('#edDiscard');
   assert.equal(await p.inputValue('#routineText'), 'title: Mine\n8 RLRL RLRL');
   assert.equal(await p.textContent('#edState'), 'Saved');
@@ -148,8 +148,8 @@ test('Clear asks what to wipe, starts with nothing ticked, and asks twice', asyn
   assert.equal(r.off, true);
   assert.equal(r.redo, false);
   await p.evaluate(() => document.querySelector('#exOpts input[data-k=dev]').click());
-  const label = await p.evaluate(() => { const b = document.getElementById('exGo'); b.click(); return b.textContent + '|' + b.classList.contains('arm'); });
-  assert.equal(label, 'Clear?|true');
+  const label = await p.evaluate(() => { const b = document.getElementById('exGo'); b.click(); return b.textContent + '|' + ('armed' in b.dataset); });
+  assert.equal(label, 'Tap again to clear|true');
 });
 
 test('a stray exercise is deleted from a run, and an unheard one is not scored', async () => {
@@ -176,7 +176,7 @@ test('a stray exercise is deleted from a run, and an unheard one is not scored',
   assert.match(t, /1 not played/);            /* nothing was heard in the last exercise */
   assert.doesNotMatch(t, /dLfR[\s\S]*ACC/);    /* it is not scored, so it cannot be the weakest */
   await p.evaluate(() => { document.querySelector('details').open = true; document.querySelector('details .ib').click(); });
-  const del = () => p.evaluate(() => [...document.querySelectorAll('.rmenu button')].find(x => /^Delete/.test(x.textContent)).click());
+  const del = () => p.evaluate(() => [...document.querySelectorAll('.rmenu button')].find(x => /^(Delete|Tap again to delete)$/.test(x.textContent)).click());
   await del(); await del();
   await p.waitForTimeout(300);
   t = await text();
