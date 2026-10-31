@@ -151,9 +151,9 @@ test('a run saved without score codes is scored from its stroke data', () => {
 
 test('each level has its own high-score ladder, scaled by points per on-time stroke', () => {
   const h = id => c.BADGES.find(b => b.id === id).at;
-  assert.deepEqual(h('hnone')[9], 250000);
-  assert.deepEqual(h('hstrokes')[9], 38000);
-  assert.deepEqual(h('hhalf')[9], 130000);
+  assert.deepEqual(h('hnone')[9], 380000);
+  assert.deepEqual(h('hstrokes')[9], 56000);
+  assert.deepEqual(h('hhalf')[9], 190000);
   ['hstrokes', 'hbeat', 'hhalf', 'hbar', 'hnone'].forEach(id => h(id).forEach((n, i, a) => { if (i) assert.ok(n > a[i - 1], id + ' climbs'); }));
 });
 
@@ -179,9 +179,10 @@ test('score breakdown counts strokes and the longest streak, and best shares com
   const short = run('half', 'oo'), long = run('half', 'o'.repeat(40) + 'b'.repeat(40));
   assert.equal(c.runShare(short), 1);
   assert.ok(c.runShare(long) < 1 && c.runShare(long) > 0.3);
-  assert.equal(c.bestShares([short, long], c.newSum()).half, 1);
-  const sum = c.newSum(); sum.hr.half = 0.9;
-  assert.equal(c.bestShares([long], sum).half, 0.9, 'an older folded best still stands');
+  assert.equal(c.bestShares([short, long], c.newSum())['half|20'], 1, 'kept per level and window; a run without a window was at ±20 ms');
+  const sum = c.newSum(); sum.hr['half|20'] = 0.9;
+  assert.equal(c.bestShares([long], sum)['half|20'], 0.9, 'an older folded best still stands');
+  assert.equal(c.bestShares([Object.assign({}, short, { tol: 50 })], c.newSum())['half|20'], undefined, 'a best at ±50 ms is not a best at ±20 ms');
 });
 
 test('score breakdown separates unplayed strokes from hits on a rest', () => {
@@ -217,8 +218,8 @@ test('the on-time window scales points and the maximum alike, so a flawless run 
   const run = tol => ({ id: 'w' + tol, t: 1, lv: 'half', bpm: 60, tol, exercises: [{ k: 'e', due: 8, within: 8, q: 'oooooooo' }] });
   const std = c.runScore(run(20));
   assert.equal(c.runMax(run(20)), std, 'a flawless run at the standard window is 100%');
-  assert.equal(c.runScore(run(50)), Math.round(std * 0.5));
-  assert.equal(c.runScore(run(10)), Math.round(std * 1.5));
+  assert.equal(c.runScore(run(50)), Math.round(std / 1.5), 'the widest window is x1');
+  assert.equal(c.runScore(run(10)), Math.round(std / 1.5 * 2), 'the tightest is x2');
   assert.equal(c.runMax(run(50)), c.runScore(run(50)), 'a flawless run at ±50 is 100%');
   assert.equal(c.runMax(run(10)), c.runScore(run(10)), 'a flawless run at ±10 is 100%, not 150%');
   assert.equal(c.winMult(undefined), 1, 'a run saved without a window counts once');
