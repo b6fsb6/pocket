@@ -207,7 +207,6 @@ async function runOnce(settings, practice, init) {
     saved: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).runs || []).map(r => r.lv),
     text: document.getElementById('advice').innerText,
     discard: !document.getElementById('advDiscRow').hidden,
-    win: document.getElementById('advWin').hidden ? '' : document.getElementById('advWin').textContent,
     badge: document.getElementById('advBadge').hidden ? '' : document.getElementById('advBadge').innerText,
     days: ((JSON.parse(localStorage.getItem('stick-timing-trainer.records.v2')) || {}).sum || {}).days || {},
   }));

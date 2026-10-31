@@ -165,12 +165,12 @@ body[data-run="1"] .notice{display:none}
 .rows.pick .prow{cursor:pointer}
 .rows.pick{user-select:none;-webkit-user-select:none}   /* the page scrolls over it; only a finished run's staff scrolls on its own */
 .rows.pick:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.bigcount{position:absolute;inset:0 0 auto 0;height:100%;max-height:260px;z-index:5;display:grid;place-items:center;font:800 96px/1 var(--font-display);color:var(--accent);background:color-mix(in srgb,var(--bg) 80%,transparent);border-radius:10px;pointer-events:none}
+.bigcount{position:absolute;inset:0 0 auto 0;height:100%;max-height:260px;z-index:5;display:grid;place-items:center;font:800 var(--t-hero) var(--font-display);font-variant-numeric:tabular-nums;color:var(--accent);background:color-mix(in srgb,var(--bg) 80%,transparent);border-radius:10px;pointer-events:none}   /* the count-in: the hero while it runs */
 .rows{border-radius:10px;--rowh:124px;--nrows:3}
 .staffs{display:grid;gap:2px}
-.rows.sliding{overflow:hidden;transition:height .24s ease}
+.rows.sliding{overflow:hidden;transition:height var(--dur-2) var(--ease)}
 .rows.win{height:var(--winh);overflow:hidden}
-.rows.win .rows-track{min-height:0;transition:transform .22s ease}
+.rows.win .rows-track{min-height:0;transition:transform var(--dur-2) var(--ease)}
 .rows.win .prow{min-height:0}
 .rows.win.rv{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
 .stobar{position:relative;display:flex;height:16px;border-radius:8px;overflow:hidden;background:var(--line)}
@@ -183,12 +183,12 @@ body[data-run="1"] .notice{display:none}
 .rvhost{overflow-y:auto;overflow-x:hidden;border-radius:10px;overscroll-behavior:auto}
 .rvtrack{display:grid;gap:4px;align-content:start}
 .stbody{padding:0 8px 12px;display:grid;gap:8px}
-.rows-track{position:relative;display:grid;gap:4px;align-content:start;min-height:calc(var(--nrows,3)*var(--rowh) + (var(--nrows,3) - 1)*4px);transition:transform .24s ease}
+.rows-track{position:relative;display:grid;gap:4px;align-content:start;min-height:calc(var(--nrows,3)*var(--rowh) + (var(--nrows,3) - 1)*4px);transition:transform var(--dur-2) var(--ease)}
 #rowEnd{margin-top:8px}
-.prow{display:grid;gap:4px;align-content:start;min-height:var(--rowh);box-shadow:inset 0 0 0 transparent;transition:opacity .24s ease,background-color 1.1s ease,box-shadow 1.1s ease}
+.prow{display:grid;gap:4px;align-content:start;min-height:var(--rowh);box-shadow:inset 0 0 0 transparent;transition:opacity var(--dur-2) var(--ease),background-color var(--dur-2) var(--ease),box-shadow var(--dur-2) var(--ease)}
 .prow.change{box-shadow:inset 0 3px 0 var(--fill)}
 .prow.change .rl{color:var(--accent)}
-.prow .rl{font:600 12px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-height:28px;padding:5px 9px;border-radius:8px;display:flex;align-items:center;transition:color 1.1s ease}
+.prow .rl{font:600 12px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-height:28px;padding:5px 9px;border-radius:8px;display:flex;align-items:center;transition:color var(--dur-2) var(--ease)}
 .prow .rl.alert{background:var(--fill);color:var(--accent-ink);font-size:14px}
 .prow .rl.newex{color:var(--accent)}
 .staff{display:block;width:100%;height:auto;overflow:visible}
@@ -268,7 +268,7 @@ canvas{display:block;width:100%;height:170px}
 details{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 summary{cursor:pointer;padding:14px;font:800 20px var(--font-display);letter-spacing:.06em;text-transform:uppercase;list-style:none}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"";float:right;width:9px;height:9px;margin:6px 4px 0 0;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform .15s}
+summary::after{content:"";float:right;width:9px;height:9px;margin:6px 4px 0 0;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);transition:transform var(--dur-1) var(--ease)}
 details[open]>summary::after{transform:rotate(-135deg);margin-top:10px}
 button.row{cursor:pointer}
 button.row:disabled{opacity:.4;cursor:not-allowed}
@@ -379,7 +379,7 @@ details.how[open]>summary::after{margin:4px 4px 0 0}
 .hrow .hb{margin:0 0 var(--s-3);padding:var(--s-2) var(--s-3);background:var(--surface);border-left:3px solid var(--accent);display:grid;gap:var(--s-2)}   /* open: the children on a band with a rail */
 .slist{display:grid}
 .sum{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.sum .big{font:600 22px var(--font-data)} .sum small{font:12px var(--font-body);color:var(--muted);margin-left:4px}
+.sum .big{font:600 20px var(--font-data);font-variant-numeric:tabular-nums}   /* a stat value, as .stat .v */ .sum small{font:12px var(--font-body);color:var(--muted);margin-left:4px}
 .sum .big.early{color:var(--early)} .sum .big.late{color:var(--late)} .sum .big.ok{color:var(--ok)}
 .sum p{margin:2px 0 0;color:var(--muted);font-size:13px}
 .hint b{color:var(--ink);font-weight:600}
@@ -434,7 +434,7 @@ html.pgopen{overflow:hidden}
 .row .sn small{color:var(--muted);font:11px var(--font-body);letter-spacing:.06em;margin-left:3px}
 .row .sn .muted{color:var(--muted)} .row .sn .ok{color:var(--ok)} .row .sn .late{color:var(--late)} .row .sn .early{color:var(--early)}
 
-.btn.icon.cv span{width:8px;height:8px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
+.btn.icon.cv span{width:8px;height:8px;border:solid var(--muted);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-2px,-2px);transition:transform var(--dur-1) var(--ease)}
 .btn.icon.cv.open span{transform:rotate(-135deg) translate(-2px,-2px)}
 .hrow ul{margin:0;padding:0;list-style:none;font-size:13px;display:grid;gap:2px}
 .hrow li{display:flex;gap:8px;justify-content:space-between}
@@ -461,29 +461,24 @@ html.pgopen{overflow:hidden}
 .medal.off .c1,.medal.off .c3{display:none}
 .medal.off .c2{fill:none;stroke:var(--muted);stroke-dasharray:3 4}
 .medal.gl:not(.off) svg{filter:drop-shadow(0 0 5px var(--g))}
-.medal .shim{animation:shim 3s ease-in-out infinite}
 .tbar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--line);margin:10px 0 4px}
 .tbar i{display:block;height:100%}
 .tleg{font:12px var(--font-body);color:var(--muted);margin:0 0 8px}
-@keyframes shim{0%,100%{opacity:0}50%{opacity:.5}}
-@media (prefers-reduced-motion:reduce){.medal .shim{animation:none}}
-#advBadge{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:14px;margin:0 0 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+/* The one celebration: a card with a medal (or none, for a new best tempo), what was earned and the next goal. */
+#advBadge{display:grid;grid-template-columns:auto 1fr;gap:var(--s-1) var(--s-3);align-items:center;padding:var(--s-4);margin:0 0 var(--s-3);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
+#advBadge.plain{grid-template-columns:1fr}
 #advBadge .medal{width:72px;height:72px}
 #advBadge .bwt{display:grid;gap:2px;min-width:0}
-#advBadge .bwt>b{font:700 22px/1.1 var(--font-body)}
-#advBadge .tier{font:700 11px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-#advBadge .sent{font-size:14px;color:var(--muted)}
-#advBadge .bnx{grid-column:1/-1;border-top:1px solid var(--line);padding-top:10px;margin-top:6px;display:grid;gap:6px}
-#advBadge .bnx b{font-size:14px}
+#advBadge .bwt>b{font:600 var(--t-title) var(--font-body)}
+#advBadge .tier{font:600 var(--t-eyebrow) var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+#advBadge .sent{font:var(--t-small) var(--font-body);color:var(--muted)}
+#advBadge .bnx{grid-column:1/-1;border-top:1px solid var(--line);padding-top:var(--s-2);margin-top:var(--s-1);display:grid;gap:var(--s-1)}
+#advBadge .bnx b{font:600 var(--t-small) var(--font-body)}
 #advBadge .bnx i{display:block;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
 #advBadge .bnx i b{display:block;height:100%;background:var(--fill)}
-#advBadge.pop{animation:winpop .9s cubic-bezier(.2,1.4,.4,1) both}
-@media (prefers-reduced-motion:reduce){#advBadge.pop{animation:none}}
+@media (prefers-reduced-motion:no-preference){#advBadge.pop{animation:winpop var(--dur-3) var(--ease) both}}   /* once, never looping */
 #advBody:empty{display:none}
-#advWin{font:700 15px var(--font-body);color:var(--accent-ink);background:var(--fill);border-radius:10px;padding:10px 14px;margin:0 0 12px}
-#advWin.pop{animation:winpop .9s cubic-bezier(.2,1.4,.4,1) both}
 @keyframes winpop{0%{transform:scale(.88);opacity:0;box-shadow:0 0 0 0 var(--fill)}50%{opacity:1;box-shadow:0 0 0 10px transparent}100%{transform:none;box-shadow:0 0 0 0 transparent}}
-@media (prefers-reduced-motion:reduce){#advWin.pop{animation:none}}
 .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:320px;margin:8px 0}
 .strip .sd{font-size:11px;color:var(--muted);text-align:center}
 .strip .sc{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:transparent}
@@ -590,20 +585,20 @@ body[data-edit=type] .buildonly{display:none}
 .erow.skip{opacity:.4}
 .live{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:8px 12px;margin:0 0 10px}
 .live[hidden]{display:none}
-.live b{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums}
+.live b{font:600 20px var(--font-data);font-variant-numeric:tabular-nums}   /* live stats are stat values, as .stat .v */
 .live small{margin-left:4px}
 .live .lvm i{position:relative}
 .live .lvm i.fl{background:none;box-shadow:none}
 .live .fire{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;visibility:hidden}
 .live .fire.on{visibility:visible}
 .live .tot{text-align:right}
-.live em{font:800 22px var(--font-display,var(--font-body));font-variant-numeric:tabular-nums;font-style:normal;color:var(--muted);opacity:0}
+.live em{font:600 20px var(--font-data);font-variant-numeric:tabular-nums;font-style:normal;color:var(--muted);opacity:0}
 .live em.ok{color:var(--ok)}.live em.late{color:var(--late)}
 .live em.on{opacity:1}
 .live .lvm{grid-column:1/-1;display:grid;grid-template-columns:repeat(16,1fr);gap:3px}
 .live .lvm i{height:14px;border-radius:3px;background:var(--line)}
 .live .lvm i.on{background:color-mix(in srgb,var(--heat) calc(var(--t)*100%),var(--heat-low));box-shadow:0 0 0 1px var(--line)}
-@media (prefers-reduced-motion:no-preference){.live .fire.on .fo{animation:lvflick .45s ease-in-out infinite alternate}.live .fire.on .fn{animation:lvflick .3s ease-in-out infinite alternate-reverse}.live .fire path{transform-box:fill-box;transform-origin:50% 100%}.live em.on{animation:lvfade .7s ease-out forwards}.live .lvm i.on{transition:background .15s}}
+@media (prefers-reduced-motion:no-preference){.live .fire.on .fo{animation:lvflick .45s ease-in-out infinite alternate}.live .fire.on .fn{animation:lvflick .3s ease-in-out infinite alternate-reverse}.live .fire path{transform-box:fill-box;transform-origin:50% 100%}.live em.on{animation:lvfade .7s ease-out forwards}.live .lvm i.on{transition:background var(--dur-1) var(--ease)}}
 @keyframes lvflick{from{transform:scale(1,.9) skewX(-4deg)}to{transform:scale(.94,1.08) skewX(4deg)}}
 @keyframes lvfade{from{opacity:1;transform:translateY(2px)}to{opacity:.15;transform:none}}
 .discrow{border-top:1px solid var(--line);padding:12px 0 4px}
@@ -656,7 +651,7 @@ body[data-input="kb"] #micPill{display:none}
 :root[data-layout=desktop] body[data-review="1"] #startBtn,:root[data-layout=desktop] body[data-review="1"] #playSummary{display:none}
 .exercises.lexs{border:0;border-radius:0;background:none}
 /* An open row is lifted with a lighter background that reaches a little past the text on both sides. */
-.bigbpm{display:block;font:600 40px/1.1 var(--font-data);margin:2px 0 8px}
+output.bigbpm{display:block;font:800 var(--t-hero) var(--font-display);font-variant-numeric:tabular-nums;margin:2px 0 8px}   /* the Play page's one big number */
 .bigrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .bigrow .hint{margin:0;text-align:right}
 .setbox{border:0;border-radius:0;background:none}
@@ -684,7 +679,7 @@ body[data-input="kb"] #micPill{display:none}
 .res .sacc small{display:block;color:var(--muted);font-size:13px}
 .res .slab{margin-bottom:-6px}
 .res .shd{display:flex;align-items:baseline;gap:8px}
-.res .shd b{font:800 64px/1 var(--font-display)}
+.res .shd b{font:800 var(--t-hero) var(--font-display);font-variant-numeric:tabular-nums}   /* the score: the result's hero */
 .res .shd span{font:500 16px var(--font-body);color:var(--muted)}
 .res .shd em{margin-left:auto;align-self:center;font:700 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;background:var(--fill);color:var(--accent-ink);padding:4px 9px;border-radius:999px;font-style:normal}
 .res .sbar{position:relative;height:10px;border-radius:999px;background:var(--line)}
@@ -692,7 +687,7 @@ body[data-input="kb"] #micPill{display:none}
 .res .sbar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);opacity:.7}
 .res .scap{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
 .res .sacc{display:flex;gap:14px;align-items:center;border-top:1px solid var(--line);padding-top:10px}
-.res .sacc b{font:800 28px var(--font-display);white-space:nowrap}
+.res .sacc b{font:800 var(--t-display) var(--font-display);font-variant-numeric:tabular-nums;white-space:nowrap}
 .res[data-ok="1"] .sacc b{color:var(--ok)}
 .res .sacc>span{font-size:13px;color:var(--muted)}
 .res.solo .slab,.res.solo .shd,.res.solo .sbar,.res.solo .scap{display:none}
@@ -1426,7 +1421,6 @@ RLRR LRLL RLRR LRLL</pre>
 
     <section id="advice" hidden aria-label="Score and tempo">
       <div id="advBadge" hidden></div>
-      <div id="advWin" hidden></div>
       <div class="res" id="advRes">
         <span class="slab">Score</span>
         <div class="shd"><b id="advScore"></b><span id="advMax"></span><em id="advHs" hidden>New high score</em></div>
@@ -2642,7 +2636,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.31';                           /* shown beside the title */
+const VERSION='1.5.32';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4491,7 +4485,7 @@ function renderAdvice(){
   if(L.discarded){
     $('advRes').hidden=true;$('advHead').textContent='Run discarded.';
     $('advBody').textContent='It is not in your records.';
-    $('advWin').hidden=true;$('advBadge').hidden=true;
+    $('advBadge').hidden=true;
     disc.hidden=true;$('advWeak').hidden=true;return;
   }
   disc.hidden=!!L.practice;
@@ -4543,11 +4537,9 @@ function renderAdvice(){
   {   /* what was just earned gets its own moment at the top, once */
     const wins=[];
     if(L.newTempo&&L.newTempo.length)wins.push('New best tempo: '+(L.newTempo.length<=2?L.newTempo.map(x=>showKey(x.key)+' at '+x.bpm+' BPM').join(', '):L.newTempo.length+' exercises at a new tempo'));
-    const win=$('advWin');win.hidden=!wins.length;win.textContent=wins.join(' · ');
-    if(wins.length&&!L.celebrated){win.classList.remove('pop');void win.offsetWidth;win.classList.add('pop');}
-    const shown=renderUnlocked(L);
+    const shown=renderUnlocked(L,wins);
     if(shown&&!L.celebrated){const bx=$('advBadge');bx.classList.remove('pop');void bx.offsetWidth;bx.classList.add('pop');}
-    if(shown||wins.length)L.celebrated=true;
+    if(shown)L.celebrated=true;
   }
   if(L.skipped)body+=' '+L.skipped+(L.skipped===1?' exercise was':' exercises were')+' stopped before one full pass and not scored.';
   if(!L.saved)body+=' Your browser would not save the records.';
@@ -4661,22 +4653,32 @@ const GL={lv1:chev(1),lv2:chev(2),lv3:chev(3),lv4:chev(4),lvM:stars(1),lvA:stars
 const MMETAL=[['#C9A878','#8E6B3E','#6B4F2B'],['#E0A074','#A8602F','#6E3A16'],['#F1F3F5','#A9B1B8','#6F7881'],['#FFE48A','#E0A91F','#9A6A00'],['#F4F8FB','#B9C9D8','#5E7388'],['#9CC2FF','#2F6FD0','#173F85'],['#FF9DB3','#D12A55','#7A0F2E'],['#F4FDFF','#8FE3F5','#2A8FA8']];
 GL.note='<ellipse cx="40" cy="62" rx="10" ry="7.5" fill="K" transform="rotate(-20 40 62)"/><path d="M48.5 59V32c1 9 15 9 15 22" fill="none" stroke="K" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>';
 let medalN=0;
-/* A round medal: glyph, colours, a glow on the higher tiers and a slow shimmer on the top one. An unearned step is a dotted outline. */
-function drawMedal(gl,m,glow,shim,earned,title){
+/* A round medal: glyph, colours and a glow on the higher tiers. An unearned step is a dotted outline. */
+function drawMedal(gl,m,glow,earned,title){
   const id='mg'+(medalN++),span=document.createElement('span');
   span.className='medal'+(glow?' gl':'')+(earned?'':' off');span.title=title;span.style.color=m[2];span.style.setProperty('--g',m[1]);
   span.innerHTML='<svg viewBox="0 0 96 96" aria-hidden="true"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+m[0]+'"/><stop offset="1" stop-color="'+m[1]+'"/></linearGradient></defs>'
     +'<circle class="c1" cx="48" cy="48" r="44" fill="'+m[1]+'" opacity=".25"/><circle class="c2" cx="48" cy="48" r="38" fill="url(#'+id+')" stroke="'+m[2]+'" stroke-width="3"/><circle class="c3" cx="48" cy="48" r="31" fill="none" stroke="'+m[2]+'" stroke-width="1.5" opacity=".5"/>'
-    +GL[gl].replace(/K/g,'currentColor')+(shim?'<circle class="shim" cx="48" cy="48" r="38" fill="#fff"/>':'')+'</svg>';
+    +GL[gl].replace(/K/g,'currentColor')+'</svg>';
   return span;
 }
-function medal(b,i,earned){const t=tierOf(i,b.at.length);return drawMedal(b.gl,MMETAL[t],t>=4,t===7,earned,b.nm[i]+' \u00b7 '+fmtBadge(b,b.at[i]));}
+function medal(b,i,earned){const t=tierOf(i,b.at.length);return drawMedal(b.gl,MMETAL[t],t>=4,earned,b.nm[i]+' \u00b7 '+fmtBadge(b,b.at[i]));}
 /* The mastery medal of one exercise on one level, from its fastest cleared tempo. */
 /* The unlocked panel on the result: the best step this run earned, and how far the next one is. */
-function renderUnlocked(L){
+/* The result's one celebration card: the best badge just earned, with any new best tempo as a line; or the new best tempo alone. */
+function renderUnlocked(L,wins){
   const box=$('advBadge'),won=(L.won||[]).slice().sort((a,b)=>{const A=BADGES.find(x=>x.id===a.id),B=BADGES.find(x=>x.id===b.id);return tierOf(b.i,B.at.length)-tierOf(a.i,A.at.length)||b.i-a.i;});
-  box.hidden=!won.length;
-  if(!won.length)return false;
+  box.classList.toggle('plain',!won.length);
+  box.hidden=!won.length&&!(wins&&wins.length);
+  if(!won.length){
+    if(box.hidden)return false;
+    box.textContent='';
+    const tx=document.createElement('div');tx.className='bwt';
+    const lb=document.createElement('span');lb.className='lbl';lb.textContent='New best tempo';
+    const p=document.createElement('span');p.className='sent';p.textContent=wins.join(' · ').replace(/^New best tempo: /,'');
+    tx.append(lb,p);box.appendChild(tx);
+    return true;
+  }
   const w=won[0],b=BADGES.find(x=>x.id===w.id),n=b.at.length,t=tierOf(w.i,n),next=b.at[w.i+1];
   box.textContent='';
   const med=medal(b,w.i,true);
@@ -4686,6 +4688,7 @@ function renderUnlocked(L){
   const tr=document.createElement('span');tr.className='tier';tr.textContent=MTIER[t]+' · step '+(w.i+1)+' of '+n;
   const p=document.createElement('span');p.className='sent';p.textContent=fmtBadge(b,b.at[w.i])+'.'+(won.length>1?' And '+(won.length-1)+' more.':'');
   tx.append(lb,h,tr,p);
+  if(wins&&wins.length){const q=document.createElement('span');q.className='sent';q.textContent=wins.join(' · ')+'.';tx.appendChild(q);}
   box.append(med,tx);
   const nx=document.createElement('div');nx.className='bnx';
   if(next){
