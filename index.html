@@ -162,9 +162,7 @@ body[data-run="1"] .notice{display:none}
 .hand.rest{border:2px dashed var(--line);color:var(--muted);font-size:18px}
 .rowswrap{position:relative}
 #exBox .hint{margin:8px 0 0}
-.rows.pick .prow{cursor:pointer}
-.rows.pick{user-select:none;-webkit-user-select:none}   /* the page scrolls over it; only a finished run's staff scrolls on its own */
-.rows.pick:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.rows:focus-visible{outline:2px solid var(--accent);outline-offset:3px}   /* the staff only shows: the start exercise is chosen in the exercise list */
 .bigcount{position:absolute;inset:0 0 auto 0;height:100%;max-height:260px;z-index:5;display:grid;place-items:center;font:800 var(--t-hero) var(--font-display);font-variant-numeric:tabular-nums;color:var(--accent);background:color-mix(in srgb,var(--bg) 80%,transparent);border-radius:10px;pointer-events:none}   /* the count-in: the hero while it runs */
 .rows{border-radius:10px;--rowh:124px;--nrows:3}
 .staffs{display:grid;gap:2px}
@@ -2636,7 +2634,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.32';                           /* shown beside the title */
+const VERSION='1.5.33';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -3884,7 +3882,6 @@ function buildRow(plan,g,w){
   const st=buildStaff(sg,w,undefined,undefined,dyn),cards=st.cards;
   cards.forEach((c,i)=>{c._slot=plan.cells[sg.cell0+pa.p*N+i].slot;});
   el.append(lab,st.svg);
-  if(!w)el.addEventListener('click',()=>{if(labelMode==='preview')goExercise(sg.idx,true);});
   return {el:el,lab:lab,cards:cards,sg:sg,si:pa.si,p:pa.p};
 }
 /* The row that will slide in next is built a moment after each shift, so building it never lands on the shift itself. */
@@ -4169,7 +4166,6 @@ function previewRows(animate){
     setRows(prevPlan,0,false);
   }
   paintRows(null,null);
-  $('rows').classList.toggle('pick',labelMode==='preview'&&!!prevPlan);
   const n=routineParsed.exercises.length;
 }
 /* Move the start exercise (routine mode, before a run). */
@@ -7004,11 +7000,6 @@ function wire(){
   $('recImport').addEventListener('click',()=>$('recFile').click());
   $('recFile').addEventListener('change',async e=>{await importRecs(e.target.files&&e.target.files[0]);e.target.value='';});
   $('recClear').addEventListener('click',openClear);
-  $('rows').addEventListener('keydown',e=>{
-    if(labelMode!=='preview'||S.mode!=='routine')return;
-    if(e.key==='ArrowDown'){e.preventDefault();goExercise(S.startExercise+1,true);}
-    else if(e.key==='ArrowUp'){e.preventDefault();goExercise(S.startExercise-1,true);}
-  });
   $('restartBtn').addEventListener('click',restartRun);
   $('stopBtn').addEventListener('click',()=>{if(run&&!run.ended)stopRun();});
   $('settle').addEventListener('input',e=>{S.settle=+e.target.value;$('settleOut').textContent=S.settle+' ms';pushDet();save();});
