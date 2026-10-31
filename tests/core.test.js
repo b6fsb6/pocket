@@ -203,3 +203,12 @@ test('an off-time stroke takes the streak back two steps, and a miss resets it',
   assert.equal(t('oob', 'half') + 10, t('oobo', 'half'), 'after an off-time stroke at streak 2 the next stroke starts again');
   assert.equal(t('ooobo', 'half'), 53, 'at streak 3 it keeps one step: 10 + 12.5 + 15 + 3 + 12.5');
 });
+
+test('the longest clean run counts strokes, so a short routine counts too', () => {
+  const ex = (due, within) => ({ k: 'e' + due + within, due, within, q: 'o'.repeat(within) + 'b'.repeat(due - within) });
+  const run = (...xs) => ({ id: 'r' + xs.join(), t: 1, lv: 'half', bpm: 60, sec: 20, ne: xs.length, exercises: xs.map(([d, w]) => ex(d, w)) });
+  assert.equal(c.badgeValues([run([32, 32], [32, 30])], c.newSum()).cln, 64, 'a 20-second routine with every exercise at 90% or more counts its 64 strokes');
+  assert.equal(c.badgeValues([run([32, 32], [32, 20])], c.newSum()).cln, 0, 'one exercise under 90% and the run is not clean');
+  const sum = c.newSum(); sum.cs = 3000;
+  assert.equal(c.badgeValues([run([32, 32], [32, 32])], sum).cln, 3000, 'an older folded best still stands');
+});
