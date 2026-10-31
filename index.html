@@ -319,6 +319,7 @@ svg.spark{display:block;overflow:visible}
 .pv[hidden]{display:none}
 #pvHist section{display:grid;gap:14px}
 #recMsg.flash{color:var(--ink);font-weight:700}
+.sortrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 6px;font:600 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)} .sortrow .seg{margin:0;letter-spacing:0;text-transform:none}
 .seg{display:inline-flex;width:fit-content;justify-self:start;align-self:flex-start;margin:4px 8px 10px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);vertical-align:top}
 .seg button{background:none;border:0;border-left:1px solid var(--line);color:var(--muted);min-height:40px;padding:0 16px;font:700 13px var(--font-body);cursor:pointer}
 .seg button:first-child{border-left:0}
@@ -1104,7 +1105,7 @@ button.pill.warn{color:var(--accent);border-color:var(--accent)}
         <li><b>Play:</b> tempo, click level, Start, Pause, Restart and Stop, the notation, the lead/drag gauge and your results.</li>
         <li><b>Library:</b> your saved routines, each with Edit and Play. <b>New</b> starts a routine, <b>Import</b> adds one from a file or a link, and <b>Export</b> saves the whole library as one file that Import reads back (it can also be hosted as a library). A title such as "Rudiment: Single stroke roll" groups the routine under Rudiment. Routines with no group go under Other. The ⋮ on a routine has Download and Delete. Delete asks for a second tap, and Undo follows. The chevron opens a routine to show its exercises.</li>
         <li><b>An unsaved routine</b> is what you are working on. It is kept as you type, but a saved routine changes only when you press Save. The app asks before you open another routine and lose unsaved work. The editor opens full screen from Edit, and Back returns you.</li>
-        <li><b>Progress:</b> <b>History</b> lists your runs by exercise or routine, with Play. <b>Scores</b> shows each exercise (weakest first) and each routine: tempo, accuracy, trend, lead or drag, and evenness. <b>Achievements</b> shows your practice days for the last four weeks, a streak that forgives one rest day a week, and badges.</li>
+        <li><b>Progress:</b> <b>History</b> lists your runs by exercise or routine, with Play. <b>Scores</b> shows each exercise (sorted by accuracy) and each routine: tempo, accuracy, trend, lead or drag, and evenness. <b>Achievements</b> shows your practice days for the last four weeks, a streak that forgives one rest day a week, and badges.</li>
         <li><b>Settings:</b> <b>Preferences</b> (on-time window, visual pulse, click volume, colours), <b>Device</b> (input, microphone level, stick calibration, latency) and <b>Data</b> (export, import, clear, storage, library links).</li>
       </ul>
     </section>
@@ -1291,7 +1292,7 @@ RLRR LRLL RLRR LRLL</pre>
         <li><b>Exercise table:</b> after a routine run, each exercise gets its accuracy, average error and spread, plus your earlier best at that tempo.</li>
         <li><b>The target is 90%.</b> An exercise is "cleared" at a tempo when it reaches 90% there. After a run the app names the weak exercises and suggests staying at that tempo until they settle. Any tempo is always allowed.</li>
         <li><b>Discard this run</b> removes it from your records, for example after a bad microphone read.</li>
-        <li><b>Progress page:</b> every exercise, weakest first, with accuracy at your last tempo, trend and lead/drag bias, grouped by click level. Play loads that exercise. A routine is cleared at a tempo when one run covered every exercise and all reached 90%.</li>
+        <li><b>Progress page:</b> every exercise, sorted by accuracy, with accuracy at your last tempo, trend and lead/drag bias, grouped by click level. Play loads that exercise. A routine is cleared at a tempo when one run covered every exercise and all reached 90%.</li>
         <li><b>Practise weak exercises:</b> after a routine run, this plays only the exercises below target. Restart repeats the same ones. A partial run never counts as clearing the routine.</li>
         <li><b>Tempo guidance:</b> each exercise in the start list shows the tempo it has cleared, or "new". The summary shows where the whole routine has been cleared.</li>
         <li><b>Staff of a run:</b> each run keeps the result of every stroke. A run's page has a <b>Staff</b> group showing the notation with each stroke coloured and read out, and the Play page rebuilds its review from the same record.</li>
@@ -2669,7 +2670,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.10';                           /* shown beside the title */
+const VERSION='1.5.11';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -4760,8 +4761,8 @@ function syncData(){
   syncBackup();
 }
 const causeText=(da,dg)=>[da?da+(da===1?' accent':' accents')+' too soft':'',dg?dg+(dg===1?' ghost':' ghosts')+' too loud':''].filter(Boolean).join(', ');
-/* Scores by click level: one row per level, and a level opens to its own page of exercises, weakest first. */
-let scoreLevel=null;
+/* Scores by click level: one row per level, and a level opens to its own page of exercises, sorted by accuracy. */
+let scoreLevel=null,scoreSort='asc';
 function renderScoreGroups(stats,practise,usual){
   const box=$('patGroups');box.textContent='';
   const levels=LEVELS.map(l=>({v:l.v,n:l.n})).concat([...new Set(stats.map(x=>x.lv))].filter(v=>!LEVELS.some(l=>l.v===v)).map(v=>({v:v,n:levelName(v)})));
@@ -4775,7 +4776,7 @@ function renderScoreGroups(stats,practise,usual){
     const rows=stats.filter(x=>x.lv===l.v);
     if(!rows.length)return;
     const weakest=Math.min.apply(null,rows.map(x=>x.recent));
-    panel.appendChild(listRow(l.n,false,rows.length+(rows.length===1?' exercise':' exercises')+' \u00B7 '+clearedN(rows)+' cleared \u00B7 weakest '+Math.round(weakest*100)+'%','',mean(rows.map(x=>x.recent)),()=>{scoreLevel=l.v;pgPush();renderProgress();}));
+    panel.appendChild(listRow(l.n,false,rows.length+(rows.length===1?' exercise':' exercises')+' \u00B7 '+clearedN(rows)+' cleared \u00B7 Lowest accuracy: '+Math.round(weakest*100)+'%','',mean(rows.map(x=>x.recent)),()=>{scoreLevel=l.v;pgPush();renderProgress();}));
   });
   box.appendChild(panel);
   if(!cur)return;
@@ -4800,9 +4801,18 @@ function renderScoreGroups(stats,practise,usual){
     const lg=document.createElement('p');lg.className='tleg';lg.textContent=parts.join(' \u00b7 ');
     wrap.appendChild(bar);wrap.appendChild(lg);
   }
-  const lb=document.createElement('div');lb.className='lbl';lb.textContent='Weakest first';wrap.appendChild(lb);
+  {   /* the order of the list: lowest accuracy first, or highest */
+    const sr=document.createElement('div');sr.className='sortrow';
+    const lb=document.createElement('span');lb.textContent='Sort by accuracy';sr.appendChild(lb);
+    const sg=document.createElement('div');sg.className='seg';sg.setAttribute('role','group');sg.setAttribute('aria-label','Sort by accuracy');
+    [['asc','Ascending'],['desc','Descending']].forEach(([v,n])=>{
+      const b=document.createElement('button');b.type='button';b.textContent=n;b.className=scoreSort===v?'on':'';b.setAttribute('aria-pressed',String(scoreSort===v));
+      b.addEventListener('click',()=>{scoreSort=v;renderProgress();});sg.appendChild(b);
+    });
+    sr.appendChild(sg);wrap.appendChild(sr);
+  }
   const list=document.createElement('div');list.className='slist';
-    rows.forEach(x=>{
+    rows.slice().sort((a,b)=>scoreSort==='asc'?a.recent-b.recent:b.recent-a.recent).forEach(x=>{
       const row=document.createElement('div');row.className='srow';
       const q=document.createElement('div');q.className='sq';
       const seq=document.createElement('span');seq.className='seq';seq.textContent=showKey(x.k);
