@@ -54,7 +54,7 @@ function staticViolations() {
     if (/#[0-9a-f]{3,8}\b|\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(|\b(white|black)\b/i.test(d.value) && !(d.prop.startsWith('--') && inTheme(d)))
       found['raw-colour'].push(sig(d));
     const size = d.prop === 'font-size' ? d.value : d.prop === 'font' ? shorthandSize(d.value) : null;
-    if (size && size !== 'inherit' && !STAFF.test(d.sel) && !SIZES.includes(size) && !isVar(size, 't-')) found['font-size'].push(sig(d));
+    if (size && size !== 'inherit' && !STAFF.test(d.sel) && !SIZES.includes(size) && !isVar(size, 't-')) found['font-size'].push(d.sel + ' { font-size: ' + size + ' }');   /* the size alone, so a change of weight or family is not a new entry */
     if (/^border(-[a-z]+)*-radius$/.test(d.prop) && d.value.split(/[\s/]+/).some(v => !RADII.includes(v) && !isVar(v, 'r-'))) found.radius.push(sig(d));
     if (d.prop === 'letter-spacing' && !TRACKING.includes(short(d.value)) && !isVar(d.value, '')) found['letter-spacing'].push(sig(d));
     for (const m of d.value.matchAll(/var\(\s*--([\w-]+)\s*(,)?/g)) if (!m[2] && !defined.has(m[1])) found['undefined-variable'].push(sig(d));

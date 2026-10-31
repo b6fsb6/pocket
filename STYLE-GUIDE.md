@@ -61,10 +61,10 @@ The dark theme and the `cb` palette must define every token above. Add `--line-s
 
 ## 3. Typography
 
-Load the weights you use. Add Barlow 700 and JetBrains Mono 700, and stop using 800 for anything except Display:
+Use only the weights that are loaded: Barlow 400–700, JetBrains Mono 400 and 600 (capped at 600, so no extra file), Big Shoulders Display 700 and 800. Nothing but Display uses 800.
 
 ```
-family=Barlow:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800&family=JetBrains+Mono:wght@400;600;700
+family=Barlow:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800&family=JetBrains+Mono:wght@400;600
 ```
 
 **Type scale.** Nine steps replace the current 23 sizes. Every `font:` declaration uses one of these tokens.
