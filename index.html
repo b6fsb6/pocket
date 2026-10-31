@@ -63,7 +63,6 @@ body{
 }
 .app{max-width:760px;margin:0 auto;display:grid;gap:12px}
 .app>*{min-width:0}
-header .sub{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
 header .ver{font:600 12px var(--font-data);letter-spacing:.04em;text-transform:none;color:var(--muted);white-space:nowrap;vertical-align:baseline}
 h1{font:800 clamp(26px,7.5vw,40px)/1 var(--font-display);text-transform:uppercase;letter-spacing:.01em;margin:0}
 /* Eyebrow: every small uppercase label. A section label (h3) is ink, with the panel's hairline and gap above; a field label is muted. */
@@ -72,7 +71,8 @@ h3{color:var(--ink);margin:0 0 var(--s-2)}
 .sub{color:var(--muted);font-size:13px;margin:2px 0 0;line-height:1.2}
 /* Header: the title and its buttons, the tagline, then the tab bar. On desktop the tabs join the title's row. */
 header{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"title btns" "sub sub" "tabs tabs";column-gap:var(--s-3);align-items:center}
-header h1{grid-area:title} header .headbtns{grid-area:btns} header .sub{grid-area:sub} header .tabs{grid-area:tabs;margin-top:var(--s-3)}
+header .brand{grid-area:title;display:flex;align-items:baseline;gap:var(--s-2);min-width:0}   /* the name, with the version beside it */
+header .headbtns{grid-area:btns} header .sub{grid-area:sub} header .tabs{grid-area:tabs;margin-top:var(--s-3)}
 :root[data-layout=desktop] header{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"title tabs btns" "sub tabs btns";column-gap:var(--s-6)}
 :root[data-layout=desktop] header .tabs{display:flex;gap:var(--s-5);margin:0;padding:0;background:none;border-radius:0;align-self:end}   /* no trough: natural width, left-aligned, a brass underline */
 :root[data-layout=desktop] .tabs button{min-width:var(--hit);padding:0;border-radius:0;border-bottom:3px solid transparent}
@@ -721,9 +721,9 @@ button[data-armed],.btn[data-armed],.rmenu button[data-armed]{background:var(--d
 <body data-input="mic" data-mode="single" data-tab="pattern" data-state="idle" data-run="0" data-review="0">
 <main class="app">
   <header>
-      <h1>Pocket</h1>
+      <div class="brand"><h1>Pocket</h1><small class="ver" id="ver"></small></div>
       <span class="headbtns"><button class="btn" id="helpBtn" type="button" data-help="help-how">Help</button><button class="btn icon" id="themeBtn" type="button"></button><span class="pill on" id="micPill" role="status" hidden><i id="micDot"></i><span id="micTxt">Mic on</span></span></span>
-    <p class="sub"><span>Go from trailing to nailing the beat</span><small class="ver" id="ver"></small></p>
+    <p class="sub">Go from trailing to nailing the beat</p>
     <nav class="tabs" role="tablist" aria-label="Pages">
       <button type="button" role="tab" id="tabPlay" aria-controls="pagePlay" aria-selected="true">Play</button>
       <button type="button" role="tab" id="tabLibrary" aria-controls="pageLibrary" aria-selected="false">Library</button>
@@ -2642,7 +2642,7 @@ function parseLibrary(text,max){
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const VERSION='1.5.30';                           /* shown beside the title */
+const VERSION='1.5.31';                           /* shown beside the title */
 const KEY='stick-timing-trainer.v1';
 const CAL_N=12;
 const MAX_TEXT=200000;
@@ -7136,12 +7136,6 @@ function init(){
   $('pulse').value=S.pulse?'on':'off';$('palette').value=S.palette;$('layout').value=S.layout;
   syncEach();
   $('ver').textContent='v'+VERSION;
-  /* Line the version up with the right end of the title's longest line, however the title wraps. */
-  const placeVer=()=>{const t=document.querySelector('header .sub'),r=document.createRange();r.selectNodeContents(document.querySelector('header h1'));
-    let m=0;for(const q of r.getClientRects())m=Math.max(m,q.right);
-    t.style.paddingRight='0';const w=t.getBoundingClientRect(),pad=Math.round(w.right-m);
-    if(pad>0&&w.width-pad>=520)t.style.paddingRight=pad+'px';};
-  placeVer();addEventListener('resize',placeVer);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(placeVer);
   renderLibrary();
   $('settle').value=S.settle;$('settleOut').textContent=S.settle+' ms';
   $('sens').value=S.sens;$('sensOut').textContent=S.sens+' dB';placeMeter();
